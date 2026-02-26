@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Verification Queue - Real Estate Wala Bhai</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="loading-animation.css">
+    <script src="loading-animation.js"></script>
+    <script src="app-state.js"></script>
+    <script src="verification-service.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+            min-height: 100vh;
+            color: #ffffff;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .header-title {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #f093fb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 1.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin-top: 0.5rem;
+        }
+
+        .filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.75rem 1.5rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            border-radius: 25px;
+            color: #e2e8f0;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: transparent;
+            color: white;
+        }
+
+        .queue-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .queue-item {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .queue-item:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateX(5px);
+        }
+
+        .queue-item-icon {
+            font-size: 2.5rem;
+        }
+
+        .queue-item-content {
+            flex: 1;
+        }
+
+        .queue-item-userId {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .queue-item-details {
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+
+        .queue-item-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .badge-pending {
+            background: rgba(251, 191, 36, 0.15);
+            color: #f59e0b;
+        }
+
+        .badge-approved {
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
+        }
+
+        .badge-rejected {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 2rem;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #1E293B;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 25px;
+            padding: 2.5rem;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .modal-title {
+            font-size: 1.75rem;
+            font-weight: 800;
+        }
+
+        .modal-close {
+            font-size: 2rem;
+            cursor: pointer;
+            color: #94a3b8;
+        }
+
+        .id-photos {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .id-photo-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 1rem;
+        }
+
+        .id-photo-label {
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .id-photo {
+            width: 100%;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .id-photo:hover {
+            transform: scale(1.05);
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            margin-bottom: 0.75rem;
+        }
+
+        .detail-label {
+            color: #94a3b8;
+        }
+
+        .detail-value {
+            font-weight: 700;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .btn-approve {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+        }
+
+        .btn-approve:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-reject {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .btn-reject:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-cancel {
+            background: rgba(255, 255, 255, 0.08);
+            color: #e2e8f0;
+        }
+
+        .rejection-form {
+            display: none;
+            padding: 1.5rem;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 12px;
+            margin-top: 1.5rem;
+        }
+
+        .rejection-form.active {
+            display: block;
+        }
+
+        .rejection-textarea {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #94a3b8;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="header-title">Verification Queue</h1>
+            <button class="filter-btn" onclick="window.location.href='admin-dashboard.html'">
+                ← Back to Dashboard
+            </button>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats" id="stats">
+            <!-- Populated by JavaScript -->
+        </div>
+
+        <!-- Filters -->
+        <div class="filters">
+            <button class="filter-btn active" onclick="filterQueue('all')">All</button>
+            <button class="filter-btn" onclick="filterQueue('pending')">Pending</button>
+            <button class="filter-btn" onclick="filterQueue('approved')">Approved</button>
+            <button class="filter-btn" onclick="filterQueue('rejected')">Rejected</button>
+        </div>
+
+        <!-- Queue List -->
+        <div class="queue-list" id="queueList">
+            <!-- Populated by JavaScript -->
+        </div>
+    </div>
+
+    <!-- Review Modal -->
+    <div class="modal" id="reviewModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Review Verification</div>
+                <div class="modal-close" onclick="closeModal()">×</div>
+            </div>
+            <div id="modalBody">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentFilter = 'all';
+        let currentReviewUserId = null;
+
+        // Render stats
+        function renderStats() {
+            const all = VerificationService.getAllVerifications();
+            const verifications = Object.values(all);
+            
+            const pending = verifications.filter(v => v.verificationStatus === 'pending').length;
+            const approved = verifications.filter(v => v.verificationStatus === 'approved').length;
+            const rejected = verifications.filter(v => v.verificationStatus === 'rejected').length;
+            
+            document.getElementById('stats').innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-value">${verifications.length}</div>
+                    <div class="stat-label">Total Submissions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" style="color: #f59e0b">${pending}</div>
+                    <div class="stat-label">Pending Review</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" style="color: #22c55e">${approved}</div>
+                    <div class="stat-label">Approved</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" style="color: #ef4444">${rejected}</div>
+                    <div class="stat-label">Rejected</div>
+                </div>
+            `;
+        }
+
+        // Filter queue
+        function filterQueue(filter) {
+            currentFilter = filter;
+            
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            renderQueue();
+        }
+
+        // Render queue
+        function renderQueue() {
+            const all = VerificationService.getAllVerifications();
+            let verifications = Object.entries(all).map(([userId, v]) => ({ userId, ...v }));
+            
+            // Filter
+            if (currentFilter !== 'all') {
+                verifications = verifications.filter(v => v.verificationStatus === currentFilter);
+            }
+            
+            // Sort: pending first
+            verifications.sort((a, b) => {
+                if (a.verificationStatus === 'pending' && b.verificationStatus !== 'pending') return -1;
+                if (a.verificationStatus !== 'pending' && b.verificationStatus === 'pending') return 1;
+                return new Date(b.verificationData.submittedAt) - new Date(a.verificationData.submittedAt);
+            });
+            
+            const queueList = document.getElementById('queueList');
+            
+            if (verifications.length === 0) {
+                queueList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📋</div>
+                        <div>No verifications found</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            queueList.innerHTML = verifications.map(v => {
+                const idTypeIcons = {
+                    aadhaar: '🪪',
+                    pan: '💳',
+                    license: '🚗',
+                    passport: '✈️'
+                };
+                
+                const badgeClass = `badge-${v.verificationStatus}`;
+                const badgeText = v.verificationStatus.charAt(0).toUpperCase() + v.verificationStatus.slice(1);
+                
+                const submittedDate = new Date(v.verificationData.submittedAt).toLocaleDateString();
+                
+                return `
+                    <div class="queue-item" onclick="openReviewModal('${v.userId}')">
+                        <div class="queue-item-icon">${idTypeIcons[v.verificationData.idType] || '📄'}</div>
+                        <div class="queue-item-content">
+                            <div class="queue-item-userId">${v.userId}</div>
+                            <div class="queue-item-details">
+                                ${v.verificationData.idType.toUpperCase()} • 
+                                ${v.verificationData.idNumber} • 
+                                Submitted: ${submittedDate}
+                            </div>
+                        </div>
+                        <div class="queue-item-badge ${badgeClass}">${badgeText}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Open review modal
+        function openReviewModal(userId) {
+            currentReviewUserId = userId;
+            const verification = VerificationService.getUserVerification(userId);
+            
+            if (!verification) return;
+            
+            const idTypes = {
+                aadhaar: 'Aadhaar Card',
+                pan: 'PAN Card',
+                license: 'Driving License',
+                passport: 'Passport'
+            };
+            
+            const submittedDate = new Date(verification.verificationData.submittedAt).toLocaleString();
+            
+            document.getElementById('modalBody').innerHTML = `
+                <div class="detail-row">
+                    <div class="detail-label">User ID</div>
+                    <div class="detail-value">${userId}</div>
+                </div>
+                
+                <div class="detail-row">
+                    <div class="detail-label">ID Type</div>
+                    <div class="detail-value">${idTypes[verification.verificationData.idType]}</div>
+                </div>
+                
+                <div class="detail-row">
+                    <div class="detail-label">ID Number</div>
+                    <div class="detail-value">${verification.verificationData.idNumber}</div>
+                </div>
+                
+                <div class="detail-row">
+                    <div class="detail-label">Submitted</div>
+                    <div class="detail-value">${submittedDate}</div>
+                </div>
+                
+                <div class="detail-row">
+                    <div class="detail-label">Status</div>
+                    <div class="detail-value">${verification.verificationStatus.toUpperCase()}</div>
+                </div>
+                
+                <div class="id-photos">
+                    <div class="id-photo-container">
+                        <div class="id-photo-label">Front Side</div>
+                        <img src="${verification.verificationData.idPhotoFront}" class="id-photo" onclick="window.open(this.src)">
+                    </div>
+                    
+                    ${verification.verificationData.idPhotoBack ? `
+                        <div class="id-photo-container">
+                            <div class="id-photo-label">Back Side</div>
+                            <img src="${verification.verificationData.idPhotoBack}" class="id-photo" onclick="window.open(this.src)">
+                        </div>
+                    ` : ''}
+                </div>
+                
+                ${verification.verificationStatus === 'pending' ? `
+                    <div class="action-buttons">
+                        <button class="btn btn-approve" onclick="approveVerification()">
+                            ✓ Approve
+                        </button>
+                        <button class="btn btn-reject" onclick="showRejectionForm()">
+                            × Reject
+                        </button>
+                    </div>
+                    
+                    <div class="rejection-form" id="rejectionForm">
+                        <div style="font-weight: 700; margin-bottom: 1rem;">Reason for Rejection:</div>
+                        <textarea class="rejection-textarea" id="rejectionReason" placeholder="e.g., Photo is blurry, ID number not visible, etc."></textarea>
+                        <div class="action-buttons">
+                            <button class="btn btn-reject" onclick="rejectVerification()">
+                                Confirm Rejection
+                            </button>
+                            <button class="btn btn-cancel" onclick="hideRejectionForm()">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                ` : ''}
+                
+                ${verification.verificationStatus !== 'pending' ? `
+                    <div class="action-buttons">
+                        <button class="btn btn-cancel" onclick="closeModal()">
+                            Close
+                        </button>
+                    </div>
+                ` : ''}
+            `;
+            
+            document.getElementById('reviewModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('reviewModal').classList.remove('active');
+            currentReviewUserId = null;
+        }
+
+        function showRejectionForm() {
+            document.getElementById('rejectionForm').classList.add('active');
+        }
+
+        function hideRejectionForm() {
+            document.getElementById('rejectionForm').classList.remove('active');
+        }
+
+        async function approveVerification() {
+            if (!currentReviewUserId) return;
+            
+            if (!confirm('Approve this verification?')) return;
+            
+            const adminId = AppState.getUserEmail() || 'admin';
+            const result = await VerificationService.approveVerification(currentReviewUserId, adminId);
+            
+            if (result.success) {
+                alert('✅ Verification approved!');
+                closeModal();
+                renderStats();
+                renderQueue();
+            } else {
+                alert('❌ Failed to approve: ' + result.error);
+            }
+        }
+
+        async function rejectVerification() {
+            if (!currentReviewUserId) return;
+            
+            const reason = document.getElementById('rejectionReason').value.trim();
+            
+            if (!reason) {
+                alert('⚠️ Please provide a reason for rejection');
+                return;
+            }
+            
+            if (!confirm('Reject this verification?')) return;
+            
+            const adminId = AppState.getUserEmail() || 'admin';
+            const result = await VerificationService.rejectVerification(currentReviewUserId, adminId, reason);
+            
+            if (result.success) {
+                alert('❌ Verification rejected');
+                closeModal();
+                renderStats();
+                renderQueue();
+            } else {
+                alert('❌ Failed to reject: ' + result.error);
+            }
+        }
+
+        // Initialize
+        window.addEventListener('load', function() {
+            // Check admin access
+            if (!AppState.isAdmin()) {
+                alert('⚠️ Admin access required');
+                window.location.href = 'admin.html';
+                return;
+            }
+            
+            renderStats();
+            renderQueue();
+        });
+    </script>
+</body>
+</html>

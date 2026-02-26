@@ -1,0 +1,339 @@
+/**
+ * ==========================================
+ * LUXURY ANIMATIONS
+ * Premium Micro-interactions
+ * ==========================================
+ * 
+ * Expensive, intentional animations
+ * Not playful - reassuring and calm
+ */
+
+/* ==================== BUTTON ANIMATIONS ==================== */
+
+.btn-animate {
+    position: relative;
+    overflow: hidden;
+}
+
+/* Scale Down on Click */
+.btn-animate:active {
+    transform: scale(0.97);
+    transition: transform var(--duration-quick) var(--ease-out);
+}
+
+/* Hover Glow */
+.btn-glow:hover {
+    box-shadow: var(--shadow-lg), var(--glow-royal);
+}
+
+/* ==================== CARD ANIMATIONS ==================== */
+
+.card-lift {
+    transition: all var(--duration-normal) var(--ease-gentle);
+}
+
+.card-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+}
+
+/* Gentle Glow on Hover */
+.card-glow:hover {
+    box-shadow: var(--shadow-xl), 0 0 40px rgba(37, 99, 235, 0.08);
+}
+
+/* ==================== PAGE TRANSITIONS ==================== */
+
+.fade-in-up {
+    animation: fadeInUp var(--duration-slow) var(--ease-smooth);
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn var(--duration-normal) var(--ease-smooth);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Staggered Fade In */
+.stagger-1 { animation-delay: 50ms; }
+.stagger-2 { animation-delay: 100ms; }
+.stagger-3 { animation-delay: 150ms; }
+.stagger-4 { animation-delay: 200ms; }
+.stagger-5 { animation-delay: 250ms; }
+.stagger-6 { animation-delay: 300ms; }
+
+/* ==================== HOVER EFFECTS ==================== */
+
+/* Smooth Scale */
+.hover-scale {
+    transition: transform var(--duration-normal) var(--ease-smooth);
+}
+
+.hover-scale:hover {
+    transform: scale(1.02);
+}
+
+/* Image Zoom on Hover */
+.image-zoom {
+    overflow: hidden;
+}
+
+.image-zoom img {
+    transition: transform var(--duration-slow) var(--ease-smooth);
+}
+
+.image-zoom:hover img {
+    transform: scale(1.08);
+}
+
+/* ==================== SUCCESS ANIMATIONS ==================== */
+
+.success-tick {
+    animation: successTick var(--duration-slow) var(--ease-bounce);
+}
+
+@keyframes successTick {
+    0% {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Success Pulse */
+.success-pulse {
+    animation: successPulse 2s var(--ease-smooth) infinite;
+}
+
+@keyframes successPulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 0 8px rgba(34, 197, 94, 0);
+    }
+}
+
+/* ==================== LOADING ANIMATIONS ==================== */
+
+.spinner-luxury {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-top-color: #FFFFFF;
+    border-radius: 50%;
+    animation: spinLuxury 0.8s linear infinite;
+}
+
+@keyframes spinLuxury {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Shimmer Luxury */
+.shimmer-luxury {
+    animation: shimmerLuxury 2s ease-in-out infinite;
+}
+
+@keyframes shimmerLuxury {
+    0%, 100% {
+        opacity: 0.6;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
+/* ==================== FOCUS EFFECTS ==================== */
+
+.focus-ring:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    border-color: var(--royal-600);
+}
+
+.focus-glow:focus {
+    outline: none;
+    box-shadow: var(--glow-royal);
+}
+
+/* ==================== TOOLTIP ANIMATIONS ==================== */
+
+.tooltip-fade {
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: all var(--duration-normal) var(--ease-smooth);
+}
+
+.tooltip-fade.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ==================== MODAL ANIMATIONS ==================== */
+
+.modal-overlay {
+    animation: fadeIn var(--duration-normal) var(--ease-smooth);
+}
+
+.modal-content {
+    animation: modalSlideUp var(--duration-slow) var(--ease-gentle);
+}
+
+@keyframes modalSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(32px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ==================== SKELETON LOADING ==================== */
+
+.skeleton-animate {
+    background: linear-gradient(
+        90deg,
+        var(--gray-200) 25%,
+        var(--gray-100) 50%,
+        var(--gray-200) 75%
+    );
+    background-size: 200% 100%;
+    animation: skeletonWave 1.8s ease-in-out infinite;
+}
+
+@keyframes skeletonWave {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+/* ==================== NOTIFICATION SLIDE ==================== */
+
+.slide-in-right {
+    animation: slideInRight var(--duration-normal) var(--ease-smooth);
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+.slide-out-right {
+    animation: slideOutRight var(--duration-normal) var(--ease-smooth);
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(100%);
+    }
+}
+
+/* ==================== BADGE ANIMATIONS ==================== */
+
+.badge-verified {
+    animation: badgeGlow 2.5s ease-in-out infinite;
+}
+
+@keyframes badgeGlow {
+    0%, 100% {
+        box-shadow: 0 0 12px rgba(212, 175, 55, 0.15);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+    }
+}
+
+/* ==================== LUXURY REVEALS ==================== */
+
+/* Reveal from Bottom */
+.reveal-bottom {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: all var(--duration-slow) var(--ease-smooth);
+}
+
+.reveal-bottom.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Reveal with Scale */
+.reveal-scale {
+    opacity: 0;
+    transform: scale(0.95);
+    transition: all var(--duration-slow) var(--ease-smooth);
+}
+
+.reveal-scale.visible {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* ==================== PREMIUM TRANSITIONS ==================== */
+
+.transition-all {
+    transition: all var(--duration-normal) var(--ease-smooth);
+}
+
+.transition-transform {
+    transition: transform var(--duration-normal) var(--ease-smooth);
+}
+
+.transition-opacity {
+    transition: opacity var(--duration-normal) var(--ease-smooth);
+}
+
+.transition-colors {
+    transition: background-color var(--duration-normal) var(--ease-smooth),
+                color var(--duration-normal) var(--ease-smooth);
+}
+
+/* ==================== REDUCED MOTION ==================== */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

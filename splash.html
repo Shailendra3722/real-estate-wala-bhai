@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real Estate Wala Bhai</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            overflow: hidden;
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #334155 100%);
+            height: 100vh;
+            width: 100vw;
+            position: relative;
+        }
+
+        /* Animated gradient background */
+        .gradient-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, 
+                #667eea 0%, 
+                #764ba2 25%, 
+                #f093fb 50%, 
+                #4facfe 75%, 
+                #00f2fe 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            opacity: 0.15;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Floating particles */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(100px);
+                opacity: 0;
+            }
+        }
+
+        /* Main container */
+        .splash-container {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* Logo/Icon container */
+        .logo-container {
+            position: relative;
+            margin-bottom: 3rem;
+            animation: fadeInScale 1s ease-out;
+        }
+
+        .logo-circle {
+            width: 140px;
+            height: 140px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 
+                0 20px 60px rgba(102, 126, 234, 0.4),
+                0 0 0 10px rgba(102, 126, 234, 0.1),
+                0 0 0 20px rgba(102, 126, 234, 0.05);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .logo-circle::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+            border-radius: 50%;
+            z-index: -1;
+            opacity: 0;
+            animation: borderGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes borderGlow {
+            0%, 100% {
+                opacity: 0;
+            }
+            50% {
+                opacity: 0.8;
+            }
+        }
+
+        .logo-icon {
+            font-size: 4rem;
+            color: white;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* App name */
+        .app-name {
+            text-align: center;
+            margin-bottom: 2rem;
+            animation: fadeInUp 1s ease-out 0.3s both;
+        }
+
+        .app-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+            letter-spacing: -1px;
+            text-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
+        }
+
+        .app-subtitle {
+            font-size: 1.1rem;
+            color: #cbd5e1;
+            font-weight: 300;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* Loading indicator */
+        .loading-container {
+            position: relative;
+            width: 250px;
+            margin-top: 2rem;
+            animation: fadeInUp 1s ease-out 0.6s both;
+        }
+
+        .loading-bar-track {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .loading-bar {
+            height: 100%;
+            background: linear-gradient(90deg, 
+                #667eea 0%, 
+                #764ba2 25%, 
+                #f093fb 50%, 
+                #764ba2 75%, 
+                #667eea 100%);
+            background-size: 200% 100%;
+            border-radius: 10px;
+            animation: loadingProgress 2s ease-in-out infinite;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+        }
+
+        @keyframes loadingProgress {
+            0% {
+                width: 0%;
+                background-position: 0% 50%;
+            }
+            50% {
+                width: 70%;
+                background-position: 100% 50%;
+            }
+            100% {
+                width: 100%;
+                background-position: 0% 50%;
+            }
+        }
+
+        .loading-text {
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #94a3b8;
+            font-weight: 300;
+            animation: pulse-text 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-text {
+            0%, 100% {
+                opacity: 0.6;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .app-title {
+                font-size: 2rem;
+            }
+            
+            .app-subtitle {
+                font-size: 0.9rem;
+            }
+            
+            .logo-circle {
+                width: 110px;
+                height: 110px;
+            }
+            
+            .logo-icon {
+                font-size: 3rem;
+            }
+            
+            .loading-container {
+                width: 200px;
+            }
+        }
+
+        /* Glassmorphism card effect */
+        .glass-card {
+            position: relative;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 4rem 3rem;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: fadeInScale 1s ease-out 0.2s both;
+        }
+
+        @media (max-width: 768px) {
+            .glass-card {
+                padding: 3rem 2rem;
+                margin: 0 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated background -->
+    <div class="gradient-bg"></div>
+    
+    <!-- Floating particles -->
+    <div class="particles" id="particles"></div>
+    
+    <!-- Main splash content -->
+    <div class="splash-container">
+        <div class="glass-card">
+            <!-- Logo -->
+            <div class="logo-container">
+                <div class="logo-circle">
+                    <div class="logo-icon">🏡</div>
+                </div>
+            </div>
+            
+            <!-- App name -->
+            <div class="app-name">
+                <h1 class="app-title">Real Estate<br>Wala Bhai</h1>
+                <p class="app-subtitle">Find property the smart way</p>
+            </div>
+            
+            <!-- Loading indicator -->
+            <div class="loading-container">
+                <div class="loading-bar-track">
+                    <div class="loading-bar"></div>
+                </div>
+                <p class="loading-text">Getting things ready for you…</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Create floating particles
+        const particlesContainer = document.getElementById('particles');
+        const particleCount = 30;
+
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            
+            // Random starting position
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.top = Math.random() * 100 + '%';
+            
+            // Random animation delay and duration
+            particle.style.animationDelay = Math.random() * 20 + 's';
+            particle.style.animationDuration = (Math.random() * 10 + 15) + 's';
+            
+            // Random size
+            const size = Math.random() * 4 + 2;
+            particle.style.width = size + 'px';
+            particle.style.height = size + 'px';
+            
+            particlesContainer.appendChild(particle);
+        }
+
+        // Auto-redirect after 3 seconds (optional)
+        // setTimeout(() => {
+        //     window.location.href = 'main-app.html';
+        // }, 3000);
+    </script>
+</body>
+</html>

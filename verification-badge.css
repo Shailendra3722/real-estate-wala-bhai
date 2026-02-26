@@ -1,0 +1,341 @@
+/* ==========================================
+   VERIFICATION BADGE SYSTEM - STYLES
+   ========================================== */
+/* Premium trust badge for verified users */
+
+/* ==========================================
+   1. VERIFICATION BADGE
+   ========================================== */
+
+.verification-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+    transition: all 0.3s ease;
+    cursor: help;
+    position: relative;
+}
+
+.verification-badge:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+/* Checkmark icon */
+.verification-badge::before {
+    content: "✓";
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    background: white;
+    color: #3b82f6;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+/* Badge text */
+.verification-badge-text {
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: 0.3px;
+}
+
+/* ==========================================
+   2. BADGE VARIANTS (Different States)
+   ========================================== */
+
+/* Verified (default - blue) */
+.verification-badge.verified {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
+/* Pending (yellow) */
+.verification-badge.pending {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+}
+
+.verification-badge.pending::before {
+    content: "⏱";
+    background: white;
+    color: #f59e0b;
+}
+
+/* Rejected (red) */
+.verification-badge.rejected {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+}
+
+.verification-badge.rejected::before {
+    content: "✕";
+    background: white;
+    color: #ef4444;
+}
+
+/* Unverified (gray - rarely shown, mostly missing badge) */
+.verification-badge.unverified {
+    background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+    box-shadow: 0 2px 8px rgba(156, 163, 175, 0.3);
+}
+
+.verification-badge.unverified::before {
+    content: "?";
+    background: white;
+    color: #9ca3af;
+}
+
+/* ==========================================
+   3. BADGE TOOLTIP
+   ========================================== */
+
+.verification-badge-tooltip {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(-4px);
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Tooltip arrow */
+.verification-badge-tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: rgba(0, 0, 0, 0.9);
+}
+
+.verification-badge:hover .verification-badge-tooltip {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* ==========================================
+   4. INLINE BADGE (for property cards)
+   ========================================== */
+
+.property-owner-verified {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.property-owner-name {
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.property-owner-verified .verification-badge {
+    font-size: 11px;
+    padding: 3px 6px;
+}
+
+.property-owner-verified .verification-badge::before {
+    width: 14px;
+    height: 14px;
+    font-size: 10px;
+}
+
+/* ==========================================
+   5. COMPACT BADGE (icon only)
+   ========================================== */
+
+.verification-badge-compact {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+    transition: all 0.3s ease;
+    cursor: help;
+    position: relative;
+}
+
+.verification-badge-compact::before {
+    content: "✓";
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.verification-badge-compact:hover {
+    transform: scale(1.1);
+    box-shadow: 0 3px 10px rgba(59, 130, 246, 0.4);
+}
+
+/* ==========================================
+   6. VERIFICATION STATUS PILL
+   ========================================== */
+
+.verification-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    background: #f3f4f6;
+    color: #6b7280;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.verification-status-pill.verified {
+    background: #eff6ff;
+    color: #2563eb;
+    border-color: #bfdbfe;
+}
+
+.verification-status-pill.pending {
+    background: #fffbeb;
+    color: #d97706;
+    border-color: #fde68a;
+}
+
+.verification-status-pill.rejected {
+    background: #fef2f2;
+    color: #dc2626;
+    border-color: #fecaca;
+}
+
+.verification-status-pill::before {
+    content: "●";
+    font-size: 8px;
+}
+
+.verification-status-pill.verified::before {
+    color: #3b82f6;
+}
+
+.verification-status-pill.pending::before {
+    color: #f59e0b;
+}
+
+.verification-status-pill.rejected::before {
+    color: #ef4444;
+}
+
+/* ==========================================
+   7. CALL-TO-ACTION BANNER
+   ========================================== */
+
+.verification-cta-banner {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 16px 24px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 24px 0;
+    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+}
+
+.verification-cta-content {
+    flex: 1;
+}
+
+.verification-cta-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.verification-cta-subtitle {
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.verification-cta-button {
+    background: white;
+    color: #667eea;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.verification-cta-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+}
+
+/* ==========================================
+   8. MOBILE RESPONSIVE
+   ========================================== */
+
+@media (max-width: 768px) {
+    .verification-badge {
+        font-size: 11px;
+        padding: 3px 6px;
+    }
+    
+    .verification-badge::before {
+        width: 14px;
+        height: 14px;
+        font-size: 10px;
+    }
+    
+    .verification-cta-banner {
+        flex-direction: column;
+        text-align: center;
+        padding: 16px;
+    }
+    
+    .verification-cta-button {
+        width: 100%;
+    }
+}
+
+/* ==========================================
+   9. ACCESSIBILITY
+   ========================================== */
+
+.verification-badge:focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+}
+
+/* Screen reader text */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}

@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Status - Real Estate Wala Bhai</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+            min-height: 100vh;
+            color: #ffffff;
+            padding: 2rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gradient-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            opacity: 0.08;
+            z-index: 0;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            max-width: 550px;
+            width: 100%;
+        }
+
+        .status-card {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            padding: 3rem 2.5rem;
+            backdrop-filter: blur(10px);
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .status-icon {
+            font-size: 5rem;
+            margin-bottom: 1.5rem;
+            animation: scaleIn 0.5s ease-out;
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .status-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+
+        .status-message {
+            font-size: 1.05rem;
+            color: #cbd5e1;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        /* Success status */
+        .status-card.success .status-icon {
+            color: #22c55e;
+        }
+
+        .status-card.success .status-title {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Pending status */
+        .status-card.pending .status-icon {
+            color: #fbbf24;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.1);
+                opacity: 0.8;
+            }
+        }
+
+        .status-card.pending .status-title {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Approved status */
+        .status-card.approved {
+            border-color: rgba(34, 197, 94, 0.3);
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, rgba(22, 163, 74, 0.05) 100%);
+        }
+
+        .status-card.approved .status-icon {
+            color: #22c55e;
+        }
+
+        .status-card.approved .status-title {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Rejected status */
+        .status-card.rejected .status-icon {
+            color: #ef4444;
+        }
+
+        .status-card.rejected .status-title {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Buttons */
+        .status-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 1.1rem 1.5rem;
+            border-radius: 15px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Outfit', sans-serif;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-2px);
+        }
+
+        /* Toggle buttons to switch between status views */
+        .demo-controls {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .demo-btn {
+            padding: 0.75rem 1.25rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            color: #cbd5e1;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 0 0.5rem;
+            transition: all 0.3s ease;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .demo-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .demo-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: #667eea;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 640px) {
+            .status-card {
+                padding: 2.5rem 2rem;
+            }
+
+            .status-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="gradient-bg"></div>
+
+    <div class="container">
+        <!-- Demo controls -->
+        <div class="demo-controls">
+            <button class="demo-btn active" onclick="showStatus('submitted')">Submitted</button>
+            <button class="demo-btn" onclick="showStatus('pending')">Pending</button>
+            <button class="demo-btn" onclick="showStatus('approved')">Approved</button>
+            <button class="demo-btn" onclick="showStatus('rejected')">Rejected</button>
+        </div>
+
+        <!-- After Submission -->
+        <div class="status-card success" id="status-submitted">
+            <div class="status-icon">✅</div>
+            <h1 class="status-title">Submission Received!</h1>
+            <p class="status-message">Your property has been submitted for review</p>
+            <div class="status-actions">
+                <button class="btn btn-primary" onclick="goHome()">Go to Home</button>
+                <button class="btn btn-secondary" onclick="viewProperty()">View Property</button>
+            </div>
+        </div>
+
+        <!-- Pending Status -->
+        <div class="status-card pending hidden" id="status-pending">
+            <div class="status-icon">⏳</div>
+            <h1 class="status-title">Under Review</h1>
+            <p class="status-message">Your property is currently being reviewed by our team. This usually takes 24-48 hours.</p>
+            <div class="status-actions">
+                <button class="btn btn-primary" onclick="goHome()">Go to Home</button>
+            </div>
+        </div>
+
+        <!-- Approved Status -->
+        <div class="status-card approved hidden" id="status-approved">
+            <div class="status-icon">🎉</div>
+            <h1 class="status-title">Congratulations!</h1>
+            <p class="status-message">Your property is now live 🎉</p>
+            <div class="status-actions">
+                <button class="btn btn-primary" onclick="viewListing()">View Live Listing</button>
+                <button class="btn btn-secondary" onclick="goHome()">Go to Home</button>
+            </div>
+        </div>
+
+        <!-- Rejected Message -->
+        <div class="status-card rejected hidden" id="status-rejected">
+            <div class="status-icon">❌</div>
+            <h1 class="status-title">Review Required</h1>
+            <p class="status-message">Please update details and resubmit</p>
+            <div class="status-actions">
+                <button class="btn btn-primary" onclick="updateProperty()">Update Details</button>
+                <button class="btn btn-secondary" onclick="contactSupport()">Contact Support</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showStatus(status) {
+            // Hide all status cards
+            document.querySelectorAll('.status-card').forEach(card => {
+                card.classList.add('hidden');
+            });
+
+            // Remove active from all buttons
+            document.querySelectorAll('.demo-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected status
+            document.getElementById('status-' + status).classList.remove('hidden');
+
+            // Highlight active button
+            event.target.classList.add('active');
+        }
+
+        function goHome() {
+            alert('Navigating to home...');
+        }
+
+        function viewProperty() {
+            alert('Opening property details...');
+        }
+
+        function viewListing() {
+            alert('Opening live property listing...');
+        }
+
+        function updateProperty() {
+            alert('Opening property edit form...');
+        }
+
+        function contactSupport() {
+            alert('Opening support chat...');
+        }
+    </script>
+</body>
+</html>

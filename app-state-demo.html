@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App State Demo - Real Estate Wala Bhai</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+            min-height: 100vh;
+            color: #ffffff;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2rem;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #cbd5e1;
+            font-size: 0.9rem;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            color: #ffffff;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            margin-right: 0.5rem;
+            margin-top: 0.5rem;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        button.secondary {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .state-display {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            margin-top: 1rem;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+
+        .status.success {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .status.error {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .status.info {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+        }
+    </style>
+</head>
+<body>
+    <!-- Include the app state module -->
+    <script src="app-state.js"></script>
+
+    <div class="container">
+        <h1>🏡 App State Management Demo</h1>
+
+        <!-- User Management Section -->
+        <div class="section">
+            <h2 class="section-title">👤 User Management</h2>
+            
+            <div class="form-group">
+                <label>User Name</label>
+                <input type="text" id="userName" placeholder="Enter user name">
+            </div>
+            
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="userEmail" placeholder="Enter email">
+            </div>
+            
+            <div class="form-group">
+                <label>Phone</label>
+                <input type="tel" id="userPhone" placeholder="Enter phone number">
+            </div>
+
+            <button onclick="loginUser()">Login User</button>
+            <button class="secondary" onclick="logoutUser()">Logout</button>
+            <button class="secondary" onclick="checkLoginStatus()">Check Login Status</button>
+
+            <div id="loginStatus"></div>
+        </div>
+
+        <!-- Role Management Section -->
+        <div class="section">
+            <h2 class="section-title">🎭 Role Management</h2>
+            
+            <div class="form-group">
+                <label>Select Role</label>
+                <select id="userRole">
+                    <option value="">Select a role</option>
+                    <option value="buyer">Buyer</option>
+                    <option value="owner">Owner</option>
+                    <option value="admin">Admin</option>
+                </select>
+            </div>
+
+            <button onclick="setUserRole()">Set Role</button>
+            <button class="secondary" onclick="checkRole()">Check Current Role</button>
+            <button class="secondary" onclick="checkPermissions()">Check Permissions</button>
+
+            <div id="roleStatus"></div>
+        </div>
+
+        <!-- Property Management Section -->
+        <div class="section">
+            <h2 class="section-title">🏠 Property Management</h2>
+            
+            <div class="form-group">
+                <label>Property ID</label>
+                <input type="text" id="propertyId" placeholder="Enter property ID">
+            </div>
+
+            <button onclick="selectProperty()">Select Property</button>
+            <button class="secondary" onclick="clearProperty()">Clear Property</button>
+            <button class="secondary" onclick="getSelectedProperty()">Get Selected Property</button>
+
+            <div id="propertyStatus"></div>
+        </div>
+
+        <!-- Current State Display -->
+        <div class="section">
+            <h2 class="section-title">📊 Current App State</h2>
+            <button onclick="refreshState()">Refresh State</button>
+            <button class="secondary" onclick="clearAllState()">Clear All State</button>
+            <button class="secondary" onclick="AppState.debugState()">Debug to Console</button>
+            
+            <div class="state-display" id="stateDisplay">
+                Click "Refresh State" to see current state
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== USER MANAGEMENT ====================
+        
+        function loginUser() {
+            const name = document.getElementById('userName').value;
+            const email = document.getElementById('userEmail').value;
+            const phone = document.getElementById('userPhone').value;
+
+            if (!name || !email || !phone) {
+                showStatus('loginStatus', 'Please fill all fields', 'error');
+                return;
+            }
+
+            const userData = {
+                id: 'user_' + Date.now(),
+                name: name,
+                email: email,
+                phone: phone,
+                avatar: null
+            };
+
+            AppState.setUser(userData);
+            AppState.setAuthToken('token_' + Date.now());
+            
+            showStatus('loginStatus', `User logged in: ${name}`, 'success');
+            refreshState();
+        }
+
+        function logoutUser() {
+            AppState.clearUser();
+            showStatus('loginStatus', 'User logged out', 'info');
+            refreshState();
+        }
+
+        function checkLoginStatus() {
+            const isLoggedIn = AppState.isLoggedIn();
+            const user = AppState.getUser();
+            
+            if (isLoggedIn && user) {
+                showStatus('loginStatus', `Logged in as: ${user.name}`, 'success');
+            } else {
+                showStatus('loginStatus', 'Not logged in', 'error');
+            }
+        }
+
+        // ==================== ROLE MANAGEMENT ====================
+        
+        function setUserRole() {
+            const role = document.getElementById('userRole').value;
+            
+            if (!role) {
+                showStatus('roleStatus', 'Please select a role', 'error');
+                return;
+            }
+
+            AppState.setRole(role);
+            showStatus('roleStatus', `Role set to: ${role}`, 'success');
+            refreshState();
+        }
+
+        function checkRole() {
+            const role = AppState.getRole();
+            
+            if (role) {
+                showStatus('roleStatus', `Current role: ${role}`, 'info');
+            } else {
+                showStatus('roleStatus', 'No role set', 'error');
+            }
+        }
+
+        function checkPermissions() {
+            const canAdd = AppState.canAddProperty();
+            const canView = AppState.canViewProperty();
+            const isBuyer = AppState.isBuyer();
+            const isOwner = AppState.isOwner();
+            
+            const permissions = `
+                Can Add Property: ${canAdd ? '✅' : '❌'}<br>
+                Can View Property: ${canView ? '✅' : '❌'}<br>
+                Is Buyer: ${isBuyer ? '✅' : '❌'}<br>
+                Is Owner: ${isOwner ? '✅' : '❌'}
+            `;
+            
+            document.getElementById('roleStatus').innerHTML = `
+                <div class="status info">${permissions}</div>
+            `;
+        }
+
+        // ==================== PROPERTY MANAGEMENT ====================
+        
+        function selectProperty() {
+            const propertyId = document.getElementById('propertyId').value;
+            
+            if (!propertyId) {
+                showStatus('propertyStatus', 'Please enter a property ID', 'error');
+                return;
+            }
+
+            AppState.setPropertyId(propertyId);
+            showStatus('propertyStatus', `Property selected: ${propertyId}`, 'success');
+            refreshState();
+        }
+
+        function clearProperty() {
+            AppState.clearPropertyId();
+            showStatus('propertyStatus', 'Property selection cleared', 'info');
+            refreshState();
+        }
+
+        function getSelectedProperty() {
+            const propertyId = AppState.getPropertyId();
+            
+            if (propertyId) {
+                showStatus('propertyStatus', `Selected property: ${propertyId}`, 'info');
+            } else {
+                showStatus('propertyStatus', 'No property selected', 'error');
+            }
+        }
+
+        // ==================== STATE DISPLAY ====================
+        
+        function refreshState() {
+            const state = AppState.getState();
+            document.getElementById('stateDisplay').textContent = JSON.stringify(state, null, 2);
+        }
+
+        function clearAllState() {
+            if (confirm('Are you sure you want to clear all app state?')) {
+                AppState.clearAll();
+                showStatus('loginStatus', 'All state cleared', 'info');
+                showStatus('roleStatus', 'All state cleared', 'info');
+                showStatus('propertyStatus', 'All state cleared', 'info');
+                refreshState();
+            }
+        }
+
+        // ==================== UTILITY ====================
+        
+        function showStatus(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+
+        // ==================== EVENT LISTENERS ====================
+        
+        // Listen to state changes
+        AppState.on('userChanged', (user) => {
+            console.log('User changed event:', user);
+        });
+
+        AppState.on('roleChanged', (role) => {
+            console.log('Role changed event:', role);
+        });
+
+        AppState.on('propertyChanged', (id) => {
+            console.log('Property changed event:', id);
+        });
+
+        // Initialize
+        window.addEventListener('DOMContentLoaded', () => {
+            refreshState();
+            
+            // Pre-fill with current data if exists
+            const user = AppState.getUser();
+            if (user) {
+                document.getElementById('userName').value = user.name || '';
+                document.getElementById('userEmail').value = user.email || '';
+                document.getElementById('userPhone').value = user.phone || '';
+            }
+            
+            const role = AppState.getRole();
+            if (role) {
+                document.getElementById('userRole').value = role;
+            }
+            
+            const propertyId = AppState.getPropertyId();
+            if (propertyId) {
+                document.getElementById('propertyId').value = propertyId;
+            }
+        });
+    </script>
+</body>
+</html>

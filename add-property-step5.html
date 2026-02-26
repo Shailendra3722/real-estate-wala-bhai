@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Property - Step 5 - Real Estate Wala Bhai</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="form-styles.css">
+    <script src="app-state.js"></script>
+    <script src="form-utils.js"></script>
+</head>
+<body>
+    <div class="gradient-bg"></div>
+    
+    <div class="container">
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 83%"></div>
+            </div>
+            <div class="progress-text">Step 5 of 6 (83%)</div>
+        </div>
+
+        <!-- Form Card -->
+        <div class="form-card">
+            <h1 class="form-title">Contact Information</h1>
+            <p class="form-subtitle">संपर्क जानकारी</p>
+
+            <form id="step5Form">
+                  <!-- Name -->
+                <div class="form-group">
+                    <label class="form-label" for="name">
+                        Your Name / आपका नाम
+                    </label>
+                    <input type="text" 
+                           class="form-input" 
+                           id="name" 
+                           name="name" 
+                           placeholder="e.g., Rajesh Kumar"
+                           required>
+                </div>
+
+                <!-- Phone -->
+                <div class="form-group">
+                    <label class="form-label" for="phone">
+                        Mobile Number / मोबाइल नंबर
+                        <div class="form-label-subtitle">Buyers will contact you on this number</div>
+                    </label>
+                    <input type="tel" 
+                           class="form-input" 
+                           id="phone" 
+                           name="phone" 
+                           placeholder="e.g., 9876543210"
+                           maxlength="10"
+                           pattern="[0-9]{10}"
+                           required>
+                </div>
+
+                <!-- Email (Optional) -->
+                <div class="form-group">
+                    <label class="form-label" for="email">
+                        Email (Optional) / ईमेल (वैकल्पिक)
+                    </label>
+                    <input type="email" 
+                           class="form-input" 
+                           id="email" 
+                           name="email" 
+                           placeholder="e.g., rajesh@example.com">
+                </div>
+
+                <!-- Preferred Contact Method -->
+                <div class="form-group">
+                    <label class="form-label">
+                        How should buyers contact you? / खरीदार आपसे कैसे संपर्क करें?
+                    </label>
+                    
+                    <div class="option-group">
+                        <div class="option-card">
+                            <input type="radio" name="contactMethod" value="call" id="contactCall" class="option-input" required>
+                            <label for="contactCall" class="option-label">
+                                <div class="option-icon">📞</div>
+                                <div class="option-title">Phone Call</div>
+                                <div class="option-desc">फोन कॉल</div>
+                            </label>
+                        </div>
+
+                        <div class="option-card">
+                            <input type="radio" name="contactMethod" value="whatsapp" id="contactWhatsApp" class="option-input" required>
+                            <label for="contactWhatsApp" class="option-label">
+                                <div class="option-icon">💬</div>
+                                <div class="option-title">WhatsApp</div>
+                                <div class="option-desc">व्हाट्सएप</div>
+                            </label>
+                        </div>
+
+                        <div class="option-card">
+                            <input type="radio" name="contactMethod" value="both" id="contactBoth" class="option-input" required>
+                            <label for="contactBoth" class="option-label">
+                                <div class="option-icon">📱</div>
+                                <div class="option-title">Both</div>
+                                <div class="option-desc">दोनों</div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Available for visits -->
+                <div class="form-group">
+                    <label class="form-label">
+                        When are you available for property visits? / आप कब घर दिखाने के लिए उपलब्ध हैं?
+                    </label>
+                    
+                    <div class="option-group">
+                        <div class="option-card">
+                            <input type="radio" name="availability" value="weekdays" id="availWeekdays" class="option-input" required>
+                            <label for="availWeekdays" class="option-label">
+                                <div class="option-icon">📅</div>
+                                <div class="option-title">Weekdays</div>
+                                <div class="option-desc">सोमवार-शुक्रवार</div>
+                            </label>
+                        </div>
+
+                        <div class="option-card">
+                            <input type="radio" name="availability" value="weekends" id="availWeekends" class="option-input" required>
+                            <label for="availWeekends" class="option-label">
+                                <div class="option-icon">🏖️</div>
+                                <div class="option-title">Weekends</div>
+                                <div class="option-desc">शनिवार-रविवार</div>
+                            </label>
+                        </div>
+
+                        <div class="option-card">
+                            <input type="radio" name="availability" value="anytime" id="availAnytime" class="option-input" required>
+                            <label for="availAnytime" class="option-label">
+                                <div class="option-icon">🕐</div>
+                                <div class="option-title">Anytime</div>
+                                <div class="option-desc">कभी भी</div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Help Text -->
+                <div class="help-text">
+                    <div class="help-icon">💡</div>
+                    <div class="help-content">
+                        <div class="help-title">Tip / सुझाव</div>
+                        <div class="help-desc">
+                            Quick responses to buyers help close deals faster!
+                            <br>खरीदारों को जल्दी जवाब देने से सौदे जल्दी होते हैं!
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <div class="form-navigation">
+                    <button type="button" class="btn btn-back" onclick="FormUtils.previousStep()">
+                        ← Back / पीछे
+                    </button>
+                    <button type="button" class="btn btn-next" onclick="FormUtils.nextStep()">
+                        Preview / पूर्वावलोकन →
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

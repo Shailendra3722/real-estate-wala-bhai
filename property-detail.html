@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Details - Real Estate Wala Bhai</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="ux-components.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+            min-height: 100vh;
+            color: #ffffff;
+            padding-bottom: 100px;
+        }
+
+        .gradient-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            opacity: 0.08;
+            z-index: 0;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        /* Image Gallery */
+        .image-gallery {
+            width: 100%;
+            height: 300px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 25px;
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gallery-badge {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            padding: 0.6rem 1.2rem;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Section */
+        .section {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 1.75rem;
+            margin-bottom: 1.25rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        /* Overview Section */
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .overview-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.25rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .overview-label {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-bottom: 0.5rem;
+        }
+
+        .overview-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .overview-value.price {
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Location Section */
+        .map-preview {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+            border-radius: 15px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            font-size: 3rem;
+        }
+
+        .location-address {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            color: #cbd5e1;
+            font-size: 1rem;
+        }
+
+        /* EMI Calculator */
+        .calculator-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-label {
+            font-size: 0.9rem;
+            color: #cbd5e1;
+            font-weight: 600;
+        }
+
+        .form-input,
+        .form-select {
+            padding: 1rem 1.25rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            font-size: 0.95rem;
+            color: #ffffff;
+            font-family: 'Outfit', sans-serif;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .form-input::placeholder {
+            color: #64748b;
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-select option {
+            background: #1e293b;
+            color: #ffffff;
+        }
+
+        .helper-text {
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+
+        .emi-result {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .emi-label {
+            font-size: 0.9rem;
+            color: #cbd5e1;
+            margin-bottom: 0.5rem;
+        }
+
+        .emi-amount {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Trust Section */
+        .trust-badges {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .badge {
+            padding: 0.75rem 1.25rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .badge-verified {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(22, 163, 74, 0.2) 100%);
+            border: 1px solid rgba(34, 197, 94, 0.4);
+            color: #86efac;
+        }
+
+        .badge-review {
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.2) 0%, rgba(245, 158, 11, 0.2) 100%);
+            border: 1px solid rgba(251, 191, 36, 0.4);
+            color: #fde047;
+        }
+
+        /* Contact Section */
+        .contact-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .btn {
+            padding: 1.1rem 1.5rem;
+            border-radius: 15px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Outfit', sans-serif;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-whatsapp {
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+            color: #ffffff;
+        }
+
+        .btn-whatsapp:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(37, 211, 102, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-2px);
+        }
+
+        .contact-note {
+            background: rgba(251, 191, 36, 0.1);
+            border: 1px solid rgba(251, 191, 36, 0.2);
+            padding: 1rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            color: #fde047;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        @media (max-width: 640px) {
+            .overview-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .contact-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <!-- Premium Smooth Scroll -->
+    <script src="https://unpkg.com/@studio-freight/lenis@1.0.35/dist/lenis.min.js"></script>
+    <script src="smooth-scroll.js"></script>
+    <!-- Theme Manager -->
+    <script src="theme-manager.js"></script>
+    <!-- Profile Menu -->
+    <script src="profile-menu.js"></script>
+</head>
+<body>
+    <div class="gradient-bg"></div>
+
+    <div class="container">
+        <!-- Image Gallery -->
+        <div class="image-gallery">
+            <div class="gallery-badge" id="gallery-badge">
+                🛡️ Verified Listing
+            </div>
+        </div>
+
+        <!-- 🏷 Overview Section -->
+        <div class="section">
+            <h2 class="section-title">🏷 Property Overview</h2>
+            <div class="overview-grid">
+                <div class="overview-item">
+                    <div class="overview-label">Price</div>
+                    <div class="overview-value price" id="property-price">₹ 30,00,000</div>
+                </div>
+                <div class="overview-item">
+                    <div class="overview-label">Specs</div>
+                    <div class="overview-value" id="property-specs">2 BHK • 900 sqft</div>
+                </div>
+                <div class="overview-item">
+                    <div class="overview-label">Address</div>
+                    <div class="overview-value" id="property-address" style="font-size: 1.1rem;">Alambagh, Lucknow</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 📍 Location Section -->
+        <div class="section">
+            <h2 class="section-title">📍 Property Location</h2>
+            <div class="map-preview">🗺️</div>
+            <div class="location-address">
+                <span>📍</span>
+                <span id="location-address">Alambagh, Lucknow - Easy access to main roads and public transport</span>
+            </div>
+            <button class="btn btn-secondary" style="width: 100%;" onclick="viewFullMap()">View on Full Map</button>
+        </div>
+
+        <!-- 🧮 EMI Calculator -->
+        <div class="section">
+            <h2 class="section-title">🧮 Check Your Monthly EMI</h2>
+            <div class="calculator-form">
+                <div class="form-group">
+                    <label class="form-label">Down Payment</label>
+                    <input 
+                        type="number" 
+                        class="form-input" 
+                        id="downPayment"
+                        placeholder="Enter down payment amount"
+                    >
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Loan Duration</label>
+                    <select class="form-select" id="loanDuration">
+                        <option value="">Select loan duration in years</option>
+                        <option value="5">5 Years</option>
+                        <option value="10">10 Years</option>
+                        <option value="15">15 Years</option>
+                        <option value="20">20 Years</option>
+                        <option value="25">25 Years</option>
+                        <option value="30">30 Years</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" onclick="calculateEMI()">Calculate EMI</button>
+                <div class="emi-result" id="emiResult" style="display: none;">
+                    <div class="emi-label">Estimated EMI: ₹24,500 per month</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🛡 Trust Section -->
+        <div class="section">
+            <h2 class="section-title">🛡️ Trust Section</h2>
+            <div class="trust-badges" id="trust-badges">
+                <div class="badge badge-verified">
+                    <span>✓</span>
+                    <span>Verified Listing</span>
+                </div>
+            </div>
+            <p class="helper-text" id="trust-message">This listing has been reviewed by our team</p>
+        </div>
+
+        <!-- 📞 Contact Section -->
+        <div class="section">
+            <h2 class="section-title">📞 Contact Agent</h2>
+            
+            <!-- Quick Contact Buttons -->
+            <div class="contact-buttons">
+                <button class="btn btn-primary" onclick="callOwner()">
+                    <span>📞</span>
+                    <span>Call Now</span>
+                </button>
+                <button class="btn btn-whatsapp" onclick="chatWhatsApp()">
+                    <span>💬</span>
+                    <span>WhatsApp</span>
+                </button>
+            </div>
+            
+            <!-- Contact Form -->
+            <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+                <h3 style="font-size: 1.1rem; margin-bottom: 1rem; color: #cbd5e1;">Or send a message</h3>
+                
+                <form id="contactForm" onsubmit="submitContactForm(event)">
+                    <div class="form-group">
+                        <label class="form-label">Your Name *</label>
+                        <input 
+                            type="text" 
+                            class="form-input" 
+                            id="contactName"
+                            placeholder="Enter your full name"
+                            required
+                        >
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Phone Number *</label>
+                        <input 
+                            type="tel" 
+                            class="form-input" 
+                            id="contactPhone"
+                            placeholder="Enter your phone number"
+                            pattern="[0-9+\-\s()]+"
+                            required
+                        >
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Email (Optional)</label>
+                        <input 
+                            type="email" 
+                            class="form-input" 
+                            id="contactEmail"
+                            placeholder="Enter your email address"
+                        >
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Message (Optional)</label>
+                        <textarea 
+                            class="form-input" 
+                            id="contactMessage"
+                            placeholder="Any specific questions or requirements?"
+                            rows="3"
+                            style="resize: vertical; min-height: 80px;"
+                        ></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="width: 100%;" id="submitBtn">
+                        <span>📧</span>
+                        <span>Send Message to Agent</span>
+                    </button>
+                </form>
+                
+                <!-- Success/Error Message -->
+                <div id="formMessage" style="display: none; margin-top: 1rem;"></div>
+            </div>
+            
+            <div class="contact-note" style="margin-top: 1rem;">
+                <span>💡</span>
+                <span>The agent will contact you within 24 hours</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Modules -->
+    <script src="api-config.js" onerror="console.log('ℹ️ API config not available, using fallback mode')"></script>
+    <script src="app-state.js"></script>
+    <script src="properties-data.js"></script>
+    <script src="navigation.js"></script>
+    <script src="mock-api.js"></script>
+    <script src="toast.js"></script>
+
+    <script>
+        // ==================== PROPERTY DATA LOADING ====================
+        
+        let currentProperty = null;
+        
+        function loadPropertyDetails() {
+            try {
+                // Try to get property ID from URL first, then fallback to AppState
+                const propertyId = getPropertyIdFromURL() || AppState.getPropertyId();
+                
+                if (!propertyId) {
+                    console.warn('⚠️ No property selected');
+                    handlePropertyNotFound('No property selected');
+                    return;
+                }
+                
+                console.log('🔍 Loading property details for:', propertyId);
+                
+                // Fetch property data
+                currentProperty = PropertiesData.getPropertyById(propertyId);
+                
+                if (!currentProperty) {
+                    console.error('❌ Property not found:', propertyId);
+                    handlePropertyNotFound('Property not found');
+                    return;
+                }
+                
+                console.log('✅ Property data loaded:', currentProperty);
+                
+                // Update URL with property ID (if not already there)
+                updateURLWithPropertyId(propertyId);
+                
+                // Store in AppState for consistency
+                AppState.setPropertyId(propertyId);
+                
+                // Update page title
+                document.title = `${currentProperty.title} - Real Estate Wala Bhai`;
+                
+                // Populate all UI elements
+                populatePropertyInfo(currentProperty);
+                
+            } catch (error) {
+                console.error('❌ Error loading property details:', error);
+                handlePropertyNotFound('Error loading property');
+            }
+        }
+        
+        /**
+         * Get property ID from URL query parameters
+         * Supports: property-detail.html?id=prop_001
+         */
+        function getPropertyIdFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id');
+        }
+        
+        /**
+         * Update URL with property ID without reloading the page
+         */
+        function updateURLWithPropertyId(propertyId) {
+            const currentUrl = new URL(window.location.href);
+            
+            // Only update if ID is not already in URL
+            if (!currentUrl.searchParams.get('id')) {
+                currentUrl.searchParams.set('id', propertyId);
+                window.history.replaceState({}, '', currentUrl);
+                console.log('🔗 URL updated with property ID:', propertyId);
+            }
+        }
+
+        
+        function populatePropertyInfo(property) {
+            // Update Gallery Badge
+            updateVerificationBadge(property.verificationStatus);
+            
+            // Update Property Overview
+            document.getElementById('property-price').textContent = 
+                PropertiesData.formatPrice(property.price, property.listingType);
+            
+            document.getElementById('property-specs').textContent = 
+                `${property.bhk} • ${property.sqft} sqft`;
+            
+            document.getElementById('property-address').textContent = 
+                `${property.area}, ${property.city}`;
+            
+            // Update Location Section
+            const locationText = property.street 
+                ? `${property.street}, ${property.area}, ${property.city}` 
+                : `${property.area}, ${property.city}`;
+            
+            const locationDescription = property.landmark 
+                ? `${locationText} - Near ${property.landmark}` 
+                : `${locationText} - Easy access to main roads and public transport`;
+            
+            document.getElementById('location-address').textContent = locationDescription;
+            
+            // Update Trust Section
+            updateTrustSection(property.verificationStatus);
+            
+            console.log('✅ UI updated with property data');
+        }
+        
+        function updateVerificationBadge(status) {
+            const badge = document.getElementById('gallery-badge');
+            
+            if (status === PropertiesData.VERIFICATION_STATUS.VERIFIED) {
+                badge.innerHTML = '🛡️ Verified Listing';
+                badge.style.background = 'rgba(34, 197, 94, 0.8)';
+            } else if (status === PropertiesData.VERIFICATION_STATUS.UNDER_REVIEW || 
+                       status === PropertiesData.VERIFICATION_STATUS.PENDING) {
+                badge.innerHTML = '⏳ Under Review';
+                badge.style.background = 'rgba(251, 191, 36, 0.8)';
+            } else {
+                badge.innerHTML = '📋 Listing';
+                badge.style.background = 'rgba(0, 0, 0, 0.7)';
+            }
+        }
+        
+        function updateTrustSection(status) {
+            const trustBadges = document.getElementById('trust-badges');
+            const trustMessage = document.getElementById('trust-message');
+            
+            if (status === PropertiesData.VERIFICATION_STATUS.VERIFIED) {
+                trustBadges.innerHTML = `
+                    <div class="badge badge-verified">
+                        <span>✓</span>
+                        <span>Verified Listing</span>
+                    </div>
+                `;
+                trustMessage.textContent = 'This listing has been reviewed and verified by our team';
+            } else if (status === PropertiesData.VERIFICATION_STATUS.UNDER_REVIEW) {
+                trustBadges.innerHTML = `
+                    <div class="badge badge-review">
+                        <span>⏳</span>
+                        <span>Verification in progress</span>
+                    </div>
+                `;
+                trustMessage.textContent = 'This listing is currently under review by our team';
+            } else if (status === PropertiesData.VERIFICATION_STATUS.PENDING) {
+                trustBadges.innerHTML = `
+                    <div class="badge badge-review">
+                        <span>⏳</span>
+                        <span>Pending Verification</span>
+                    </div>
+                `;
+                trustMessage.textContent = 'This listing is awaiting verification';
+            } else {
+                trustBadges.innerHTML = '';
+                trustMessage.textContent = 'Listing information';
+            }
+        }
+        
+        
+        function handlePropertyNotFound(message) {
+            console.error('❌', message);
+            
+            // Show error message in the UI instead of alert
+            const container = document.querySelector('.container');
+            container.innerHTML = `
+                <div class="section" style="text-align: center; padding: 3rem;">
+                    <div style="font-size: 4rem; margin-bottom: 1rem;">🏠❌</div>
+                    <h2 style="font-size: 1.8rem; margin-bottom: 1rem;">Property Not Found</h2>
+                    <p style="color: #94a3b8; margin-bottom: 2rem;">${message}</p>
+                    <button class="btn btn-primary" onclick="window.location.href='home.html'">
+                        ← Back to Home
+                    </button>
+                </div>
+            `;
+            
+            // Redirect after 3 seconds
+            setTimeout(() => {
+                window.location.href = 'home.html';
+            }, 3000);
+        }
+
+        
+        // Load property details when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📄 Property detail page loaded');
+            loadPropertyDetails();
+        });
+        
+        // ==================== EMI CALCULATOR ====================
+        
+        function calculateEMI() {
+            const downPayment = document.getElementById('downPayment').value;
+            const duration = document.getElementById('loanDuration').value;
+            
+            if (!downPayment || !duration) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            // Show result
+            document.getElementById('emiResult').style.display = 'block';
+            
+            // Use actual property price
+            const propertyPrice = currentProperty ? currentProperty.price : 3000000;
+            const loanAmount = propertyPrice - parseFloat(downPayment);
+            const interestRate = 8.5 / 100 / 12; // Monthly interest rate
+            const months = parseInt(duration) * 12;
+            
+            const emi = (loanAmount * interestRate * Math.pow(1 + interestRate, months)) / 
+                        (Math.pow(1 + interestRate, months) - 1);
+            
+            document.getElementById('emiResult').innerHTML = `
+                <div class="emi-label">Estimated EMI</div>
+                <div class="emi-amount">₹${Math.round(emi).toLocaleString('en-IN')} per month</div>
+            `;
+        }
+
+        function viewFullMap() {
+            if (currentProperty) {
+                Navigation.goToMap(currentProperty.id);
+            } else {
+                Navigation.goToMap();
+            }
+        }
+
+
+        function callOwner() {
+            if (!currentProperty) {
+                console.error('❌ No property loaded');
+                showFormMessage('Property information not available. Please try again.', 'error');
+                return;
+            }
+            
+            if (!currentProperty.ownerPhone) {
+                console.error('❌ Owner phone not available for property:', currentProperty.id);
+                showFormMessage('Owner contact information is not available for this property.', 'error');
+                return;
+            }
+            
+            console.log('📞 Calling owner:', currentProperty.ownerPhone);
+            window.location.href = `tel:${currentProperty.ownerPhone}`;
+        }
+
+        function chatWhatsApp() {
+            if (!currentProperty) {
+                console.error('❌ No property loaded');
+                showFormMessage('Property information not available. Please try again.', 'error');
+                return;
+            }
+            
+            if (!currentProperty.ownerPhone) {
+                console.error('❌ Owner phone not available for property:', currentProperty.id);
+                showFormMessage('Owner contact information is not available for this property.', 'error');
+                return;
+            }
+            
+            const message = encodeURIComponent(`Hi, I'm interested in your property: ${currentProperty.title} listed on Real Estate Wala Bhai`);
+            console.log('💬 Opening WhatsApp for:', currentProperty.ownerPhone);
+            window.open(`https://wa.me/${currentProperty.ownerPhone}?text=${message}`, '_blank');
+        }
+
+        // ==================== CONTACT FORM SUBMISSION ====================
+
+        async function submitContactForm(event) {
+            event.preventDefault();
+            
+            if (!currentProperty) {
+                showFormMessage('Property information not available. Please try again.', 'error');
+                return;
+            }
+            
+            // Get form values
+            const name = document.getElementById('contactName').value.trim();
+            const phone = document.getElementById('contactPhone').value.trim();
+            const email = document.getElementById('contactEmail').value.trim();
+            const message = document.getElementById('contactMessage').value.trim();
+            
+            // Validate required fields
+            if (!name || !phone) {
+                showFormMessage('Please fill in all required fields (Name and Phone)', 'error');
+                return;
+            }
+            
+            // Validate phone number
+            const phoneRegex = /^[0-9+\-\s()]{10,}$/;
+            if (!phoneRegex.test(phone)) {
+                showFormMessage('Please enter a valid phone number (at least 10 digits)', 'error');
+                return;
+            }
+            
+            // Validate email if provided
+            if (email) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    showFormMessage('Please enter a valid email address', 'error');
+                    return;
+                }
+            }
+            
+            console.log('📤 Submitting contact form for property:', currentProperty.id);
+            
+            // Disable submit button and show loading
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.classList.add('btn-loading');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Sending...';
+            
+            try {
+                // Prepare data for backend
+                const contactData = {
+                    propertyId: currentProperty.id,
+                    name: name,
+                    phone: phone,
+                    email: email || null,
+                    message: message || `I'm interested in ${currentProperty.title}`,
+                    contactMethod: 'email'
+                };
+                
+                // Check if API config is available (backend is running)
+                const apiAvailable = typeof ApiConfig !== 'undefined' && typeof ApiConfig.post === 'function';
+                
+                if (apiAvailable) {
+                    // Submit to backend API
+                    console.log('🔄 Sending to backend API...');
+                    try {
+                        const response = await ApiConfig.post(ApiConfig.endpoints.submitContact, contactData);
+                        
+                        if (response.success) {
+                            console.log('✅ Contact form submitted successfully:', response.inquiryId);
+                            
+                            // Show success toast
+                            Toast.success('✅ Message sent successfully! The agent will contact you within 24 hours.');
+                            
+                            // Reset form with success animation
+                            document.getElementById('contactForm').reset();
+                            submitBtn.classList.remove('btn-loading');
+                            submitBtn.classList.add('success-tick');
+                            submitBtn.textContent = '✓ Sent';
+                            
+                            // Reset button after delay
+                            setTimeout(() => {
+                                submitBtn.classList.remove('success-tick');
+                                submitBtn.textContent = originalText;
+                                submitBtn.disabled = false;
+                            }, 2000);
+                        } else {
+                            throw new Error(response.error || 'Submission failed');
+                        }
+                    } catch (error) {
+                        // Backend failed, use MockAPI
+                        console.log('⚠️ Backend API failed, using MockAPI...');
+                        const mockResponse = await MockAPI.submitContact(contactData);
+                        
+                        if (mockResponse.success) {
+                            Toast.success('✅ Message sent successfully! The agent will contact you within 24 hours.');
+                            document.getElementById('contactForm').reset();
+                            submitBtn.classList.remove('btn-loading');
+                            submitBtn.classList.add('success-tick');
+                            submitBtn.textContent = '✓ Sent';
+                            
+                            setTimeout(() => {
+                                submitBtn.classList.remove('success-tick');
+                                submitBtn.textContent = originalText;
+                                submitBtn.disabled = false;
+                            }, 2000);
+                        } else {
+                            throw new Error(mockResponse.error || 'Submission failed');
+                        }
+                    }
+                } else {
+                    // Use MockAPI (client-side simulation)
+                    console.log('🔄 Using MockAPI for contact submission...');
+                    const response = await MockAPI.submitContact(contactData);
+                    
+                    if (response.success) {
+                        console.log('✅ Contact request saved:', response.inquiryId);
+                        
+                        Toast.success(`✅ Message sent! ${response.agentName} will contact you within 24 hours.`);
+                        
+                        // Reset form with success animation
+                        document.getElementById('contactForm').reset();
+                        submitBtn.classList.remove('btn-loading');
+                        submitBtn.classList.add('success-tick');
+                        submitBtn.textContent = '✓ Sent';
+                        
+                        setTimeout(() => {
+                            submitBtn.classList.remove('success-tick');
+                            submitBtn.textContent = originalText;
+                            submitBtn.disabled = false;
+                        }, 2000);
+                    } else {
+                        throw new Error(response.error || 'Submission failed');
+                    }
+                }
+                
+            } catch (error) {
+                console.error('❌ Error submitting contact form:', error);
+                
+                Toast.error('❌ Failed to send message. Please try again or contact us directly.');
+                
+                // Reset button to original state
+                submitBtn.classList.remove('btn-loading');
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
+        }
+
+        /**
+         * Show success or error message to user
+         * @param {string} message - Message to display
+         * @param {string} type - 'success' or 'error'
+         */
+        function showFormMessage(message, type = 'info') {
+            const messageDiv = document.getElementById('formMessage');
+            
+            // Set message content and style
+            messageDiv.textContent = message;
+            messageDiv.style.display = 'block';
+            messageDiv.style.padding = '1rem 1.25rem';
+            messageDiv.style.borderRadius = '12px';
+            messageDiv.style.fontSize = '0.95rem';
+            messageDiv.style.fontWeight = '600';
+            messageDiv.style.textAlign = 'center';
+            
+            if (type === 'success') {
+                messageDiv.style.background = 'linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(22, 163, 74, 0.2) 100%)';
+                messageDiv.style.border = '1px solid rgba(34, 197, 94, 0.4)';
+                messageDiv.style.color = '#86efac';
+            } else if (type === 'error') {
+                messageDiv.style.background = 'linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(220, 38, 38, 0.2) 100%)';
+                messageDiv.style.border = '1px solid rgba(239, 68, 68, 0.4)';
+                messageDiv.style.color = '#fca5a5';
+            } else {
+                messageDiv.style.background = 'rgba(59, 130, 246, 0.2)';
+                messageDiv.style.border = '1px solid rgba(59, 130, 246, 0.4)';
+                messageDiv.style.color = '#93c5fd';
+            }
+            
+            // Scroll to message
+            messageDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            
+            // Auto-hide after 8 seconds
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 8000);
+        }
+
+    </script>
+</body>
+</html>

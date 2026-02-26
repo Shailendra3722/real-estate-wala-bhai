@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Property - Step 6 - Real Estate Wala Bhai</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="form-styles.css">
+    <script src="app-state.js"></script>
+    <script src="api-config.js"></script>
+    <script src="properties-data-api.js"></script>
+    <script src="form-utils.js"></script>
+    <style>
+        .preview-card {
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+        
+        .preview-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .preview-content {
+            padding: 1.5rem;
+        }
+        
+        .preview-price {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: #667eea;
+            margin-bottom: 0.75rem;
+        }
+        
+        .preview-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .preview-location {
+            font-size: 0.95rem;
+            color: #94a3b8;
+            margin-bottom: 1rem;
+        }
+        
+        .preview-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .preview-detail-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .edit-section {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .edit-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 0.75rem;
+        }
+        
+        .edit-link {
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            color: #93c5fd;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .edit-link:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+        
+        .terms-checkbox {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+        
+        .terms-checkbox input {
+            margin-top: 0.25rem;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        .btn-publish {
+            width: 100%;
+            padding: 1.25rem 2rem;
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-publish:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(34, 197, 94, 0.4);
+        }
+        
+        .btn-publish:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="gradient-bg"></div>
+    
+    <div class="container">
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 100%"></div>
+            </div>
+            <div class="progress-text">Step 6 of 6 (100%)</div>
+        </div>
+
+        <!-- Form Card -->
+        <div class="form-card">
+            <h1 class="form-title">Review Your Listing</h1>
+            <p class="form-subtitle">अपनी लिस्टिंग की समीक्षा करें</p>
+
+            <!-- Preview Card -->
+            <div class="preview-card" id="previewCard">
+                <!-- Will be populated by JavaScript -->
+            </div>
+
+            <!-- Edit Section -->
+            <div class="edit-section">
+                <div style="font-weight: 700; margin-bottom: 0.5rem;">
+                    ✏️ Want to change something? / कुछ बदलना चाहते हैं?
+                </div>
+                <div style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 0.75rem;">
+                    Click to edit any section
+                </div>
+                <div class="edit-links">
+                    <a href="add-property-step1.html" class="edit-link">Property Type</a>
+                    <a href="add-property-step2.html" class="edit-link">Location</a>
+                    <a href="add-property-step3.html" class="edit-link">Details</a>
+                    <a href="add-property-step4.html" class="edit-link">Price & Photos</a>
+                    <a href="add-property-step5.html" class="edit-link">Contact Info</a>
+                </div>
+            </div>
+
+            <!-- Terms & Conditions -->
+            <div class="terms-checkbox">
+                <input type="checkbox" id="agreeTerms" required>
+                <label for="agreeTerms" style="font-size: 0.9rem; line-height: 1.5;">
+                    I confirm that all information provided is accurate and I agree to the terms and conditions.
+                    <br>मैं पुष्टि करता/करती हूं कि दी गई सभी जानकारी सही है और मैं नियम और शर्तों से सहमत हूं।
+                </label>
+            </div>
+
+            <!-- Publish Button -->
+            <button class="btn-publish" id="publishBtn" onclick="publishProperty()">
+                🎉 Publish My Property / मेरी संपत्ति प्रकाशित करें
+            </button>
+
+            <!-- Back Button -->
+            <div style="margin-top: 1rem;">
+                <button type="button" class="btn btn-back" onclick="FormUtils.previousStep()" style="width: 100%;">
+                    ← Back / पीछे
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let propertyData = {};
+        
+        // Load and display preview
+        document.addEventListener('DOMContentLoaded', function() {
+            const draft = FormUtils.getDraft();
+            propertyData = {
+                ...draft.step1,
+                ...draft.step2,
+                ...draft.step3,
+                ...draft.step4,
+                ...draft.step5
+            };
+            
+            renderPreview();
+        });
+        
+        function renderPreview() {
+            const previewCard = document.getElementById('previewCard');
+            
+            // Build property title
+            const bedrooms = propertyData.bedrooms || '?';
+            const propertyTypeMap = {
+                'flat': 'Flat',
+                'house': 'House',
+                'plot': 'Plot'
+            };
+            const propertyTypeName = propertyTypeMap[propertyData.propertyType] || 'Property';
+            const title = `${bedrooms} BHK ${propertyTypeName} in ${propertyData.area || 'Area'}`;
+            
+            // Format price
+            const price = parseInt(propertyData.price);
+            const priceText = FormUtils.formatIndianPrice(price);
+            const listingTypeText = propertyData.listingType === 'rent' ? '/month' : '';
+            
+            // Build location
+            const location = `${propertyData.area || ''}, ${propertyData.city || ''}`;
+            
+            // Get first photo or placeholder
+            const firstPhoto = propertyData.photos && propertyData.photos.length > 0 
+                ? propertyData.photos[0] 
+                : '';
+            
+            // Furnishing status
+            const furnishingMap = {
+                'unfurnished': 'Empty',
+                'semi': 'Semi-Furnished',
+                'fully': 'Fully Furnished'
+            };
+            const furnishing = furnishingMap[propertyData.furnished] || 'N/A';
+            
+            previewCard.innerHTML = `
+                ${firstPhoto ? `<img src="${firstPhoto}" alt="Property" class="preview-image">` : '<div class="preview-image" style="display: flex; align-items: center; justify-content: center; font-size: 4rem;">🏠</div>'}
+                <div class="preview-content">
+                    <div class="preview-price">${priceText}${listingTypeText}</div>
+                    <div class="preview-title">${title}</div>
+                    <div class="preview-location">📍 ${location}</div>
+                    
+                    <div class="preview-details">
+                        <div class="preview-detail-item">
+                            <span>🛏️</span>
+                            <span>${bedrooms} Bedrooms</span>
+                        </div>
+                        <div class="preview-detail-item">
+                            <span>🚿</span>
+                            <span>${propertyData.bathrooms} Bathrooms</span>
+                        </div>
+                        <div class="preview-detail-item">
+                            <span>📐</span>
+                            <span>${propertyData.sqft} sqft</span>
+                        </div>
+                        <div class="preview-detail-item">
+                            <span>${propertyData.parking === 'yes' ? '🚗' : '🚫'}</span>
+                            <span>Parking ${propertyData.parking === 'yes' ? 'Available' : 'Not Available'}</span>
+                        </div>
+                        <div class="preview-detail-item">
+                            <span>🪑</span>
+                            <span>${furnishing}</span>
+                        </div>
+                    </div>
+                    
+                    <div style="padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+                        <div style="font-weight: 700; margin-bottom: 0.5rem;">Contact</div>
+                        <div style="font-size: 0.9rem; color: #cbd5e1;">
+                            📱 ${propertyData.name || 'Name'}<br>
+                            📞 ${propertyData.phone || 'Phone'}<br>
+                            ${propertyData.email ? `📧 ${propertyData.email}<br>` : ''}
+                            💬 Preferred: ${propertyData.contactMethod || 'Not specified'}<br>
+                            📅 Available: ${propertyData.availability || 'Anytime'}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function publishProperty() {
+            const agreeTerms = document.getElementById('agreeTerms');
+            
+            if (!agreeTerms.checked) {
+                alert('⚠️ Please accept the terms and conditions.\n\nकृपया नियम और शर्तों को स्वीकार करें।');
+                return;
+            }
+            
+            // Disable button
+            const publishBtn = document.getElementById('publishBtn');
+            publishBtn.disabled = true;
+            publishBtn.textContent = '📤 Publishing... / प्रकाशित हो रहा है...';
+            
+            // Submit property
+            FormUtils.submitProperty();
+        }
+    </script>
+</body>
+</html>

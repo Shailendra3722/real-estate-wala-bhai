@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Your Identity - Real Estate Wala Bhai</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="verification-badge.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 18px;
+            opacity: 0.95;
+        }
+
+        /* Trust Badge */
+        .trust-badge {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            color: white;
+        }
+
+        .trust-badge h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .trust-badge ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .trust-badge li {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 15px;
+        }
+
+        .trust-badge li::before {
+            content: "✓";
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            background: white;
+            color: #667eea;
+            border-radius: 50%;
+            font-size: 12px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        /* Upload Card */
+        .upload-card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .step-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            color: #9ca3af;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .step.active .step-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .step.complete .step-number {
+            background: #10b981;
+            color: white;
+        }
+
+        .step-arrow {
+            color: #d1d5db;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+
+        .label-hint {
+            font-weight: 400;
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        select, input[type="text"] {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: 'Outfit', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        /* Upload Area */
+        .upload-area {
+            border: 2px dashed #d1d5db;
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f9fafb;
+        }
+
+        .upload-area:hover {
+            border-color: #667eea;
+            background: #f3f4f6;
+        }
+
+        .upload-area.dragover {
+            border-color: #667eea;
+            background: #eff6ff;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        .upload-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .upload-hint {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        /* Preview */
+        .preview-container {
+            margin-top: 16px;
+            display: none;
+        }
+
+        .preview-container.active {
+            display: block;
+        }
+
+        .preview-image {
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .preview-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-secondary {
+            flex: 1;
+            padding: 10px 16px;
+            background: #f3f4f6;
+            color: #1f2937;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        /* Guidelines */
+        .guidelines {
+            background: #fffbeb;
+            border: 2px solid #fde68a;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+
+        .guidelines h4 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #d97706;
+            margin-bottom: 8px;
+        }
+
+        .guidelines ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .guidelines li {
+            font-size: 13px;
+            color: #92400e;
+            padding-left: 16px;
+            position: relative;
+        }
+
+        .guidelines li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            font-weight: 700;
+        }
+
+        /* Submit Button */
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Success Message */
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .success-message.active {
+            display: block;
+        }
+
+        .success-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        .success-message h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+
+        .success-message p {
+            font-size: 16px;
+            color: #6b7280;
+            margin-bottom: 24px;
+        }
+
+        .status-box {
+            background: #fffbeb;
+            border: 2px solid #fde68a;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .status-box-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .status-box-icon {
+            font-size: 24px;
+        }
+
+        .status-box-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #d97706;
+        }
+
+        .status-box-text {
+            color: #92400e;
+            font-size: 15px;
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .upload-card {
+                padding: 24px 20px;
+            }
+
+            .step-indicator {
+                font-size: 12px;
+            }
+
+            .step-number {
+                width: 28px;
+                height: 28px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🔐 Verify Your Identity</h1>
+            <p>Build trust with buyers and sellers</p>
+        </div>
+
+        <!-- Trust Badge -->
+        <div class="trust-badge">
+            <h3>🛡️ Why verify your identity?</h3>
+            <ul>
+                <li>Get 3x more inquiries from serious buyers</li>
+                <li>Your ID is safe and deleted after verification</li>
+                <li>Stand out with a verified trust badge</li>
+                <li>Usually approved within 24 hours</li>
+            </ul>
+        </div>
+
+        <!-- Upload Card -->
+        <div class="upload-card">
+            <!-- Step Indicator -->
+            <div class="step-indicator">
+                <div class="step active" id="step1">
+                    <span class="step-number">1</span>
+                </div>
+                <span class="step-arrow">→</span>
+                <div class="step" id="step2">
+                    <span class="step-number">2</span>
+                </div>
+                <span class="step-arrow">→</span>
+                <div class="step" id="step3">
+                    <span class="step-number">3</span>
+                </div>
+            </div>
+
+            <!-- Form -->
+            <form id="verificationForm">
+                <!-- ID Type Selection -->
+                <div class="form-group">
+                    <label for="idType">
+                        Select ID Proof Type
+                        <span class="label-hint">(Choose any government ID)</span>
+                    </label>
+                    <select id="idType" name="idType" required>
+                        <option value="">-- Select ID Type --</option>
+                        <option value="aadhaar">Aadhaar Card</option>
+                        <option value="pan">PAN Card</option>
+                        <option value="driving_license">Driving License</option>
+                        <option value="passport">Passport</option>
+                    </select>
+                </div>
+
+                <!-- Upload Guidelines -->
+                <div class="guidelines" id="uploadGuidelines" style="display: none;">
+                    <h4>📸 Photo Guidelines</h4>
+                    <ul>
+                        <li>Take a clear, readable photo</li>
+                        <li>All text should be visible</li>
+                        <li>No blurry or cropped images</li>
+                        <li>Good lighting (no shadows)</li>
+                    </ul>
+                </div>
+
+                <!-- Upload Area -->
+                <div class="form-group" id="uploadSection" style="display: none;">
+                    <label>Upload ID Photo</label>
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">📤</div>
+                        <div class="upload-text">Click to upload or drag and drop</div>
+                        <div class="upload-hint">PNG, JPG up to 5MB</div>
+                        <input type="file" id="fileInput" accept="image/*" required>
+                    </div>
+
+                    <!-- Preview -->
+                    <div class="preview-container" id="previewContainer">
+                        <img id="previewImage" class="preview-image" alt="ID preview">
+                        <div class="preview-actions">
+                            <button type="button" class="btn-secondary" id="changePhotoBtn">Change Photo</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Last 4 Digits -->
+                <div class="form-group" id="last4Section" style="display: none;">
+                    <label for="last4Digits">
+                        Last 4 Digits of ID Number
+                        <span class="label-hint">(For verification purposes)</span>
+                    </label>
+                    <input type="text" id="last4Digits" name="last4Digits" placeholder="e.g., 1234" maxlength="4" pattern="[0-9]{4}" required>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn-primary" id="submitBtn" disabled>
+                    Submit for Verification
+                </button>
+            </form>
+
+            <!-- Success Message -->
+            <div class="success-message" id="successMessage">
+                <div class="success-icon">✅</div>
+                <h2>Submitted Successfully!</h2>
+                <p>Your ID is being verified by our team</p>
+
+                <div class="status-box">
+                    <div class="status-box-header">
+                        <span class="status-box-icon">⏱️</span>
+                        <span class="status-box-title">Verification Pending</span>
+                    </div>
+                    <p class="status-box-text">
+                        We'll notify you within 24 hours. Your ID is secure and will be deleted after verification.
+                    </p>
+                </div>
+
+                <button class="btn-primary" onclick="window.location.href='profile.html'">
+                    Go to My Profile
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Form elements
+        const form = document.getElementById('verificationForm');
+        const idTypeSelect = document.getElementById('idType');
+        const uploadGuidelines = document.getElementById('uploadGuidelines');
+        const uploadSection = document.getElementById('uploadSection');
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const previewContainer = document.getElementById('previewContainer');
+        const previewImage = document.getElementById('previewImage');
+        const changePhotoBtn = document.getElementById('changePhotoBtn');
+        const last4Section = document.getElementById('last4Section');
+        const last4Input = document.getElementById('last4Digits');
+        const submitBtn = document.getElementById('submitBtn');
+        const successMessage = document.getElementById('successMessage');
+
+        // Steps
+        const step1 = document.getElementById('step1');
+        const step2 = document.getElementById('step2');
+        const step3 = document.getElementById('step3');
+
+        let selectedFile = null;
+
+        // Step 1: ID Type Selection
+        idTypeSelect.addEventListener('change', function() {
+            if (this.value) {
+                uploadGuidelines.style.display = 'block';
+                uploadSection.style.display = 'block';
+                step1.classList.add('complete');
+                step2.classList.add('active');
+            }
+        });
+
+        // Upload Area Click
+        uploadArea.addEventListener('click', function() {
+            fileInput.click();
+        });
+
+        // Drag and Drop
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', function() {
+            this.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        // File Input Change
+        fileInput.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                handleFile(this.files[0]);
+            }
+        });
+
+        // Handle File
+        function handleFile(file) {
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                alert('Please upload an image file');
+                return;
+            }
+
+            // Validate file size (5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('File size should be less than 5MB');
+                return;
+            }
+
+            selectedFile = file;
+
+            // Show preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImage.src = e.target.result;
+                uploadArea.style.display = 'none';
+                previewContainer.classList.add('active');
+                last4Section.style.display = 'block';
+                
+                step2.classList.add('complete');
+                step3.classList.add('active');
+                
+                checkFormComplete();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Change Photo
+        changePhotoBtn.addEventListener('click', function() {
+            uploadArea.style.display = 'block';
+            previewContainer.classList.remove('active');
+            selectedFile = null;
+            fileInput.value = '';
+            checkFormComplete();
+        });
+
+        // Last 4 Digits Input
+        last4Input.addEventListener('input', function() {
+            // Only allow numbers
+            this.value = this.value.replace(/[^0-9]/g, '');
+            checkFormComplete();
+        });
+
+        // Check if form is complete
+        function checkFormComplete() {
+            if (idTypeSelect.value && selectedFile && last4Input.value.length === 4) {
+                submitBtn.disabled = false;
+                step3.classList.add('complete');
+            } else {
+                submitBtn.disabled = true;
+                step3.classList.remove('complete');
+            }
+        }
+
+        // Form Submit
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // In production, upload to server
+            // For now, simulate success
+            setTimeout(function() {
+                form.style.display = 'none';
+                successMessage.classList.add('active');
+
+                // Store in localStorage (in production, this comes from backend)
+                localStorage.setItem('verificationStatus', 'pending');
+                localStorage.setItem('verificationSubmittedAt', new Date().toISOString());
+            }, 500);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verification Status - Real Estate Wala Bhai</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="loading-animation.css">
+    <script src="loading-animation.js"></script>
+    <script src="app-state.js"></script>
+    <script src="verification-service.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+            min-height: 100vh;
+            color: #ffffff;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .status-card {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 25px;
+            padding: 3rem 2.5rem;
+            text-align: center;
+        }
+
+        .status-icon {
+            font-size: 5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .status-title {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+
+        .status-message {
+            font-size: 1.1rem;
+            color: #cbd5e1;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        /* Badge */
+        .verification-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            font-weight: 700;
+            margin: 1.5rem 0;
+        }
+
+        .verification-badge.verified {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+        }
+
+        .verification-badge.pending {
+            background: rgba(251, 191, 36, 0.15);
+            color: #f59e0b;
+            border: 2px solid #f59e0b;
+        }
+
+        .verification-badge.rejected {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border: 2px solid #ef4444;
+        }
+
+        .verification-badge.none {
+            background: rgba(148, 163, 184, 0.15);
+            color: #94a3b8;
+            border: 2px dashed #94a3b8;
+        }
+
+        /* Trust Score */
+        .trust-score {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .trust-score-label {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin-bottom: 0.5rem;
+        }
+
+        .trust-score-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #f093fb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Timeline */
+        .timeline {
+            text-align: left;
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .timeline-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .timeline-content {
+            flex: 1;
+        }
+
+        .timeline-title {
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .timeline-text {
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Outfit', sans-serif;
+            margin: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: #e2e8f0;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .rejection-reason {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            text-align: left;
+        }
+
+        .rejection-reason-title {
+            font-weight: 700;
+            color: #ef4444;
+            margin-bottom: 0.5rem;
+        }
+
+        .rejection-reason-text {
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="status-card" id="statusCard">
+            <!-- Content will be populated by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        function renderStatus() {
+            const userId = AppState.getUserEmail() || 'user_demo';
+            const verification = VerificationService.getUserVerification(userId);
+            const statusCard = document.getElementById('statusCard');
+
+            if (!verification || verification.verificationStatus === 'none') {
+                // Not yet submitted
+                statusCard.innerHTML = `
+                    <div class="status-icon">🔒</div>
+                    <h1 class="status-title">Get Verified</h1>
+                    <div class="verification-badge none">
+                        <span>?</span>
+                        <span>Not Verified</span>
+                    </div>
+                    <p class="status-message">
+                        Verify your identity to build trust with buyers and sellers.
+                        Verified users get 3x more responses!
+                    </p>
+                    <button class="btn btn-primary" onclick="window.location.href='verify-account.html'">
+                        Start Verification
+                    </button>
+                    <button class="btn btn-secondary" onclick="window.location.href='home.html'">
+                        Back to Home
+                    </button>
+                `;
+            } else if (verification.verificationStatus === 'pending') {
+                // Pending review
+                statusCard.innerHTML = `
+                    <div class="status-icon">⏳</div>
+                    <h1 class="status-title">Verification Pending</h1>
+                    <div class="verification-badge pending">
+                        <span>⏳</span>
+                        <span>Under Review</span>
+                    </div>
+                    <p class="status-message">
+                        Our team is reviewing your ID. This usually takes less than 24 hours.
+                        We'll notify you once verified!
+                    </p>
+
+                    <div class="trust-score">
+                        <div class="trust-score-label">Trust Score</div>
+                        <div class="trust-score-value">${verification.trustScore}/100</div>
+                    </div>
+
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-icon">✅</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">Submitted</div>
+                                <div class="timeline-text">
+                                    ${new Date(verification.verificationData.submittedAt).toLocaleDateString()} at 
+                                    ${new Date(verification.verificationData.submittedAt).toLocaleTimeString()}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-icon">⏳</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">Under Review</div>
+                                <div class="timeline-text">Our team is verifying your ID</div>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-icon">🎉</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">Verification Complete</div>
+                                <div class="timeline-text">You'll get notified</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-secondary" onclick="window.location.href='home.html'">
+                        Back to Home
+                    </button>
+                `;
+            } else if (verification.verificationStatus === 'approved') {
+                // Verified!
+                statusCard.innerHTML = `
+                    <div class="status-icon">🎉</div>
+                    <h1 class="status-title">You're Verified!</h1>
+                    <div class="verification-badge verified">
+                        <span>✓</span>
+                        <span>Verified</span>
+                    </div>
+                    <p class="status-message">
+                        Congratulations! Your profile now shows a verified badge.
+                        You can now list unlimited properties and get priority in search.
+                    </p>
+
+                    <div class="trust-score">
+                        <div class="trust-score-label">Trust Score</div>
+                        <div class="trust-score-value">${verification.trustScore}/100 🌟</div>
+                    </div>
+
+                    <div style="margin: 2rem 0; padding: 1.5rem; background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 15px; text-align: left;">
+                        <div style="font-weight: 700; margin-bottom: 1rem;">Benefits Unlocked:</div>
+                        <div style="color: #cbd5e1; line-height: 1.8;">
+                            ✓ Unlimited property listings<br>
+                            ✓ Priority in search results<br>
+                            ✓ Verified badge on all listings<br>
+                            ✓ 3x higher response rate
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="window.location.href='add-property-step1.html'">
+                        List a Property
+                    </button>
+                    <button class="btn btn-secondary" onclick="window.location.href='home.html'">
+                        Back to Home
+                    </button>
+                `;
+            } else if (verification.verificationStatus === 'rejected') {
+                // Rejected
+                statusCard.innerHTML = `
+                    <div class="status-icon">❌</div>
+                    <h1 class="status-title">Verification Unsuccessful</h1>
+                    <div class="verification-badge rejected">
+                        <span>×</span>
+                        <span>Rejected</span>
+                    </div>
+                    <p class="status-message">
+                        We couldn't verify your ID. Don't worry! You can submit again with a clearer photo.
+                    </p>
+
+                    ${verification.verificationData.rejectionReason ? `
+                        <div class="rejection-reason">
+                            <div class="rejection-reason-title">Reason:</div>
+                            <div class="rejection-reason-text">${verification.verificationData.rejectionReason}</div>
+                        </div>
+                    ` : ''}
+
+                    <div style="margin: 2rem 0; padding: 1.5rem; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 15px; text-align: left;">
+                        <div style="font-weight: 700; margin-bottom: 1rem;">Tips for successful verification:</div>
+                        <div style="color: #cbd5e1; line-height: 1.8;">
+                            • Take photo in good lighting<br>
+                            • Make sure all text is clear and readable<br>
+                            • Avoid glare or shadows<br>
+                            • Upload both front and back (if applicable)
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="window.location.href='verify-account.html'">
+                        Try Again
+                    </button>
+                    <button class="btn btn-secondary" onclick="window.location.href='home.html'">
+                        Back to Home
+                    </button>
+                `;
+            }
+        }
+
+        // Render on load
+        window.addEventListener('load', renderStatus);
+    </script>
+</body>
+</html>

@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Verified - Real Estate Wala Bhai</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="loading-animation.css">
+    <script src="loading-animation.js"></script>
+    <script src="app-state.js"></script>
+    <script src="verification-service.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+            min-height: 100vh;
+            color: #ffffff;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .header-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.75rem;
+            background: linear-gradient(135deg, #667eea 0%, #f093fb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-subtitle {
+            font-size: 1.1rem;
+            color: #94a3b8;
+        }
+
+        /* Benefits Section */
+        .benefits-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .benefits-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: #e2e8f0;
+        }
+
+        .benefit-item {
+            display: flex;
+            align-items: start;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: rgba(102, 126, 234, 0.08);
+            border-radius: 12px;
+        }
+
+        .benefit-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .benefit-text {
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        /* Form Card */
+        .form-card {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 25px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-section {
+            margin-bottom: 2.5rem;
+        }
+
+        .form-section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: #e2e8f0;
+        }
+
+        /* ID Type Selection */
+        .id-type-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .id-type-card {
+            position: relative;
+        }
+
+        .id-type-input {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .id-type-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1.5rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .id-type-input:checked + .id-type-label {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .id-type-icon {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .id-type-name {
+            font-weight: 700;
+            color: #e2e8f0;
+            font-size: 0.95rem;
+        }
+
+        /* Photo Upload */
+        .upload-zone {
+            border: 3px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.03);
+            margin-bottom: 1rem;
+        }
+
+        .upload-zone:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .photo-preview {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 12px;
+            margin-top: 1rem;
+        }
+
+        /* Form Input */
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 1rem;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-input::placeholder {
+            color: #64748b;
+        }
+
+        /* Privacy Notice */
+        .privacy-notice {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .privacy-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .privacy-text {
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 1.25rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .btn-submit {
+            width: 100%;
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+        }
+
+        .btn-submit:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(34, 197, 94, 0.4);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-back {
+            display: block;
+            width: 100%;
+            margin-top: 1rem;
+            background: rgba(255, 255, 255, 0.08);
+            color: #e2e8f0;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 640px) {
+            .id-type-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-title {
+                font-size: 2rem;
+            }
+
+            .form-card {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="header-title">Get Verified & Build Trust</h1>
+            <p class="header-subtitle">Verified users get 3x more responses</p>
+        </div>
+
+        <!-- Benefits -->
+        <div class="benefits-card">
+            <h2 class="benefits-title">Why Get Verified?</h2>
+            
+            <div class="benefit-item">
+                <div class="benefit-icon">✅</div>
+                <div class="benefit-text">
+                    <strong>Build Trust:</strong> Buyers and sellers trust verified users more
+                </div>
+            </div>
+
+            <div class="benefit-item">
+                <div class="benefit-icon">📊</div>
+                <div class="benefit-text">
+                    <strong>Priority Listings:</strong> Your properties appear higher in search results
+                </div>
+            </div>
+
+            <div class="benefit-item">
+                <div class="benefit-icon">🎯</div>
+                <div class="benefit-text">
+                    <strong>Unlimited Properties:</strong> List as many properties as you want
+                </div>
+            </div>
+        </div>
+
+        <!-- Verification Form -->
+        <form id="verificationForm" class="form-card">
+            <!-- Step 1: Choose ID Type -->
+            <div class="form-section" id="step1">
+                <h3 class="form-section-title">1. Which ID would you like to use?</h3>
+                
+                <div class="id-type-grid">
+                    <div class="id-type-card">
+                        <input type="radio" name="idType" value="aadhaar" id="idAadhaar" class="id-type-input" required>
+                        <label for="idAadhaar" class="id-type-label">
+                            <div class="id-type-icon">🪪</div>
+                            <div class="id-type-name">Aadhaar Card</div>
+                        </label>
+                    </div>
+
+                    <div class="id-type-card">
+                        <input type="radio" name="idType" value="pan" id="idPAN" class="id-type-input" required>
+                        <label for="idPAN" class="id-type-label">
+                            <div class="id-type-icon">💳</div>
+                            <div class="id-type-name">PAN Card</div>
+                        </label>
+                    </div>
+
+                    <div class="id-type-card">
+                        <input type="radio" name="idType" value="license" id="idLicense" class="id-type-input" required>
+                        <label for="idLicense" class="id-type-label">
+                            <div class="id-type-icon">🚗</div>
+                            <div class="id-type-name">Driving License</div>
+                        </label>
+                    </div>
+
+                    <div class="id-type-card">
+                        <input type="radio" name="idType" value="passport" id="idPassport" class="id-type-input" required>
+                        <label for="idPassport" class="id-type-label">
+                            <div class="id-type-icon">✈️</div>
+                            <div class="id-type-name">Passport</div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Upload Photos -->
+            <div class="form-section">
+                <h3 class="form-section-title">2. Upload a clear photo of your ID</h3>
+                
+                <div class="upload-zone" onclick="document.getElementById('photoFront').click()">
+                    <div class="upload-icon">📸</div>
+                    <div style="font-weight: 700; margin-bottom: 0.5rem;">Click to Upload Front Side</div>
+                    <div style="font-size: 0.9rem; color: #94a3b8;">Make sure all text is readable</div>
+                </div>
+                <input type="file" id="photoFront" accept="image/*" class="hidden" required onchange="handlePhotoUpload(event, 'front')">
+                <img id="previewFront" class="photo-preview hidden">
+
+                <div class="upload-zone" onclick="document.getElementById('photoBack').click()" style="margin-top: 1.5rem;">
+                    <div class="upload-icon">📷</div>
+                    <div style="font-weight: 700; margin-bottom: 0.5rem;">Back Side (Optional)</div>
+                    <div style="font-size: 0.9rem; color: #94a3b8;">Upload if your ID has details on back</div>
+                </div>
+                <input type="file" id="photoBack" accept="image/*" class="hidden" onchange="handlePhotoUpload(event, 'back')">
+                <img id="previewBack" class="photo-preview hidden">
+            </div>
+
+            <!-- Step 3: Enter ID Number -->
+            <div class="form-section">
+                <h3 class="form-section-title">3. Enter your ID number</h3>
+                <input type="text" 
+                       class="form-input" 
+                       id="idNumber" 
+                       name="idNumber" 
+                       placeholder="Enter your ID number"
+                       required>
+                <div style="font-size: 0.85rem; color: #94a3b8; margin-top: 0.5rem;">
+                    This will be encrypted and masked for your privacy
+                </div>
+            </div>
+
+            <!-- Privacy Notice -->
+            <div class="privacy-notice">
+                <div class="privacy-icon">🔒</div>
+                <div class="privacy-text">
+                    <strong>Your privacy matters:</strong> We encrypt your ID and only show the last 4 characters. 
+                    We never share your personal information with anyone. Your ID is used only for verification.
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-submit" id="submitBtn">
+                Submit for Verification
+            </button>
+
+            <button type="button" class="btn btn-back" onclick="window.location.href='home.html'">
+                Cancel
+            </button>
+        </form>
+    </div>
+
+    <script>
+        let photoFrontData = null;
+        let photoBackData = null;
+
+        // Handle photo upload
+        function handlePhotoUpload(event, side) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const data = e.target.result;
+                
+                if (side === 'front') {
+                    photoFrontData = data;
+                    document.getElementById('previewFront').src = data;
+                    document.getElementById('previewFront').classList.remove('hidden');
+                } else {
+                    photoBackData = data;
+                    document.getElementById('previewBack').src = data;
+                    document.getElementById('previewBack').classList.remove('hidden');
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Handle form submission
+        document.getElementById('verificationForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const idType = document.querySelector('input[name="idType"]:checked')?.value;
+            const idNumber = document.getElementById('idNumber').value;
+
+            // Validation
+            if (!idType) {
+                alert('⚠️ Please select an ID type');
+                return;
+            }
+
+            if (!photoFrontData) {
+                alert('⚠️ Please upload the front side of your ID');
+                return;
+            }
+
+            if (!idNumber) {
+                alert('⚠️ Please enter your ID number');
+                return;
+            }
+
+            // Validate ID number format
+            if (!VerificationService.validateIDNumber(idNumber, idType)) {
+                alert('⚠️ Please enter a valid ID number');
+                return;
+            }
+
+            // Disable submit button
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+
+            // Submit verification
+            const userId = AppState.getUserEmail() || 'user_demo';
+            const result = await VerificationService.submitVerification(userId, {
+                idType: idType,
+                idNumber: idNumber,
+                photoFront: photoFrontData,
+                photoBack: photoBackData
+            });
+
+            if (result.success) {
+                alert('✅ Verification submitted successfully!\n\nOur team will review your ID within 24 hours. You\'ll get a notification once verified.');
+                window.location.href = 'verification-status.html';
+            } else {
+                alert('❌ Submission failed. Please try again.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit for Verification';
+            }
+        });
+
+        // Check if already verified or pending
+        window.addEventListener('load', function() {
+            const userId = AppState.getUserEmail() || 'user_demo';
+            const verification = VerificationService.getUserVerification(userId);
+
+            if (verification) {
+                if (verification.verificationStatus === 'approved') {
+                    alert('✓ You are already verified!');
+                    window.location.href = 'verification-status.html';
+                } else if (verification.verificationStatus === 'pending') {
+                    if (confirm('You have a pending verification request. Do you want to check the status?')) {
+                        window.location.href = 'verification-status.html';
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

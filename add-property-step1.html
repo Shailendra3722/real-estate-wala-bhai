@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Property - Step 1 - Real Estate Wala Bhai</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="form-styles.css">
+    <script src="app-state.js"></script>
+    <script src="form-utils.js"></script>
+</head>
+<body>
+    <div class="gradient-bg"></div>
+    
+    <div class="container">
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 17%"></div>
+            </div>
+            <div class="progress-text">Step 1 of 6 (17%)</div>
+        </div>
+
+        <!-- Form Card -->
+        <div class="form-card">
+            <h1 class="form-title">What do you want to do?</h1>
+            <p class="form-subtitle">आप क्या करना चाहते हैं?</p>
+
+            <form id="step1Form">
+                <!-- Listing Type -->
+                <div class="form-group">
+                    <label class="form-label">
+                        Choose one / एक चुनें
+                    </label>
+                    
+                    <div class="option-group">
+                        <div class="option-card">
+                            <input type="radio" name="listingType" value="sell" id="listingSell" class="option-input" required>
+                            <label for="listingSell" class="option-label">
+                                <div class="option-icon">🏠</div>
+                                <div class="option-title">Sell Property</div>
+                                <div class="option-desc">संपत्ति बेचें</div>
+                            </label>
+                        </div>
+
+                        <div class="option-card">
+                            <input type="radio" name="listingType" value="rent" id="listingRent" class="option-input" required>
+                            <label for="listingRent" class="option-label">
+                                <div class="option-icon">🏘️</div>
+                                <div class="option-title">Rent Out</div>
+                                <div class="option-desc">किराए पर दें</div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Property Type -->
+                <div class="form-group">
+                    <label class="form-label">
+                        What type of property? / संपत्ति का प्रकार?
+                    </label>
+                    
+                    <div class="option-group">
+                        <div class="option-card">
+                            <input type="radio" name="propertyType" value="flat" id="typeFlat" class="option-input" required>
+                            <label for="typeFlat" class="option-label">
+                                <div class="option-icon">🏢</div>
+                                <div class="option-title">Flat/Apartment</div>
+                                <div class="option-desc">फ्लैट</div>
+                            </label>
+                        </div>
+
+                        <div class="option-card">
+                            <input type="radio" name="propertyType" value="house" id="typeHouse" class="option-input" required>
+                            <label for="typeHouse" class="option-label">
+                                <div class="option-icon">🏡</div>
+                                <div class="option-title">Independent House</div>
+                                <div class="option-desc">मकान</div>
+                            </label>
+                        </div>
+
+                        <div class="option-card">
+                            <input type="radio" name="propertyType" value="plot" id="typePlot" class="option-input" required>
+                            <label for="typePlot" class="option-label">
+                                <div class="option-icon">📐</div>
+                                <div class="option-title">Plot/Land</div>
+                                <div class="option-desc">जमीन</div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Help Text -->
+                <div class="help-text">
+                    <div class="help-icon">💡</div>
+                    <div class="help-content">
+                        <div class="help-title">Tip / सुझाव</div>
+                        <div class="help-desc">
+                            Your information is automatically saved. You can return anytime to complete!
+                            <br>आपकी जानकारी अपने-आप सेव हो रही है। आप कभी भी वापस आकर पूरा कर सकते हैं!
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <div class="form-navigation">
+                    <button type="button" class="btn btn-back" onclick="window.location.href='home.html'">
+                        ← Cancel / रद्द करें
+                    </button>
+                    <button type="button" class="btn btn-next" onclick="FormUtils.nextStep()">
+                        Continue / जारी रखें →
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Check role permission
+        if (!AppState.canAddProperty()) {
+            alert('⚠️ Only property owners can add listings.\n\nकेवल संपत्ति के मालिक ही लिस्टिंग जोड़ सकते हैं।');
+            window.location.href = 'home.html';
+        }
+    </script>
+</body>
+</html>

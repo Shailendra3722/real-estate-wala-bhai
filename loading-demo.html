@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Loading Animation - Demo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="loading-animation.css">
+    <script src="loading-animation.js"></script>
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            margin: 0;
+            padding: 2rem;
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        
+        .demo-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #f093fb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .demo-section {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .demo-section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .demo-section p {
+            color: #cbd5e1;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+        
+        .btn {
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .code-block {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            overflow-x: auto;
+        }
+        
+        .code-block code {
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: #93c5fd;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <h1>Premium Loading Animation</h1>
+        
+        <!-- Demo 1: Show/Hide -->
+        <div class="demo-section">
+            <h2>1. Manual Show/Hide</h2>
+            <p>Display the loading animation manually and hide it after a delay.</p>
+            
+            <button class="btn" onclick="demoShowHide()">Show for 3 Seconds</button>
+            
+            <div class="code-block">
+                <code>
+PremiumLoader.show();<br>
+// ... do something ...<br>
+PremiumLoader.hide();
+                </code>
+            </div>
+        </div>
+        
+        <!-- Demo 2: Page Transition -->
+        <div class="demo-section">
+            <h2>2. Page Transition</h2>
+            <p>Show loading animation while navigating to another page.</p>
+            
+            <button class="btn" onclick="PremiumLoader.showForTransition('home.html')">
+                Go to Home (with animation)
+            </button>
+            
+            <div class="code-block">
+                <code>
+PremiumLoader.showForTransition('home.html');
+                </code>
+            </div>
+        </div>
+        
+        <!-- Demo 3: Async Operation -->
+        <div class="demo-section">
+            <h2>3. Wrap Async Operation</h2>
+            <p>Show loading while performing an async operation (e.g., API call).</p>
+            
+            <button class="btn" onclick="demoAsyncOperation()">Simulate API Call</button>
+            
+            <div class="code-block">
+                <code>
+await PremiumLoader.wrapWithLoader(async () => {<br>
+&nbsp;&nbsp;// Your async code here<br>
+&nbsp;&nbsp;const data = await fetch('/api/properties');<br>
+&nbsp;&nbsp;return data;<br>
+});
+                </code>
+            </div>
+        </div>
+        
+        <!-- Demo 4: Transition Mode -->
+        <div class="demo-section">
+            <h2>4. Transition Mode (Faster)</h2>
+            <p>Use faster animation for quick page transitions.</p>
+            
+            <button class="btn" onclick="demoTransitionMode()">Show Transition Mode</button>
+            
+            <div class="code-block">
+                <code>
+PremiumLoader.show(true); // true = transition mode
+                </code>
+            </div>
+        </div>
+        
+        <!-- Integration Guide -->
+        <div class="demo-section">
+            <h2>📋 Integration Guide</h2>
+            <p>Add these lines to the &lt;head&gt; of your HTML pages:</p>
+            
+            <div class="code-block">
+                <code>
+&lt;link rel="stylesheet" href="loading-animation.css"&gt;<br>
+&lt;script src="loading-animation.js"&gt;&lt;/script&gt;
+                </code>
+            </div>
+            
+            <p style="margin-top: 1.5rem;">The loader will automatically show on page load and hide when ready!</p>
+        </div>
+    </div>
+    
+    <script>
+        // Demo 1: Show/Hide
+        function demoShowHide() {
+            PremiumLoader.show();
+            setTimeout(() => {
+                PremiumLoader.hide();
+            }, 3000);
+        }
+        
+        // Demo 3: Async Operation
+        async function demoAsyncOperation() {
+            await PremiumLoader.wrapWithLoader(async () => {
+                // Simulate API call
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                console.log('✅ Async operation completed!');
+                alert('✅ Async operation completed!');
+            });
+        }
+        
+        // Demo 4: Transition Mode
+        function demoTransitionMode() {
+            PremiumLoader.show(true); // faster transition mode
+            setTimeout(() => {
+                PremiumLoader.hide();
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

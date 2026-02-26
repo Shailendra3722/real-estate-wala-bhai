@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Property - Step 4 - Real Estate Wala Bhai</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="form-styles.css">
+    <script src="app-state.js"></script>
+    <script src="form-utils.js"></script>
+    <style>
+        .photo-upload-zone {
+            border: 3px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 3rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.03);
+        }
+        
+        .photo-upload-zone:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+        
+        .photo-upload-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .photo-preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .photo-preview {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+        }
+        
+        .photo-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .photo-remove {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(239, 68, 68, 0.95);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            line-height: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="gradient-bg"></div>
+    
+    <div class="container">
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 67%"></div>
+            </div>
+            <div class="progress-text">Step 4 of 6 (67%)</div>
+        </div>
+
+        <!-- Form Card -->
+        <div class="form-card">
+            <h1 class="form-title">Price and Photos</h1>
+            <p class="form-subtitle">कीमत और फोटो</p>
+
+            <form id="step4Form">
+                <!-- Price -->
+                <div class="form-group">
+                    <label class="form-label" for="price">
+                        <span id="priceLabel">Your Asking Price / आपकी मांगी गई कीमत</span>
+                        <div class="form-label-subtitle" id="priceSubtitle">Total price in Rupees</div>
+                    </label>
+                    <input type="number" 
+                           class="form-input" 
+                           id="price" 
+                           name="price" 
+                           placeholder="e.g., 8500000"
+                           min="1"
+                           required>
+                    <div style="margin-top: 0.5rem; font-size: 0.9rem; color: #94a3b8;" id="priceDisplay"></div>
+                </div>
+
+                <!-- Photos -->
+                <div class="form-group">
+                    <label class="form-label">
+                        Add Photos (Maximum 10) / फोटो जोड़ें (अधिकतम 10)
+                        <div class="form-label-subtitle">First photo will be the cover photo</div>
+                    </label>
+                    
+                    <div class="photo-upload-zone" onclick="document.getElementById('photoInput').click()">
+                        <div class="photo-upload-icon">📸</div>
+                        <div style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem;">
+                            Click to Upload Photos
+                        </div>
+                        <div style="font-size: 0.9rem; color: #94a3b8;">
+                            फोटो अपलोड करने के लिए क्लिक करें
+                        </div>
+                    </div>
+                    
+                    <input type="file" 
+                           id="photoInput" 
+                           accept="image/*" 
+                           multiple 
+                           style="display: none;"
+                           onchange="handlePhotoUpload(event)">
+                    
+                    <div class="photo-preview-grid" id="photoPreviewGrid"></div>
+                </div>
+
+                <!-- Help Text -->
+                <div class="help-text">
+                    <div class="help-icon">💡</div>
+                    <div class="help-content">
+                        <div class="help-title">Tip / सुझाव</div>
+                        <div class="help-desc">
+                            Good quality photos attract more buyers. Show all rooms and important features!
+                            <br>अच्छी क्वालिटी की फोटो से ज्यादा खरीदार आकर्षित होते हैं। सभी कमरे और जरूरी फीचर दिखाएं!
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <div class="form-navigation">
+                    <button type="button" class="btn btn-back" onclick="FormUtils.previousStep()">
+                        ← Back / पीछे
+                    </button>
+                    <button type="button" class="btn btn-next" onclick="FormUtils.nextStep()">
+                        Continue / जारी रखें →
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let uploadedPhotos = [];
+        
+        // Update price label based on listing type
+        document.addEventListener('DOMContentLoaded', function() {
+            const draft = FormUtils.getDraft();
+            if (draft.step1 && draft.step1.listingType === 'rent') {
+                document.getElementById('priceLabel').innerHTML = 'Monthly Rent / मासिक किराया';
+                document.getElementById('priceSubtitle').textContent = 'Rent per month in Rupees';
+            }
+            
+            // Load saved photos
+            if (draft.step4 && draft.step4.photos) {
+                uploadedPhotos = draft.step4.photos;
+                renderPhotos();
+            }
+        });
+        
+        // Format price display
+        document.getElementById('price').addEventListener('input', function(e) {
+            const price = parseInt(e.target.value);
+            if (!isNaN(price) && price > 0) {
+                document.getElementById('priceDisplay').textContent = 
+                    '💰 ' + FormUtils.formatIndianPrice(price);
+            } else {
+                document.getElementById('priceDisplay').textContent = '';
+            }
+        });
+        
+        // Handle photo upload
+        function handlePhotoUpload(event) {
+            const files = Array.from(event.target.files);
+            
+            if (uploadedPhotos.length + files.length > 10) {
+                alert('⚠️ Maximum 10 photos allowed!\n\nअधिकतम 10 फोटो की अनुमति है!');
+                return;
+            }
+            
+            files.forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        uploadedPhotos.push(e.target.result);
+                        renderPhotos();
+                        
+                        // Autosave
+                        const formData = FormUtils.collectCurrentStepData();
+                        formData.photos = uploadedPhotos;
+                        FormUtils.autosave(4, formData);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+        
+        // Render photo previews
+        function renderPhotos() {
+            const grid = document.getElementById('photoPreviewGrid');
+            grid.innerHTML = '';
+            
+            uploadedPhotos.forEach((photo, index) => {
+                const div = document.createElement('div');
+                div.className = 'photo-preview';
+                div.innerHTML = `
+                    <img src="${photo}" alt="Photo ${index + 1}">
+                    <button class="photo-remove" onclick="removePhoto(${index})">×</button>
+                `;
+                grid.appendChild(div);
+            });
+        }
+        
+        // Remove photo
+        function removePhoto(index) {
+            uploadedPhotos.splice(index, 1);
+            renderPhotos();
+            
+            // Autosave
+            const formData = FormUtils.collectCurrentStepData();
+            formData.photos = uploadedPhotos;
+            FormUtils.autosave(4, formData);
+        }
+    </script>
+</body>
+</html>

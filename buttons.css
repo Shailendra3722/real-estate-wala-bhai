@@ -1,0 +1,151 @@
+/* ============================================
+   BUTTONS - Unified Button System
+   ============================================
+   Use these classes for all buttons across the app
+   for consistent look and feel.
+============================================ */
+
+/* Base button */
+.btn {
+    font-family: 'Outfit', sans-serif;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+/* ============================================
+   PRIMARY BUTTONS
+   Use for main call-to-actions
+============================================ */
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 1.1rem 2rem;
+    border-radius: 15px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+/* ============================================
+   SECONDARY BUTTONS
+   Use for less important actions
+============================================ */
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1.1rem 2rem;
+    border-radius: 15px;  
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+/* ============================================
+   GHOST BUTTONS
+   Use for minimal actions like "Skip" or "Cancel"
+============================================ */
+.btn-ghost {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 1rem 2rem;
+    border-radius: 15px;
+    font-weight: 600;
+    color: #cbd5e1;
+}
+
+.btn-ghost:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+}
+
+/* ============================================
+   ICON BUTTONS
+   Use with btn-primary, btn-secondary, or btn-ghost
+============================================ */
+.btn-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    padding: 0;
+}
+
+/* ============================================
+   FULL WIDTH
+   Use for mobile or form buttons
+============================================ */
+.btn-full {
+    width: 100%;
+}
+
+/* ============================================
+   SIZES
+============================================ */
+.btn-sm {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+}
+
+.btn-lg {
+    padding: 1.3rem 2.5rem;
+    font-size: 1.1rem;
+}
+
+/* ============================================
+   DISABLED STATE
+============================================ */
+.btn:disabled,
+.btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* ============================================
+   USAGE EXAMPLES
+============================================ */
+
+/*
+<!-- Primary action -->
+<button class="btn btn-primary">View Details</button>
+<button class="btn btn-primary">📞 Call Now</button>
+
+<!-- Secondary action -->
+<button class="btn btn-secondary">Apply Filters</button>
+<button class="btn btn-secondary">🗺️ Map View</button>
+
+<!-- Ghost/minimal -->
+<button class="btn btn-ghost">Skip</button>
+<button class="btn btn-ghost">Cancel</button>
+
+<!-- Icon button -->
+<button class="btn btn-primary btn-icon">❤️</button>
+
+<!-- Full width -->
+<button class="btn btn-primary btn-full">Submit</button>
+
+<!-- Small button -->
+<button class="btn btn-primary btn-sm">Save</button>
+
+<!-- Large button -->
+<button class="btn btn-primary btn-lg">Get Started</button>
+*/

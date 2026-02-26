@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Property - Step 2 - Real Estate Wala Bhai</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="form-styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="app-state.js"></script>
+    <script src="form-utils.js"></script>
+    <style>
+        #map {
+            width: 100%;
+            height: 300px;
+            border-radius: 15px;
+            margin-bottom: 1.5rem;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+        }
+        
+        .location-btn {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(102, 126, 234, 0.15);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 12px;
+            color: #93c5fd;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .location-btn:hover {
+            background: rgba(102, 126, 234, 0.25);
+        }
+    </style>
+</head>
+<body>
+    <div class="gradient-bg"></div>
+    
+    <div class="container">
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 33%"></div>
+            </div>
+            <div class="progress-text">Step 2 of 6 (33%)</div>
+        </div>
+
+        <!-- Form Card -->
+        <div class="form-card">
+            <h1 class="form-title">Where is your property?</h1>
+            <p class="form-subtitle">आपकी संपत्ति कहाँ है?</p>
+
+            <form id="step2Form">
+                <!-- Map -->
+                <div class="form-group">
+                    <label class="form-label">
+                        Drop a pin on the map / मैप पर पिन लगाएं
+                        <div class="form-label-subtitle">Click on the map to mark your property location</div>
+                    </label>
+                    
+                    <button type="button" class="location-btn" onclick="useCurrentLocation()">
+                        📍 Use My Current Location / मेरी वर्तमान स्थिति उपयोग करें
+                    </button>
+                    
+                    <div id="map"></div>
+                    
+                    <input type="hidden" name="latitude" id="latitude">
+                    <input type="hidden" name="longitude" id="longitude">
+                </div>
+
+                <!-- Street/Building -->
+                <div class="form-group">
+                    <label class="form-label" for="street">
+                        Building/House Name or Number / भवन/मकान का नाम या नंबर
+                    </label>
+                    <input type="text" 
+                           class="form-input" 
+                           id="street" 
+                           name="street" 
+                           placeholder="e.g., Sunshine Apartments, Plot 45"
+                           required>
+                </div>
+
+                <!-- Area/Locality -->
+                <div class="form-group">
+                    <label class="form-label" for="area">
+                        Area/Locality / इलाका/मोहल्ला
+                    </label>
+                    <input type="text" 
+                           class="form-input" 
+                           id="area" 
+                           name="area" 
+                           placeholder="e.g., Gomti Nagar, Andheri West"
+                           required>
+                </div>
+
+                <!-- City -->
+                <div class="form-group">
+                    <label class="form-label" for="city">
+                        City / शहर
+                    </label>
+                    <select class="form-select" id="city" name="city" required>
+                        <option value="">Select City / शहर चुनें</option>
+                        <option value="Lucknow">Lucknow / लखनऊ</option>
+                        <option value="Mumbai">Mumbai / मुंबई</option>
+                        <option value="Delhi">Delhi / दिल्ली</option>
+                        <option value="Bangalore">Bangalore / बेंगलुरु</option>
+                        <option value="Chennai">Chennai / चेन्नई</option>
+                        <option value="Hyderabad">Hyderabad / हैदराबाद</option>
+                        <option value="Pune">Pune / पुणे</option>
+                        <option value="Kolkata">Kolkata / कोलकाता</option>
+                    </select>
+                </div>
+
+                <!-- Pincode -->
+                <div class="form-group">
+                    <label class="form-label" for="pincode">
+                        Pincode / पिन कोड
+                    </label>
+                    <input type="text" 
+                           class="form-input" 
+                           id="pincode" 
+                           name="pincode" 
+                           placeholder="e.g., 226010"
+                           maxlength="6"
+                           pattern="[0-9]{6}"
+                           required>
+                </div>
+
+                <!-- Help Text -->
+                <div class="help-text">
+                    <div class="help-icon">💡</div>
+                    <div class="help-content">
+                        <div class="help-title">Tip / सुझाव</div>
+                        <div class="help-desc">
+                            Accurate location helps buyers find your property easily!
+                            <br>सही स्थान से खरीदारों को आपकी संपत्ति आसानी से मिलेगी!
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <div class="form-navigation">
+                    <button type="button" class="btn btn-back" onclick="FormUtils.previousStep()">
+                        ← Back / पीछे
+                    </button>
+                    <button type="button" class="btn btn-next" onclick="FormUtils.nextStep()">
+                        Continue / जारी रखें →
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let map, marker;
+        
+        // Initialize map
+        function initMap() {
+            // Default to Lucknow
+            const defaultLat = 26.8467;
+            const defaultLng = 80.9462;
+            
+            map = L.map('map').setView([defaultLat, defaultLng], 13);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap'
+            }).addTo(map);
+            
+            // Click to drop pin
+            map.on('click', function(e) {
+                dropPin(e.latlng.lat, e.latlng.lng);
+            });
+            
+            // Load saved location if exists
+            const draft = FormUtils.getDraft();
+            if (draft.step2 && draft.step2.latitude && draft.step2.longitude) {
+                dropPin(draft.step2.latitude, draft.step2.longitude);
+                map.setView([draft.step2.latitude, draft.step2.longitude], 15);
+            }
+        }
+        
+        function dropPin(lat, lng) {
+            // Remove existing marker
+            if (marker) {
+                map.removeLayer(marker);
+            }
+            
+            // Add new marker
+            const icon = L.divIcon({
+                html: '<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); width: 30px; height: 30px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.3);"></div>',
+                iconSize: [30, 30],
+                iconAnchor: [15, 30]
+            });
+            
+            marker = L.marker([lat, lng], { icon }).addTo(map);
+            
+            // Save coordinates
+            document.getElementById('latitude').value = lat;
+            document.getElementById('longitude').value = lng;
+            
+            // Trigger autosave
+            FormUtils.autosave(2, FormUtils.collectCurrentStepData());
+        }
+        
+        function useCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        
+                        map.setView([lat, lng], 15);
+                        dropPin(lat, lng);
+                        
+                        alert('✅ Location set! / स्थान सेट हो गया!');
+                    },
+                    function() {
+                        alert('⚠️ Unable to get location. Please click on the map.\n\nस्थान नहीं मिल सका। कृपया मैप पर क्लिक करें।');
+                    }
+                );
+            } else {
+                alert('⚠️ Location not supported. Please click on the map.\n\nस्थान समर्थित नहीं है। कृपया मैप पर क्लिक करें।');
+            }
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', initMap);
+    </script>
+</body>
+</html>

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Property - Step 3 - Real Estate Wala Bhai</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="form-styles.css">
+    <script src="app-state.js"></script>
+    <script src="form-utils.js"></script>
+</head>
+<body>
+    <div class="gradient-bg"></div>
+    
+    <div class="container">
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 50%"></div>
+            </div>
+            <div class="progress-text">Step 3 of 6 (50%)</div>
+        </div>
+
+        <!-- Form Card -->
+        <div class="form-card">
+            <h1 class="form-title">Tell us about your property</h1>
+            <p class="form-subtitle">अपनी संपत्ति के बारे में बताएं</p>
+
+            <form id="step3Form">
+                <!-- Bedrooms -->
+                <div class="form-group">
+                    <label class="form-label">
+                        How many bedrooms? / कितने बेडरूम हैं?
+                    </label>
+                    
+                    <div class="option-group">
+                        <div class="option-card">
+                            <input type="radio" name="bedrooms" value="1" id="bed1" class="option-input" required>
+                            <label for="bed1" class="option-label">
+                                <div class="option-icon">🛏️</div>
+                                <div class="option-title">1 BHK</div>
+                            </label>
+                        </div>
+
+                        <div class="option-card">
+                            <input type="radio" name="bedrooms" value="2" id="bed2" class="option-input" required>
+                            <label for="bed2" class="option-label">
+                                <div class="option-icon">🛏️🛏️</div>
+                                <div class="option-title">2 BHK</div>
+                            </label>
+                        </div>
+
+                        <div class="option-card">
+                            <input type="radio" name="bedrooms" value="3" id="bed3" class="option-input" required>
+                            <label for="bed3" class="option-label">
+                                <div class="option-icon">🛏️</div>
+                                <div class="option-title">3 BHK</div>
+                            </label>
+                        </div>
+
+                        <div class="option-card">
+                            <input type="radio" name="bedrooms" value="4" id="bed4" class="option-input" required>
+                            <label for="bed4" class="option-label">
+                                <div class="option-icon">🛏️</div>
+                                <div class="option-title">4 BHK</div>
+                            </label>
+                        </div>
+
+                        <div class="option-card">
+                            <input type="radio" name="bedrooms" value="5" id="bed5" class="option-input" required>
+                            <label for="bed5" class="option-label">
+                                <div class="option-icon">🛏️</div>
+                                <div class="option-title">5+ BHK</div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bathrooms -->
+                <div class="form-group">
+                    <label class="form-label">
+                        How many bathrooms? / कितने बाथरूम हैं?
+                    </label>
+                    
+                    <div class="option-group">
+                        <div class="option-card">
+                            <input type="radio" name="bathrooms" value="1" id="bath1" class="option-input" required>
+                            <label for="bath1" class="option-label">
+                                <div class="option-icon">🚿</div>
+                                <div class="option-title">1</div>
+                            </label>
+                        </div>
+
+                        <div class="option-card">
+                            <input type="radio" name="bathrooms" value="2" id="bath2" class="option-input" required>
+                            <label for="bath2" class="option-label">
+                                <div class="option-icon">🚿</div>
+                                <div class="option-title">2</div>
+                            </label>
+                        </div>
+
+                        <div class="option-card">
+                            <input type="radio" name="bathrooms" value="3" id="bath3" class="option-input" required>
+                            <label for="bath3" class="option-label">
+                                <div class="option-icon">🚿</div>
+                                <div class="option-title">3</div>
+                            </label>
+                        </div>
+
+                        <div class="option-card">
+                            <input type="radio" name="bathrooms" value="4" id="bath4" class="option-input" required>
+                            <label for="bath4" class="option-label">
+                                <div class="option-icon">🚿</div>
+                                <div class="option-title">4+</div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Square Feet -->
+                <div class="form-group">
+                    <label class="form-label" for="sqft">
+                        Property Size (Square Feet) / संपत्ति का आकार (वर्ग फुट)
+                    </label>
+                    <input type="number" 
+                           class="form-input" 
+                           id="sqft" 
+                           name="sqft" 
+                           placeholder="e.g., 1450"
+                           min="100"
+                           required>
+                </div>
+
+                <!-- Parking -->
+                <div class="form-group">
+                    <label class="form-label">
+                        Parking Available? / पार्किंग उपलब्ध है?
+                    </label>
+                    
+                    <div class="option-group">
+                        <div class="option-card">
+                            <input type="radio" name="parking" value="yes" id="parkingYes" class="option-input" required>
+                            <label for="parkingYes" class="option-label">
+                                <div class="option-icon">🚗</div>
+                                <div class="option-title">Yes / हाँ</div>
+                            </label>
+                        </div>
+
+                        <div class="option-card">
+                            <input type="radio" name="parking" value="no" id="parkingNo" class="option-input" required>
+                            <label for="parkingNo" class="option-label">
+                                <div class="option-icon">🚫</div>
+                                <div class="option-title">No / नहीं</div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Furnished Status -->
+                <div class="form-group">
+                    <label class="form-label">
+                        Furnishing Status / फर्निशिंग स्थिति
+                    </label>
+                    
+                    <div class="option-group">
+                        <div class="option-card">
+                            <input type="radio" name="furnished" value="unfurnished" id="furnUnfurnished" class="option-input" required>
+                            <label for="furnUnfurnished" class="option-label">
+                                <div class="option-icon">📦</div>
+                                <div class="option-title">Empty</div>
+                                <div class="option-desc">खाली</div>
+                            </label>
+                        </div>
+
+                        <div class="option-card">
+                            <input type="radio" name="furnished" value="semi" id="furnSemi" class="option-input" required>
+                            <label for="furnSemi" class="option-label">
+                                <div class="option-icon">🪑</div>
+                                <div class="option-title">Semi-Furnished</div>
+                                <div class="option-desc">आंशिक फर्निश्ड</div>
+                            </label>
+                        </div>
+
+                        <div class="option-card">
+                            <input type="radio" name="furnished" value="fully" id="furnFully" class="option-input" required>
+                            <label for="furnFully" class="option-label">
+                                <div class="option-icon">🛋️</div>
+                                <div class="option-title">Fully Furnished</div>
+                                <div class="option-desc">पूर्ण फर्निश्ड</div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Help Text -->
+                <div class="help-text">
+                    <div class="help-icon">💡</div>
+                    <div class="help-content">
+                        <div class="help-title">Tip / सुझाव</div>
+                        <div class="help-desc">
+                            Accurate details help set the right price and attract serious buyers!
+                            <br>सही जानकारी से सही कीमत मिलती है और गंभीर खरीदार आकर्षित होते हैं!
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <div class="form-navigation">
+                    <button type="button" class="btn btn-back" onclick="FormUtils.previousStep()">
+                        ← Back / पीछे
+                    </button>
+                    <button type="button" class="btn btn-next" onclick="FormUtils.nextStep()">
+                        Continue / जारी रखें →
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

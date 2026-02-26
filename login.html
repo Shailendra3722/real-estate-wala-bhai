@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Real Estate Wala Bhai</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <!-- Global App State -->
+    <script src="app-state.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            overflow-x: hidden;
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #334155 100%);
+            min-height: 100vh;
+            width: 100vw;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+
+        /* Animated gradient background */
+        .gradient-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, 
+                #667eea 0%, 
+                #764ba2 25%, 
+                #f093fb 50%, 
+                #4facfe 75%, 
+                #00f2fe 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            opacity: 0.15;
+            z-index: 0;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Floating particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(100px);
+                opacity: 0;
+            }
+        }
+
+        /* Main container */
+        .login-container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 450px;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Glassmorphism card */
+        .login-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 3rem 2.5rem;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Logo section */
+        .logo-section {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .logo-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .welcome-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.5px;
+        }
+
+        .welcome-subtitle {
+            font-size: 1.05rem;
+            color: #cbd5e1;
+            font-weight: 300;
+            line-height: 1.6;
+        }
+
+        /* Form section */
+        .auth-form {
+            margin-top: 2.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.9rem;
+            color: #e2e8f0;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            font-size: 1rem;
+            color: #ffffff;
+            font-family: 'Outfit', sans-serif;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-input::placeholder {
+            color: #94a3b8;
+        }
+
+        .form-input:focus {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .helper-text {
+            margin-top: 0.75rem;
+            font-size: 0.85rem;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .helper-icon {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            background: rgba(102, 126, 234, 0.2);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+        }
+
+        /* Continue button */
+        .btn-continue {
+            width: 100%;
+            padding: 1.1rem 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 15px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #ffffff;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 2rem;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-continue::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-continue:hover::before {
+            left: 100%;
+        }
+
+        .btn-continue:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-continue:active {
+            transform: translateY(-1px);
+        }
+
+        /* Divider */
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 2rem 0;
+            gap: 1rem;
+        }
+
+        .divider-line {
+            flex: 1;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .divider-text {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            font-weight: 300;
+        }
+
+        /* Social login */
+        .social-login {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-btn {
+            flex: 1;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+            color: #e2e8f0;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .social-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .social-icon {
+            font-size: 1.3rem;
+        }
+
+        /* Footer text */
+        .footer-text {
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        .footer-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .footer-link:hover {
+            color: #764ba2;
+        }
+
+        /* Responsive design */
+        @media (max-width: 640px) {
+            .login-card {
+                padding: 2rem 1.5rem;
+            }
+
+            .welcome-title {
+                font-size: 2rem;
+            }
+
+            .welcome-subtitle {
+                font-size: 0.95rem;
+            }
+
+            .social-login {
+                flex-direction: column;
+            }
+        }
+
+        /* Input animation on page load */
+        .form-group {
+            animation: slideInLeft 0.6s ease-out backwards;
+        }
+
+        .form-group:nth-child(1) {
+            animation-delay: 0.2s;
+        }
+
+        .form-group:nth-child(2) {
+            animation-delay: 0.3s;
+        }
+
+        .btn-continue {
+            animation: slideInLeft 0.6s ease-out 0.4s backwards;
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated background -->
+    <div class="gradient-bg"></div>
+    
+    <!-- Floating particles -->
+    <div class="particles" id="particles"></div>
+    
+    <!-- Main login container -->
+    <div class="login-container">
+        <div class="login-card">
+            <!-- Logo and welcome section -->
+            <div class="logo-section">
+                <div class="logo-icon">🏡</div>
+                <h1 class="welcome-title">Welcome 👋</h1>
+                <p class="welcome-subtitle">Sign in to explore verified properties near you</p>
+            </div>
+
+            <!-- Auth form -->
+            <form class="auth-form" id="authForm">
+                <div class="form-group">
+                    <input 
+                        type="text" 
+                        class="form-input" 
+                        id="nameInput"
+                        placeholder="Enter your name"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <input 
+                        type="tel" 
+                        class="form-input" 
+                        id="phoneInput"
+                        placeholder="Enter your phone number"
+                        required
+                    >
+                    <div class="helper-text">
+                        <span class="helper-icon">ℹ️</span>
+                        <span>We'll send you a one-time password for verification</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <select class="form-input" id="roleSelect" required>
+                        <option value="">I am looking to...</option>
+                        <option value="buyer">Buy a Property</option>
+                        <option value="owner">Sell/Rent a Property</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-continue">
+                    Continue
+                </button>
+            </form>
+
+            <!-- Divider -->
+            <div class="divider">
+                <div class="divider-line"></div>
+                <span class="divider-text">or continue with</span>
+                <div class="divider-line"></div>
+            </div>
+
+            <!-- Social login options -->
+            <div class="social-login">
+                <button class="social-btn" onclick="handleGoogleLogin()">
+                    <span class="social-icon">🔍</span>
+                    <span>Google</span>
+                </button>
+                <button class="social-btn" onclick="handleEmailLogin()">
+                    <span class="social-icon">📧</span>
+                    <span>Email</span>
+                </button>
+            </div>
+
+            <!-- Footer -->
+            <p class="footer-text">
+                By continuing, you agree to our <a href="#" class="footer-link">Terms</a> & <a href="#" class="footer-link">Privacy Policy</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Create floating particles
+        const particlesContainer = document.getElementById('particles');
+        const particleCount = 25;
+
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            
+            // Random starting position
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.top = Math.random() * 100 + '%';
+            
+            // Random animation delay and duration
+            particle.style.animationDelay = Math.random() * 20 + 's';
+            particle.style.animationDuration = (Math.random() * 10 + 15) + 's';
+            
+            // Random size
+            const size = Math.random() * 4 + 2;
+            particle.style.width = size + 'px';
+            particle.style.height = size + 'px';
+            
+            particlesContainer.appendChild(particle);
+        }
+
+        // Handle form submission
+        document.getElementById('authForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const userName = document.getElementById('nameInput').value;
+            const phoneNumber = document.getElementById('phoneInput').value;
+            const userRole = document.getElementById('roleSelect').value;
+            
+            if (!userName || !phoneNumber || !userRole) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            // Add loading state to button
+            const btn = document.querySelector('.btn-continue');
+            const originalText = btn.textContent;
+            btn.textContent = 'Verifying...';
+            btn.style.opacity = '0.7';
+            btn.disabled = true;
+            
+            // Simulate OTP verification process
+            setTimeout(() => {
+                // Generate unique user ID
+                const userId = 'user_' + Date.now();
+                
+                // Store user data in AppState
+                AppState.setUser({
+                    id: userId,
+                    name: userName,
+                    phone: phoneNumber,
+                    email: null, // Can be added later
+                    avatar: null
+                });
+                
+                // Set user role
+                AppState.setRole(userRole);
+                
+                // Generate and store auth token
+                const authToken = 'token_' + Math.random().toString(36).substr(2, 9) + Date.now();
+                AppState.setAuthToken(authToken);
+                
+                // Show success message
+                console.log('✅ Login successful!');
+                console.log('User ID:', userId);
+                console.log('Name:', userName);
+                console.log('Phone:', phoneNumber);
+                console.log('Role:', userRole);
+                
+                // Debug state
+                AppState.debugState();
+                
+                // Check for stored intent and redirect accordingly
+                const intent = AppState.getIntent();
+                console.log('🎯 Stored intent:', intent);
+                
+                let redirectUrl = 'home.html'; // Default
+                
+                if (intent) {
+                    switch(intent) {
+                        case 'buy':
+                            redirectUrl = 'home.html?filter=buy';
+                            console.log('📍 Redirecting to buy properties');
+                            break;
+                        case 'sell':
+                        case 'owner':
+                            redirectUrl = 'add-property-step1.html';
+                            console.log('📍 Redirecting to add property form');
+                            break;
+                        case 'rent':
+                            redirectUrl = 'home.html?filter=rent';
+                            console.log('📍 Redirecting to rent properties');
+                            break;
+                        case 'map':
+                            redirectUrl = 'map-explore.html';
+                            console.log('📍 Redirecting to map explorer');
+                            break;
+                        default:
+                            console.log('📍 Unknown intent, redirecting to home');
+                    }
+                    
+                    // Clear intent after processing
+                    AppState.clearIntent();
+                }
+                
+                // Redirect to appropriate page
+                window.location.href = redirectUrl;
+                
+            }, 1500);
+        });
+
+        // Phone number formatting (optional enhancement)
+        document.getElementById('phoneInput').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 10) {
+                value = value.slice(0, 10);
+            }
+            e.target.value = value;
+        });
+
+        // Social login handlers
+        function handleGoogleLogin() {
+            alert('Google login would be implemented here');
+        }
+
+        function handleEmailLogin() {
+            alert('Email login would be implemented here');
+        }
+    </script>
+</body>
+</html>
