@@ -1,0 +1,816 @@
+/**
+ * ====================================================
+ *  3D MODERN DESIGN SYSTEM
+ *  Real Estate Wala Bhai — Next Dimension Edition
+ * ====================================================
+ *
+ *  Concepts:
+ *  - Layered physical depth (multi-stop box-shadow)
+ *  - Holographic shimmer on hover
+ *  - Neomorphic press on :active
+ *  - Crystal glass surfaces
+ *  - Floating atmospheric orbs
+ *  - Perspective-tilt cards
+ * ====================================================
+ */
+
+/* ====================================================
+   3D DESIGN TOKENS
+==================================================== */
+
+:root {
+    /* 3D Shadow Stack */
+    --shadow-3d-raised:
+        0 1px 0px rgba(255,255,255,0.35) inset,   /* top highlight */
+        0 -1px 0px rgba(0,0,0,0.15) inset,        /* bottom inner edge */
+        0 2px 4px rgba(0,0,0,0.08),
+        0 4px 8px rgba(0,0,0,0.06),
+        0 8px 20px rgba(0,0,0,0.08),
+        0 16px 40px rgba(0,0,0,0.06);
+
+    --shadow-3d-float:
+        0 1px 0px rgba(255,255,255,0.4) inset,
+        0 4px 8px rgba(0,0,0,0.06),
+        0 12px 32px rgba(0,0,0,0.10),
+        0 24px 64px rgba(0,0,0,0.08),
+        0 0 0 1px rgba(255,255,255,0.08);
+
+    --shadow-3d-inset:
+        0 1px 3px rgba(0,0,0,0.2) inset,
+        0 3px 8px rgba(0,0,0,0.15) inset,
+        0 0px 0px rgba(255,255,255,0.0);
+
+    /* Holographic gradient for shimmer */
+    --holo-shimmer: linear-gradient(
+        105deg,
+        transparent 20%,
+        rgba(255,255,255,0.6) 35%,
+        rgba(160,220,255,0.4) 45%,
+        rgba(255,200,255,0.4) 55%,
+        rgba(255,255,220,0.4) 65%,
+        rgba(255,255,255,0.6) 75%,
+        transparent 90%
+    );
+
+    /* 3D Button Blue glow */
+    --glow-3d-primary: 
+        0 0 20px rgba(99,179,237,0.35),
+        0 0 60px rgba(37,99,235,0.2),
+        0 8px 24px rgba(37,99,235,0.3);
+
+    /* Crystal glass */
+    --crystal-bg: linear-gradient(
+        135deg,
+        rgba(255,255,255,0.22) 0%,
+        rgba(255,255,255,0.08) 50%,
+        rgba(255,255,255,0.14) 100%
+    );
+
+    --ease-spring-3d: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --ease-smooth-3d: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* ====================================================
+   FLOATING BACKGROUND ORBS
+==================================================== */
+
+.orb-container {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.45;
+    will-change: transform;
+}
+
+.orb-1 {
+    width: 600px; height: 600px;
+    top: -200px; left: -150px;
+    background: radial-gradient(circle, rgba(37,99,235,0.5) 0%, rgba(59,130,246,0.2) 60%, transparent 100%);
+    animation: orbFloat1 22s ease-in-out infinite alternate;
+}
+
+.orb-2 {
+    width: 500px; height: 500px;
+    top: 30%; right: -150px;
+    background: radial-gradient(circle, rgba(139,92,246,0.4) 0%, rgba(168,85,247,0.15) 60%, transparent 100%);
+    animation: orbFloat2 18s ease-in-out infinite alternate;
+}
+
+.orb-3 {
+    width: 400px; height: 400px;
+    bottom: 5%; left: 20%;
+    background: radial-gradient(circle, rgba(16,185,129,0.3) 0%, rgba(52,211,153,0.1) 60%, transparent 100%);
+    animation: orbFloat3 25s ease-in-out infinite alternate;
+}
+
+.orb-4 {
+    width: 350px; height: 350px;
+    top: 55%; left: 45%;
+    background: radial-gradient(circle, rgba(245,158,11,0.25) 0%, rgba(251,191,36,0.08) 60%, transparent 100%);
+    animation: orbFloat4 20s ease-in-out infinite alternate;
+}
+
+@keyframes orbFloat1 {
+    0%   { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(80px, 60px) scale(1.15); }
+}
+@keyframes orbFloat2 {
+    0%   { transform: translate(0, 0) scale(1.1); }
+    100% { transform: translate(-60px, 80px) scale(0.9); }
+}
+@keyframes orbFloat3 {
+    0%   { transform: translate(0, 0) scale(0.95); }
+    100% { transform: translate(40px, -50px) scale(1.1); }
+}
+@keyframes orbFloat4 {
+    0%   { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(-30px, -60px) scale(1.05); }
+}
+
+/* ====================================================
+   3D PRIMARY BUTTON
+==================================================== */
+
+.btn-3d-primary {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.85rem 1.75rem;
+    font-family: var(--font-primary);
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: none;
+    color: #ffffff;
+    background: linear-gradient(
+        160deg,
+        #4f8ef5 0%,
+        #2563eb 40%,
+        #1d4ed8 100%
+    );
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    overflow: hidden;
+    transition:
+        transform 0.18s var(--ease-spring-3d),
+        box-shadow 0.25s var(--ease-smooth-3d);
+    box-shadow:
+        0 1px 0px rgba(255,255,255,0.3) inset,
+        0 -2px 0px rgba(0,0,0,0.2) inset,
+        0 4px 0px #1239a0,
+        0 6px 12px rgba(37,99,235,0.35),
+        0 12px 32px rgba(37,99,235,0.2);
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    text-decoration: none;
+}
+
+/* Shimmer layer */
+.btn-3d-primary::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--holo-shimmer);
+    background-size: 300% 100%;
+    background-position: 120% center;
+    opacity: 0;
+    transition:
+        opacity 0.3s ease,
+        background-position 0.6s ease;
+    z-index: 1;
+    border-radius: inherit;
+}
+
+/* Top-edge light strip */
+.btn-3d-primary::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 10%; right: 10%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
+    border-radius: 999px;
+    z-index: 2;
+}
+
+.btn-3d-primary span {
+    position: relative;
+    z-index: 3;
+}
+
+.btn-3d-primary:hover {
+    transform: translateY(-3px);
+    box-shadow:
+        0 1px 0px rgba(255,255,255,0.4) inset,
+        0 -2px 0px rgba(0,0,0,0.2) inset,
+        0 5px 0px #0f2a80,
+        0 8px 24px rgba(37,99,235,0.5),
+        0 20px 50px rgba(37,99,235,0.25),
+        0 0 0 1px rgba(99,179,237,0.2);
+}
+
+.btn-3d-primary:hover::before {
+    opacity: 1;
+    background-position: -20% center;
+    transition:
+        opacity 0.3s ease,
+        background-position 0.9s ease;
+}
+
+.btn-3d-primary:active {
+    transform: translateY(2px);
+    box-shadow:
+        0 1px 3px rgba(0,0,0,0.25) inset,
+        0 3px 8px rgba(0,0,0,0.2) inset,
+        0 0px 0px #1239a0,
+        0 2px 8px rgba(37,99,235,0.2);
+}
+
+/* ====================================================
+   3D GHOST / OUTLINE BUTTON
+==================================================== */
+
+.btn-3d-ghost {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.85rem 1.75rem;
+    font-family: var(--font-primary);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--royal-600);
+    background: rgba(255,255,255,0.06);
+    border: 1.5px solid rgba(37,99,235,0.35);
+    border-radius: 14px;
+    cursor: pointer;
+    overflow: hidden;
+    transition:
+        transform 0.18s var(--ease-spring-3d),
+        box-shadow 0.25s var(--ease-smooth-3d),
+        background 0.25s ease;
+    box-shadow:
+        0 1px 0px rgba(255,255,255,0.12) inset,
+        0 2px 8px rgba(37,99,235,0.08),
+        0 6px 20px rgba(37,99,235,0.06);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    text-decoration: none;
+    user-select: none;
+}
+
+.btn-3d-ghost::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(37,99,235,0.08) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: inherit;
+}
+
+.btn-3d-ghost:hover {
+    transform: translateY(-2px);
+    background: rgba(37,99,235,0.06);
+    border-color: rgba(37,99,235,0.6);
+    box-shadow:
+        0 1px 0px rgba(255,255,255,0.15) inset,
+        0 0 0 3px rgba(37,99,235,0.1),
+        0 8px 24px rgba(37,99,235,0.15),
+        0 0 20px rgba(37,99,235,0.08);
+    color: var(--royal-700);
+}
+
+.btn-3d-ghost:hover::before { opacity: 1; }
+
+.btn-3d-ghost:active {
+    transform: translateY(1px);
+    box-shadow:
+        0 1px 3px rgba(0,0,0,0.1) inset,
+        0 2px 6px rgba(37,99,235,0.08);
+}
+
+/* ====================================================
+   3D CRYSTAL CARD BUTTON (for action tiles)
+==================================================== */
+
+.btn-3d-crystal {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1.75rem 1.25rem;
+    background: var(--crystal-bg);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 20px;
+    cursor: pointer;
+    overflow: hidden;
+    transition:
+        transform 0.22s var(--ease-spring-3d),
+        box-shadow 0.28s var(--ease-smooth-3d);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow:
+        0 1px 0px rgba(255,255,255,0.5) inset,
+        0 -1px 0px rgba(0,0,0,0.08) inset,
+        0 4px 12px rgba(0,0,0,0.08),
+        0 10px 28px rgba(0,0,0,0.06),
+        0 0 0 1px rgba(255,255,255,0.08);
+    text-align: center;
+    user-select: none;
+}
+
+/* Crystal refraction top-highlight */
+.btn-3d-crystal::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 5%; right: 5%;
+    height: 50%;
+    background: linear-gradient(
+        180deg,
+        rgba(255,255,255,0.18) 0%,
+        transparent 100%
+    );
+    border-radius: 20px 20px 50% 50%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Animated gradient border glow on hover */
+.btn-3d-crystal::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: 21px;
+    background: linear-gradient(135deg,
+        rgba(37,99,235,0) 0%,
+        rgba(99,179,237,0.6) 40%,
+        rgba(167,139,250,0.6) 60%,
+        rgba(37,99,235,0) 100%
+    );
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.btn-3d-crystal:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow:
+        0 2px 0px rgba(255,255,255,0.55) inset,
+        0 -1px 0px rgba(0,0,0,0.05) inset,
+        0 8px 24px rgba(0,0,0,0.10),
+        0 20px 60px rgba(37,99,235,0.12),
+        0 0 0 1.5px rgba(255,255,255,0.2);
+}
+
+.btn-3d-crystal:hover::after { opacity: 1; }
+
+.btn-3d-crystal:active {
+    transform: translateY(-1px) scale(0.98);
+    box-shadow:
+        0 1px 4px rgba(0,0,0,0.12) inset,
+        0 4px 12px rgba(0,0,0,0.06);
+}
+
+/* Map button variant — Blue crystal */
+.btn-3d-crystal.crystal-map {
+    background: linear-gradient(
+        160deg,
+        rgba(37,99,235,0.85) 0%,
+        rgba(29,78,216,0.9) 100%
+    );
+    border-color: rgba(99,179,237,0.4);
+    box-shadow:
+        0 1px 0px rgba(255,255,255,0.3) inset,
+        0 -2px 0px rgba(0,0,0,0.25) inset,
+        0 4px 0px #0f2a80,
+        0 8px 24px rgba(37,99,235,0.3),
+        0 16px 48px rgba(37,99,235,0.15);
+}
+
+.btn-3d-crystal.crystal-map:hover {
+    transform: translateY(-7px) scale(1.03);
+    box-shadow:
+        0 2px 0px rgba(255,255,255,0.35) inset,
+        0 -2px 0px rgba(0,0,0,0.25) inset,
+        0 6px 0px #0a1e6a,
+        0 12px 32px rgba(37,99,235,0.4),
+        0 24px 64px rgba(37,99,235,0.2),
+        0 0 40px rgba(99,179,237,0.2);
+}
+
+/* ====================================================
+   CRYSTAL TILE TEXT
+==================================================== */
+
+.crystal-tile-icon {
+    font-size: 2.6rem;
+    display: block;
+    position: relative;
+    z-index: 2;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,0.15));
+    transition: transform 0.3s var(--ease-spring-3d);
+}
+
+.btn-3d-crystal:hover .crystal-tile-icon {
+    transform: scale(1.12) translateY(-2px);
+}
+
+.crystal-tile-text {
+    font-size: 0.95rem;
+    font-weight: 600;
+    position: relative;
+    z-index: 2;
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+}
+
+.crystal-map .crystal-tile-text {
+    color: #ffffff;
+}
+
+/* ====================================================
+   3D PROPERTY CARD
+==================================================== */
+
+.property-card-3d {
+    position: relative;
+    background: rgba(255,255,255,0.95);
+    border: 1px solid rgba(255,255,255,0.8);
+    border-radius: 20px;
+    overflow: hidden;
+    cursor: pointer;
+    transition:
+        transform 0.28s var(--ease-smooth-3d),
+        box-shadow 0.28s var(--ease-smooth-3d);
+    box-shadow:
+        0 1px 0px rgba(255,255,255,0.9) inset,
+        0 4px 8px rgba(15,23,42,0.06),
+        0 8px 24px rgba(15,23,42,0.06),
+        0 20px 64px rgba(15,23,42,0.08);
+    will-change: transform, box-shadow;
+}
+
+.property-card-3d:hover {
+    transform: translateY(-8px);
+    box-shadow:
+        0 1px 0px rgba(255,255,255,0.9) inset,
+        0 8px 16px rgba(15,23,42,0.08),
+        0 20px 48px rgba(15,23,42,0.10),
+        0 40px 96px rgba(37,99,235,0.08),
+        0 0 0 1.5px rgba(37,99,235,0.08);
+}
+
+/* ====================================================
+   3D SEARCH BAR
+==================================================== */
+
+.search-3d {
+    position: relative;
+    filter: drop-shadow(0 6px 20px rgba(15,23,42,0.09));
+}
+
+.search-3d .search-input {
+    background: rgba(255,255,255,0.96);
+    border: 1.5px solid rgba(255,255,255,0.9);
+    border-radius: 18px;
+    box-shadow:
+        0 1px 0px rgba(255,255,255,1) inset,
+        0 -1px 0px rgba(0,0,0,0.05) inset,
+        0 4px 8px rgba(15,23,42,0.06),
+        0 10px 28px rgba(15,23,42,0.07);
+    transition:
+        transform 0.22s var(--ease-spring-3d),
+        box-shadow 0.25s var(--ease-smooth-3d),
+        border-color 0.2s ease;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+.search-3d .search-input:focus {
+    transform: translateY(-2px);
+    border-color: rgba(37,99,235,0.4);
+    box-shadow:
+        0 1px 0px rgba(255,255,255,1) inset,
+        0 -1px 0px rgba(0,0,0,0.04) inset,
+        0 0 0 3px rgba(37,99,235,0.08),
+        0 8px 24px rgba(37,99,235,0.1),
+        0 16px 48px rgba(15,23,42,0.06);
+}
+
+/* ====================================================
+   3D LOGO ICON
+==================================================== */
+
+.logo-icon-3d {
+    position: relative;
+    width: 52px;
+    height: 52px;
+    background: linear-gradient(160deg, #5a9af5 0%, #2563eb 45%, #1d4ed8 100%);
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    cursor: default;
+    box-shadow:
+        0 1px 0px rgba(255,255,255,0.35) inset,
+        0 -2px 0px rgba(0,0,0,0.2) inset,
+        0 4px 0px #0f2a80,
+        0 6px 16px rgba(37,99,235,0.35),
+        0 12px 32px rgba(37,99,235,0.2);
+    transition: transform 0.22s var(--ease-spring-3d), box-shadow 0.25s ease;
+}
+
+.logo-icon-3d:hover {
+    transform: translateY(-2px) scale(1.04);
+    box-shadow:
+        0 1px 0px rgba(255,255,255,0.4) inset,
+        0 -2px 0px rgba(0,0,0,0.2) inset,
+        0 6px 0px #0a1e6a,
+        0 10px 24px rgba(37,99,235,0.4),
+        0 20px 48px rgba(37,99,235,0.2);
+}
+
+/* ====================================================
+   3D FAVORITE BUTTON
+==================================================== */
+
+.btn-3d-favorite {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 42px;
+    height: 42px;
+    background: rgba(255,255,255,0.95);
+    border: 1px solid rgba(255,255,255,0.8);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition:
+        transform 0.2s var(--ease-spring-3d),
+        box-shadow 0.2s ease;
+    box-shadow:
+        0 1px 0px rgba(255,255,255,0.9) inset,
+        0 2px 6px rgba(0,0,0,0.1),
+        0 6px 18px rgba(0,0,0,0.08);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 5;
+}
+
+.btn-3d-favorite:hover {
+    transform: scale(1.18);
+    box-shadow:
+        0 1px 0px rgba(255,255,255,0.9) inset,
+        0 4px 12px rgba(239,68,68,0.25),
+        0 8px 24px rgba(239,68,68,0.15);
+    background: rgba(255,255,255,1);
+}
+
+.btn-3d-favorite:active {
+    transform: scale(0.9);
+    box-shadow:
+        0 1px 3px rgba(0,0,0,0.12) inset,
+        0 2px 6px rgba(0,0,0,0.08);
+}
+
+/* ====================================================
+   3D USER PROFILE AVATAR
+==================================================== */
+
+.user-profile-3d {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(155deg, #5a9af5 0%, #2563eb 50%, #7c3aed 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition:
+        transform 0.22s var(--ease-spring-3d),
+        box-shadow 0.25s ease;
+    box-shadow:
+        0 1px 0px rgba(255,255,255,0.3) inset,
+        0 -1px 0px rgba(0,0,0,0.18) inset,
+        0 2px 0px #1239a0,
+        0 4px 12px rgba(37,99,235,0.3),
+        0 8px 24px rgba(37,99,235,0.15);
+    border: none;
+}
+
+.user-profile-3d:hover {
+    transform: translateY(-2px) scale(1.08);
+    box-shadow:
+        0 1px 0px rgba(255,255,255,0.35) inset,
+        0 -1px 0px rgba(0,0,0,0.18) inset,
+        0 4px 0px #0a1e6a,
+        0 8px 20px rgba(37,99,235,0.4),
+        0 14px 40px rgba(37,99,235,0.2),
+        0 0 30px rgba(124,58,237,0.15);
+}
+
+/* ====================================================
+   SECTION TITLE ACCENT
+==================================================== */
+
+.section-title-3d {
+    position: relative;
+    display: inline-block;
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+    margin-bottom: var(--space-6);
+}
+
+.section-title-3d::after {
+    content: '';
+    position: absolute;
+    bottom: -6px; left: 0;
+    height: 3px;
+    width: 40%;
+    background: linear-gradient(90deg, #2563eb, #7c3aed, transparent);
+    border-radius: 999px;
+}
+
+/* ====================================================
+   DARK MODE ADAPTATIONS
+==================================================== */
+
+[data-theme="dark"] .btn-3d-crystal {
+    background: linear-gradient(
+        135deg,
+        rgba(255,255,255,0.1) 0%,
+        rgba(255,255,255,0.04) 50%,
+        rgba(255,255,255,0.08) 100%
+    );
+    border-color: rgba(255,255,255,0.12);
+}
+
+[data-theme="dark"] .btn-3d-crystal::before {
+    background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, transparent 100%);
+}
+
+[data-theme="dark"] .property-card-3d {
+    background: rgba(30,41,59,0.95);
+    border-color: rgba(255,255,255,0.08);
+    box-shadow:
+        0 1px 0px rgba(255,255,255,0.06) inset,
+        0 4px 8px rgba(0,0,0,0.3),
+        0 12px 32px rgba(0,0,0,0.25),
+        0 24px 64px rgba(0,0,0,0.2);
+}
+
+[data-theme="dark"] .property-card-3d:hover {
+    box-shadow:
+        0 1px 0px rgba(255,255,255,0.08) inset,
+        0 8px 20px rgba(0,0,0,0.35),
+        0 20px 50px rgba(0,0,0,0.28),
+        0 40px 100px rgba(37,99,235,0.12);
+}
+
+[data-theme="dark"] .crystal-tile-text {
+    color: var(--text-on-dark);
+}
+
+[data-theme="dark"] .search-3d .search-input {
+    background: rgba(30,41,59,0.9);
+    border-color: rgba(255,255,255,0.1);
+    color: var(--text-on-dark);
+}
+
+[data-theme="dark"] .search-3d .search-input:focus {
+    border-color: rgba(37,99,235,0.5);
+    box-shadow:
+        0 1px 0px rgba(255,255,255,0.06) inset,
+        0 0 0 3px rgba(37,99,235,0.12),
+        0 8px 24px rgba(37,99,235,0.12),
+        0 16px 48px rgba(0,0,0,0.2);
+}
+
+[data-theme="dark"] .btn-3d-ghost {
+    color: var(--royal-500);
+    border-color: rgba(59,130,246,0.3);
+    background: rgba(255,255,255,0.04);
+}
+
+[data-theme="dark"] .btn-3d-favorite {
+    background: rgba(30,41,59,0.92);
+    border-color: rgba(255,255,255,0.12);
+}
+
+[data-theme="dark"] .user-profile-3d {
+    box-shadow:
+        0 1px 0px rgba(255,255,255,0.2) inset,
+        0 -1px 0px rgba(0,0,0,0.3) inset,
+        0 2px 0px #0a1e6a,
+        0 4px 12px rgba(37,99,235,0.4),
+        0 8px 24px rgba(37,99,235,0.2);
+}
+
+/* ====================================================
+   SECTION BACKGROUND LAYER
+==================================================== */
+
+.section-surface {
+    position: relative;
+    padding: var(--space-6);
+    border-radius: 24px;
+    background: rgba(255,255,255,0.5);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.7);
+    box-shadow:
+        0 1px 0px rgba(255,255,255,0.9) inset,
+        0 4px 12px rgba(15,23,42,0.04),
+        0 12px 32px rgba(15,23,42,0.05);
+    margin-bottom: var(--space-8);
+}
+
+[data-theme="dark"] .section-surface {
+    background: rgba(30,41,59,0.5);
+    border-color: rgba(255,255,255,0.07);
+    box-shadow:
+        0 1px 0px rgba(255,255,255,0.05) inset,
+        0 4px 12px rgba(0,0,0,0.2),
+        0 12px 32px rgba(0,0,0,0.15);
+}
+
+/* ====================================================
+   LOADING STATE - 3D Shimmer
+==================================================== */
+
+.skeleton-3d {
+    background: linear-gradient(
+        100deg,
+        rgba(240,244,255,0) 0%,
+        rgba(240,244,255,0.9) 30%,
+        rgba(210,230,255,0.8) 50%,
+        rgba(240,244,255,0.9) 70%,
+        rgba(240,244,255,0) 100%
+    );
+    background-size: 300% 100%;
+    background-color: rgba(226,232,240,0.8);
+    animation: skeleton3dShimmer 1.6s ease-in-out infinite;
+    border-radius: 12px;
+}
+
+[data-theme="dark"] .skeleton-3d {
+    background-color: rgba(51,65,85,0.8);
+    background: linear-gradient(
+        100deg,
+        rgba(51,65,85,0) 0%,
+        rgba(71,85,105,0.8) 30%,
+        rgba(100,116,139,0.6) 50%,
+        rgba(71,85,105,0.8) 70%,
+        rgba(51,65,85,0) 100%
+    );
+    background-size: 300% 100%;
+    background-color: rgba(51,65,85,0.8);
+}
+
+@keyframes skeleton3dShimmer {
+    0%   { background-position: 200% center; }
+    100% { background-position: -200% center; }
+}
+
+/* ====================================================
+   RESPONSIVE
+==================================================== */
+
+@media (max-width: 768px) {
+    .orb-1 { width: 350px; height: 350px; }
+    .orb-2 { width: 300px; height: 300px; }
+    .orb-3 { width: 250px; height: 250px; }
+    .orb-4 { display: none; }
+
+    .btn-3d-crystal {
+        padding: 1.25rem 1rem;
+        border-radius: 16px;
+    }
+
+    .crystal-tile-icon { font-size: 2rem; }
+    .crystal-tile-text { font-size: 0.85rem; }
+
+    .btn-3d-primary { padding: 0.75rem 1.4rem; font-size: 0.85rem; }
+}
