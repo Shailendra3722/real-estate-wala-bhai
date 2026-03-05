@@ -3,16 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home - Real Estate Wala Bhai</title>
+    <title>Real Estate Wala Bhai - Find Your Dream Home in India</title>
+    <meta name="description" content="Discover verified properties for sale and rent across India. Buy, sell, or rent homes with Real Estate Wala Bhai.">
+    <meta property="og:title" content="Real Estate Wala Bhai">
+    <meta property="og:description" content="Find verified properties across India - Buy, Sell, Rent.">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏡</text></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Luxury Design System -->
     <link rel="stylesheet" href="luxury-design-system.css">
     <link rel="stylesheet" href="luxury-components.css">
     <link rel="stylesheet" href="luxury-animations.css">
     <!-- 3D Modern Design System -->
     <link rel="stylesheet" href="3d-modern.css">
+    <!-- Fresh Modern Design System -->
+    <link rel="stylesheet" href="fresh-modern.css">
     <!-- Premium Loading Animation -->
     <link rel="stylesheet" href="loading-animation.css">
     <!-- UX Components -->
@@ -572,7 +579,7 @@
     <!-- Main container -->
     <div class="container">
         <!-- Header -->
-        <header class="header">
+        <header class="header" id="mainHeader">
             <div class="logo">
                 <div class="logo-icon logo-icon-3d">🏡</div>
                 <span class="logo-text">Real Estate Wala Bhai</span>
@@ -582,16 +589,72 @@
             <div class="user-profile user-profile-3d">👤</div>
         </header>
 
+        <!-- Hero Greeting Banner -->
+        <div class="hero-greeting" id="heroGreeting">
+            <div class="hero-label">🏙️ India's Trusted Platform</div>
+            <div class="hero-title">Find Your <span>Dream Home</span><br>Across India</div>
+            <div class="hero-subtitle">Verified listings · Real prices · Zero brokerage surprises</div>
+            <div class="live-badge">
+                <span class="live-dot"></span>
+                <span id="liveBadgeText">Loading properties...</span>
+            </div>
+        </div>
+
+        <!-- City Stats Chips -->
+        <div class="city-stats" id="cityStatsRow">
+            <div class="stat-chip active" data-city="all" onclick="filterByCity('all')">
+                <span class="stat-chip-emoji">🌏</span>
+                <span>All Cities</span>
+            </div>
+            <div class="stat-chip" data-city="Mumbai" onclick="filterByCity('Mumbai')">
+                <span class="stat-chip-emoji">🏙️</span>
+                <span>Mumbai</span>
+            </div>
+            <div class="stat-chip" data-city="Delhi" onclick="filterByCity('Delhi')">
+                <span class="stat-chip-emoji">🕌</span>
+                <span>Delhi</span>
+            </div>
+            <div class="stat-chip" data-city="Bangalore" onclick="filterByCity('Bangalore')">
+                <span class="stat-chip-emoji">🌿</span>
+                <span>Bangalore</span>
+            </div>
+            <div class="stat-chip" data-city="Hyderabad" onclick="filterByCity('Hyderabad')">
+                <span class="stat-chip-emoji">💎</span>
+                <span>Hyderabad</span>
+            </div>
+            <div class="stat-chip" data-city="Pune" onclick="filterByCity('Pune')">
+                <span class="stat-chip-emoji">🏔️</span>
+                <span>Pune</span>
+            </div>
+            <div class="stat-chip" data-city="Chennai" onclick="filterByCity('Chennai')">
+                <span class="stat-chip-emoji">🌊</span>
+                <span>Chennai</span>
+            </div>
+            <div class="stat-chip" data-city="Kolkata" onclick="filterByCity('Kolkata')">
+                <span class="stat-chip-emoji">🎨</span>
+                <span>Kolkata</span>
+            </div>
+            <div class="stat-chip" data-city="Ahmedabad" onclick="filterByCity('Ahmedabad')">
+                <span class="stat-chip-emoji">🏛️</span>
+                <span>Ahmedabad</span>
+            </div>
+            <div class="stat-chip" data-city="Jaipur" onclick="filterByCity('Jaipur')">
+                <span class="stat-chip-emoji">🌹</span>
+                <span>Jaipur</span>
+            </div>
+        </div>
+
         <!-- Search section -->
         <section class="search-section">
-            <div class="search-container search-3d">
+            <div class="search-container search-3d search-wrapper-fresh">
                 <span class="search-icon">🔍</span>
                 <input 
                     type="text" 
                     class="search-input" 
-                    placeholder="Search by area, city, or landmark"
+                    placeholder="Search by area, city, or landmark..."
                     id="searchInput"
                 >
+                <span class="search-badge-fresh">⌘ Search</span>
             </div>
         </section>
 
@@ -602,6 +665,10 @@
                 <button class="btn-3d-crystal" onclick="handleAction('buy')">
                     <span class="crystal-tile-icon">🏠</span>
                     <div class="crystal-tile-text">Buy</div>
+                </button>
+                <button class="btn-3d-crystal" onclick="handleAction('rent')">
+                    <span class="crystal-tile-icon">🔑</span>
+                    <div class="crystal-tile-text">Rent</div>
                 </button>
                 <button class="btn-3d-crystal" onclick="handleAction('sell')">
                     <span class="crystal-tile-icon">🏷️</span>
@@ -617,31 +684,67 @@
         <!-- All properties -->
         <section class="featured-section">
             <div class="featured-header">
-                <h2 class="section-title section-title-3d">All Properties</h2>
-                <a href="#" class="view-all" onclick="handleAction('filter'); return false;">Filter →</a>
+                <h2 class="section-title section-title-3d" id="propertySectionTitle">All Properties</h2>
             </div>
-            <div class="property-grid">
+
+            <!-- Filter bar -->
+            <div class="filter-bar" id="filterBar">
+                <button class="filter-pill active" id="filterAll" onclick="applyFilter('all')">🏘️ All</button>
+                <button class="filter-pill" id="filterBuy" onclick="applyFilter('buy')">🏠 Buy</button>
+                <button class="filter-pill" id="filterRent" onclick="applyFilter('rent')">🔑 Rent</button>
+                <button class="filter-pill" id="filterVerified" onclick="applyFilter('verified')">✅ Verified</button>
+                <button class="filter-pill" id="filterFeatured" onclick="applyFilter('featured')">⭐ Featured</button>
+            </div>
+
+            <!-- Listing toolbar -->
+            <div class="listing-toolbar">
+                <div class="listing-count-chip">
+                    <span>🏠</span>
+                    <span class="listing-count-number stat-number" id="listingCountNum">0</span>
+                    <span>listings</span>
+                </div>
+                <div style="display:flex;gap:0.6rem;align-items:center;">
+                    <div class="sort-dropdown">
+                        <span>↕️</span>
+                        <select id="sortSelect" onchange="applySortAndRender()">
+                            <option value="default">Default</option>
+                            <option value="price-asc">Price: Low → High</option>
+                            <option value="price-desc">Price: High → Low</option>
+                            <option value="sqft">Largest First</option>
+                        </select>
+                    </div>
+                    <button class="btn-refresh" id="refreshBtn" onclick="refreshListings()">
+                        <span class="refresh-icon">🔄</span>
+                        <span>Refresh</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="property-grid" id="propertyGrid">
                 <!-- Properties will be loaded dynamically from PropertiesData -->
             </div>
         </section>
     </div>
 
+    <!-- Scroll to top FAB -->
+    <button class="fab-scroll-top" id="fabScrollTop" onclick="scrollToTopFab()" aria-label="Scroll to top">⬆️</button>
+
     <!-- Bottom Navigation (Mobile) -->
     <nav class="bottom-nav">
         <div class="nav-items">
-            <div class="nav-item active">
+            <div class="nav-item active" id="nav-home" onclick="bottomNavAction('home')">
                 <span class="nav-icon">🏠</span>
                 <span class="nav-label">Home</span>
             </div>
-            <div class="nav-item">
+            <div class="nav-item" id="nav-search" onclick="bottomNavAction('search')">
                 <span class="nav-icon">🔍</span>
                 <span class="nav-label">Search</span>
             </div>
-            <div class="nav-item">
+            <div class="nav-item" id="nav-saved" onclick="bottomNavAction('saved')">
                 <span class="nav-icon">❤️</span>
                 <span class="nav-label">Saved</span>
             </div>
-            <div class="nav-item">
+            <div class="nav-item" id="nav-profile" onclick="bottomNavAction('profile')">
                 <span class="nav-icon">👤</span>
                 <span class="nav-label">Profile</span>
             </div>
@@ -650,12 +753,140 @@
 
     <script src="navigation.js"></script>
     <script>
+        // ==================== FRESH STATE ====================
+        let allLoadedProperties = [];
+        let currentCityFilter = 'all';
+        let currentTypeFilter = 'all';
+        let currentSort = 'default';
+
         // ==================== INITIALIZATION ====================
         
+        // Sticky header on scroll
+        window.addEventListener('scroll', function() {
+            const header = document.getElementById('mainHeader');
+            const fab = document.getElementById('fabScrollTop');
+            if (window.scrollY > 80) {
+                header.classList.add('scrolled');
+                if (fab) fab.classList.add('visible');
+            } else {
+                header.classList.remove('scrolled');
+                if (fab) fab.classList.remove('visible');
+            }
+        }, { passive: true });
+
+        function scrollToTopFab() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Update hero greeting with user name
+        function updateHeroGreeting() {
+            if (AppState.isLoggedIn()) {
+                const user = AppState.getUser();
+                if (user && user.name) {
+                    const heroTitle = document.querySelector('.hero-title');
+                    if (heroTitle) {
+                        heroTitle.innerHTML = `Welcome back, <span>${user.name.split(' ')[0]}!</span><br>Find Your World`;
+                    }
+                }
+            }
+        }
+
+        // ===== CITY FILTER CHIPS =====
+        function filterByCity(city) {
+            currentCityFilter = city;
+            document.querySelectorAll('.stat-chip').forEach(chip => {
+                chip.classList.toggle('active', chip.dataset.city === city);
+            });
+            renderFiltered();
+        }
+
+        // ===== FILTER PILLS =====
+        function applyFilter(type) {
+            currentTypeFilter = type;
+            document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+            const btn = document.getElementById('filter' + type.charAt(0).toUpperCase() + type.slice(1));
+            if (btn) btn.classList.add('active');
+            renderFiltered();
+        }
+
+        // ===== SORT =====
+        function applySortAndRender() {
+            currentSort = document.getElementById('sortSelect').value;
+            renderFiltered();
+        }
+
+        // ===== REFRESH BUTTON =====
+        async function refreshListings() {
+            const btn = document.getElementById('refreshBtn');
+            btn.classList.add('is-spinning');
+            btn.disabled = true;
+            setTimeout(() => { btn.classList.remove('is-spinning'); btn.disabled = false; }, 800);
+            await loadAllProperties();
+        }
+
+        // ===== RENDER FILTERED + SORTED =====
+        function renderFiltered() {
+            let props = [...allLoadedProperties];
+
+            // City filter
+            if (currentCityFilter !== 'all') {
+                props = props.filter(p => p.city && p.city.toLowerCase().includes(currentCityFilter.toLowerCase()));
+            }
+
+            // Type filter
+            if (currentTypeFilter === 'buy') {
+                props = props.filter(p => p.listingType === 'sale' || p.listingType === 'buy');
+            } else if (currentTypeFilter === 'rent') {
+                props = props.filter(p => p.listingType === 'rent');
+            } else if (currentTypeFilter === 'verified') {
+                props = props.filter(p => p.verificationStatus === (PropertiesData.VERIFICATION_STATUS && PropertiesData.VERIFICATION_STATUS.VERIFIED || 'verified'));
+            } else if (currentTypeFilter === 'featured') {
+                props = props.filter(p => p.featured);
+            }
+
+            // Sort
+            if (currentSort === 'price-asc')  props.sort((a,b) => a.price - b.price);
+            if (currentSort === 'price-desc') props.sort((a,b) => b.price - a.price);
+            if (currentSort === 'sqft')       props.sort((a,b) => (b.sqft||0) - (a.sqft||0));
+
+            const grid = document.getElementById('propertyGrid') || document.querySelector('.property-grid');
+            grid.innerHTML = '';
+
+            updateListingCount(props.length);
+
+            if (props.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state-fresh">
+                        <div class="empty-state-icon-wrap">🏚️</div>
+                        <p style="font-size:1rem;font-weight:600;color:var(--text-primary);">No properties found</p>
+                        <p style="font-size:0.85rem;color:var(--text-secondary);">Try a different city or filter</p>
+                    </div>`;
+                return;
+            }
+
+            props.forEach((property, index) => {
+                const card = createPropertyCard(property);
+                card.style.animationDelay = `${Math.min(index, 6) * 0.06}s`;
+                grid.appendChild(card);
+            });
+        }
+
+        // ===== UPDATE COUNT =====
+        function updateListingCount(count) {
+            const el = document.getElementById('listingCountNum');
+            if (el) el.textContent = count;
+            const badge = document.getElementById('propertyCountBadge');
+            if (badge) badge.textContent = `${count} listings`;
+            const live = document.getElementById('liveBadgeText');
+            if (live) live.textContent = `${count} properties live`;
+        }
+
         // Check if user is logged in on page load
         window.addEventListener('DOMContentLoaded', function() {
             // Check if logged in to determine what to show
             const isLoggedIn = AppState.isLoggedIn();
+
+            updateHeroGreeting();
             
             if (isLoggedIn) {
                 // Get user data
@@ -700,45 +931,63 @@
         
         
         async function loadAllProperties() {
-            const propertyGrid = document.querySelector('.property-grid');
-            const sectionTitle = document.querySelector('.featured-section .section-title');
+            const propertyGrid = document.getElementById('propertyGrid') || document.querySelector('.property-grid');
+            const sectionTitle = document.getElementById('propertySectionTitle') || document.querySelector('.featured-section .section-title');
             
             // Reset title
             sectionTitle.textContent = 'All Properties';
+
+            // Reset filters UI
+            currentCityFilter = 'all';
+            currentTypeFilter = 'all';
+            currentSort = 'default';
+            document.querySelectorAll('.stat-chip').forEach(c => c.classList.toggle('active', c.dataset.city === 'all'));
+            document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+            const allPill = document.getElementById('filterAll');
+            if (allPill) allPill.classList.add('active');
+            const sortSel = document.getElementById('sortSelect');
+            if (sortSel) sortSel.value = 'default';
             
             // Show loading skeletons
             EmptyStates.showLoadingSkeletons(propertyGrid, 6);
+            updateListingCount('...');
             
             try {
                 // Fetch from API (async)
-                const allProperties = await PropertiesData.getVerifiedProperties();
+                const fetchedProperties = await PropertiesData.getVerifiedProperties();
+                allLoadedProperties = fetchedProperties;
                 
                 // Clear loading skeletons
                 propertyGrid.innerHTML = '';
                 
-                if (allProperties.length === 0) {
+                if (fetchedProperties.length === 0) {
                     propertyGrid.innerHTML = EmptyStates.getNoPropertiesState();
+                    updateListingCount(0);
                     return;
                 }
                 
+                updateListingCount(fetchedProperties.length);
+
                 // Render each property card with fade-in animation
-                allProperties.forEach((property, index) => {
+                fetchedProperties.forEach((property, index) => {
                     const card = createPropertyCard(property);
                     card.classList.add('fade-in');
-                    card.style.animationDelay = `${index * 0.05}s`;
+                    card.style.animationDelay = `${Math.min(index, 6) * 0.06}s`;
                     propertyGrid.appendChild(card);
                 });
                 
-                console.log(`📦 Loaded ${allProperties.length} verified properties`);
+                console.log(`📦 Loaded ${fetchedProperties.length} verified properties`);
             } catch (error) {
                 console.error('❌ Failed to load properties:', error);
                 propertyGrid.innerHTML = `
-                    <div style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
-                        <p style="font-size: 1.2rem; color: var(--text-secondary); margin-bottom: 1rem;">⚠️ Failed to load properties</p>
-                        <p style="color: var(--text-tertiary);">Please check if the backend server is running.</p>
-                        <button onclick="loadAllProperties()" style="margin-top: 1rem; padding: 0.75rem 1.5rem; background: var(--royal-600); color: white; border: none; border-radius: 8px; cursor: pointer;">Retry</button>
+                    <div class="empty-state-fresh">
+                        <div class="empty-state-icon-wrap">⚠️</div>
+                        <p style="font-size:1rem;font-weight:600;color:var(--text-primary);">Failed to load properties</p>
+                        <p style="font-size:0.85rem;color:var(--text-secondary);">Please check if the backend server is running.</p>
+                        <button onclick="refreshListings()" style="margin-top:1rem;padding:0.6rem 1.5rem;background:var(--fresh-indigo,#6366f1);color:white;border:none;border-radius:999px;cursor:pointer;font-weight:600;">🔄 Retry</button>
                     </div>
                 `;
+                updateListingCount(0);
             }
         }
         
@@ -875,9 +1124,13 @@
         }
         
         function handleGuestProfileClick() {
-            alert('Please login to access your profile and saved properties');
-            AppState.setIntent('profile');
-            Navigation.goToLogin();
+            if (typeof Toast !== 'undefined') {
+                Toast.show('Please login to access your profile', 'info');
+            }
+            setTimeout(() => {
+                AppState.setIntent('profile');
+                Navigation.goToLogin();
+            }, 1200);
         }
         
         // ==================== QUICK ACTIONS ====================
@@ -896,20 +1149,20 @@
             // User is logged in, proceed with action
             switch(action) {
                 case 'buy':
-                    // Filter properties for sale
                     const buyProperties = await PropertiesData.getPropertiesByType('sale');
                     displayFilteredProperties(buyProperties, 'Buy');
                     break;
+                case 'rent':
+                    const rentProperties = await PropertiesData.getPropertiesByType('rent');
+                    displayFilteredProperties(rentProperties, 'Rent');
+                    break;
                 case 'sell':
-                    // Navigate to the property listing form
                     Navigation.goToAddProperty();
                     break;
                 case 'map':
-                    // Navigate to map page
                     Navigation.goToMap();
                     break;
                 case 'filter':
-                    // Show all properties (filter functionality)
                     loadAllProperties();
                     break;
                 default:
@@ -991,14 +1244,28 @@
         // Property interactions are now handled in createPropertyCard() function
 
         // ==================== BOTTOM NAVIGATION ====================
-        
-        // Bottom nav click
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', function() {
-                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-                this.classList.add('active');
-            });
-        });
+
+        function bottomNavAction(tab) {
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.getElementById('nav-' + tab)?.classList.add('active');
+            switch(tab) {
+                case 'home':
+                    loadAllProperties();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    break;
+                case 'search':
+                    document.getElementById('searchInput').focus();
+                    document.getElementById('searchInput').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    break;
+                case 'saved':
+                    if (typeof Toast !== 'undefined') Toast.show('Saved properties coming soon! ❤️', 'info');
+                    break;
+                case 'profile':
+                    const profileBtn = document.querySelector('.user-profile');
+                    if (profileBtn) profileBtn.click();
+                    break;
+            }
+        }
     </script>
 </body>
 </html>

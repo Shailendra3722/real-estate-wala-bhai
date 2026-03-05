@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Property Details - Real Estate Wala Bhai</title>
+    <meta name="description" content="View detailed property information, location, EMI calculator and contact the agent on Real Estate Wala Bhai.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏡</text></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
@@ -345,8 +347,15 @@
     <div class="gradient-bg"></div>
 
     <div class="container">
+        <!-- Back Button -->
+        <div style="margin-bottom:1rem;">
+            <button onclick="window.history.back()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#e2e8f0;padding:0.6rem 1.2rem;border-radius:12px;font-size:0.9rem;font-family:'Outfit',sans-serif;cursor:pointer;display:flex;align-items:center;gap:0.5rem;transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.14)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">
+                &larr; Back
+            </button>
+        </div>
+
         <!-- Image Gallery -->
-        <div class="image-gallery">
+        <div class="image-gallery" id="imageGallery">
             <div class="gallery-badge" id="gallery-badge">
                 🛡️ Verified Listing
             </div>
@@ -354,6 +363,7 @@
 
         <!-- 🏷 Overview Section -->
         <div class="section">
+            <h1 id="property-title" style="font-size:1.5rem;font-weight:700;margin-bottom:1.25rem;color:#f8fafc;line-height:1.3;">Loading...</h1>
             <h2 class="section-title">🏷 Property Overview</h2>
             <div class="overview-grid">
                 <div class="overview-item">
@@ -424,6 +434,12 @@
                 </div>
             </div>
             <p class="helper-text" id="trust-message">This listing has been reviewed by our team</p>
+        </div>
+
+        <!-- 🏠 Amenities Section -->
+        <div class="section" id="amenitiesSection" style="display:none;">
+            <h2 class="section-title">🏠 Amenities</h2>
+            <div id="amenitiesList" style="display:flex;flex-wrap:wrap;gap:0.75rem;"></div>
         </div>
 
         <!-- 📞 Contact Section -->
@@ -590,6 +606,23 @@
         function populatePropertyInfo(property) {
             // Update Gallery Badge
             updateVerificationBadge(property.verificationStatus);
+
+            // Update gallery image
+            const gallery = document.getElementById('imageGallery');
+            if (gallery && property.images && property.images.length > 0) {
+                const img = document.createElement('img');
+                img.src = property.images[0];
+                img.alt = property.title;
+                img.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border-radius:25px;';
+                img.onerror = function() { this.remove(); };
+                gallery.style.position = 'relative';
+                gallery.appendChild(img);
+            }
+            
+            // Update property title
+            const titleEl = document.getElementById('property-title');
+            if (titleEl) titleEl.textContent = property.title || 'Property Details';
+            document.title = `${property.title} - Real Estate Wala Bhai`;
             
             // Update Property Overview
             document.getElementById('property-price').textContent = 
@@ -614,6 +647,18 @@
             
             // Update Trust Section
             updateTrustSection(property.verificationStatus);
+
+            // Update Amenities
+            if (property.amenities && property.amenities.length > 0) {
+                const amenitiesSection = document.getElementById('amenitiesSection');
+                const amenitiesList = document.getElementById('amenitiesList');
+                if (amenitiesSection && amenitiesList) {
+                    amenitiesSection.style.display = 'block';
+                    amenitiesList.innerHTML = property.amenities.map(a => 
+                        `<span style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);padding:0.4rem 0.9rem;border-radius:20px;font-size:0.85rem;color:#cbd5e1;">${a}</span>`
+                    ).join('');
+                }
+            }
             
             console.log('✅ UI updated with property data');
         }

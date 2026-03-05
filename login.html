@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Real Estate Wala Bhai</title>
+    <meta name="description" content="Sign in to Real Estate Wala Bhai to explore verified properties across India.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏡</text></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <!-- Global App State -->
     <script src="app-state.js"></script>
     <style>
@@ -472,6 +474,9 @@
             <p class="footer-text">
                 By continuing, you agree to our <a href="#" class="footer-link">Terms</a> & <a href="#" class="footer-link">Privacy Policy</a>
             </p>
+            <p style="text-align:center; margin-top:1.25rem;">
+                <a href="home.html" style="color:#94a3b8; font-size:0.9rem; text-decoration:none; transition:color 0.2s;" onmouseover="this.style.color='#e2e8f0'" onmouseout="this.style.color='#94a3b8'">Browse as Guest &rarr;</a>
+            </p>
         </div>
     </div>
 
@@ -504,12 +509,20 @@
         document.getElementById('authForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const userName = document.getElementById('nameInput').value;
-            const phoneNumber = document.getElementById('phoneInput').value;
+            const userName = document.getElementById('nameInput').value.trim();
+            const phoneNumber = document.getElementById('phoneInput').value.trim();
             const userRole = document.getElementById('roleSelect').value;
             
+            // Remove old error if any
+            const oldErr = document.getElementById('formError');
+            if (oldErr) oldErr.remove();
+
             if (!userName || !phoneNumber || !userRole) {
-                alert('Please fill in all fields');
+                const err = document.createElement('div');
+                err.id = 'formError';
+                err.style.cssText = 'background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.35);color:#fca5a5;padding:0.85rem 1.1rem;border-radius:12px;font-size:0.9rem;margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem;';
+                err.innerHTML = '<span>⚠️</span><span>Please fill in all fields to continue</span>';
+                document.querySelector('.auth-form').prepend(err);
                 return;
             }
             
@@ -601,11 +614,25 @@
 
         // Social login handlers
         function handleGoogleLogin() {
-            alert('Google login would be implemented here');
+            const note = document.createElement('div');
+            note.style.cssText = 'background:rgba(102,126,234,0.12);border:1px solid rgba(102,126,234,0.3);color:#a5b4fc;padding:0.75rem 1rem;border-radius:12px;font-size:0.88rem;text-align:center;margin-top:0.75rem;';
+            note.textContent = '🚀 Google login coming soon!';
+            const existing = document.getElementById('socialNote');
+            if (existing) existing.remove();
+            note.id = 'socialNote';
+            document.querySelector('.social-login').after(note);
+            setTimeout(() => note.remove(), 3000);
         }
 
         function handleEmailLogin() {
-            alert('Email login would be implemented here');
+            const note = document.createElement('div');
+            note.style.cssText = 'background:rgba(102,126,234,0.12);border:1px solid rgba(102,126,234,0.3);color:#a5b4fc;padding:0.75rem 1rem;border-radius:12px;font-size:0.88rem;text-align:center;margin-top:0.75rem;';
+            note.textContent = '📧 Email login coming soon!';
+            const existing = document.getElementById('socialNote');
+            if (existing) existing.remove();
+            note.id = 'socialNote';
+            document.querySelector('.social-login').after(note);
+            setTimeout(() => note.remove(), 3000);
         }
     </script>
 </body>
