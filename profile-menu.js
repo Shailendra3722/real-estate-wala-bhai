@@ -128,12 +128,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Actions
     document.getElementById('btnMyDetails').addEventListener('click', () => {
-        alert('Navigating to your profile details... (Coming Soon)');
+        window.location.href = 'settings.html';
         popup.classList.remove('active');
     });
 
     document.getElementById('btnSavedProperties').addEventListener('click', () => {
-        alert('Navigating to saved properties... (Coming Soon)');
+        // Assume property-list.html can show saved properties
+        window.location.href = 'property-list.html?saved=true';
         popup.classList.remove('active');
     });
 
@@ -143,12 +144,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('btnSettings').addEventListener('click', () => {
-        alert('Navigating to Settings... (Coming Soon)');
+        window.location.href = 'settings.html';
         popup.classList.remove('active');
     });
 
     document.getElementById('btnSupport').addEventListener('click', () => {
-        alert('Opening Help & Support... (Coming Soon)');
+        window.location.href = 'mailto:support@realestatewala.com?subject=Need Help';
         popup.classList.remove('active');
     });
 
