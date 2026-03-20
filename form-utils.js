@@ -327,9 +327,14 @@ const FormUtils = {
 
     /**
      * Submit property listing
+     * PRIMARY: Saves to Firebase Firestore (permanent, visible to all users)
+     * FALLBACK: Saves to localStorage if Firebase unavailable
      */
     async submitProperty() {
         const draft = this.getDraft();
+
+        // Get logged-in user
+        const user = window.AppState ? window.AppState.getUser() : null;
 
         // Combine all steps
         const propertyData = {
@@ -341,56 +346,132 @@ const FormUtils = {
             submittedAt: new Date().toISOString()
         };
 
-        console.log('📤 Submitting property to API:', propertyData);
+        console.log('📤 Preparing property for Firestore:', propertyData);
 
         try {
-            // Send to backend API
-            const response = await ApiConfig.post('/api/properties', propertyData);
+            // ── Strip base64 data: URLs (too large for Firestore) ──
+            const PLACEHOLDER_IMAGES = [
+                'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800',
+                'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800',
+                'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800'
+            ];
 
-            if (response.success) {
-                console.log('✅ Property created:', response.property);
+            const rawPhotos = (this._pendingPhotos && this._pendingPhotos.length > 0)
+                ? this._pendingPhotos
+                : (propertyData.photos && propertyData.photos.length > 0 ? propertyData.photos : []);
 
-                // Clear frontend cache so new property appears
-                if (window.PropertiesData && window.PropertiesData.clearCache) {
-                    window.PropertiesData.clearCache();
+            const sanitisedImages = rawPhotos.length > 0
+                ? rawPhotos.map((p, i) =>
+                    typeof p === 'string' && p.startsWith('data:')
+                        ? PLACEHOLDER_IMAGES[i % PLACEHOLDER_IMAGES.length]
+                        : p
+                  )
+                : PLACEHOLDER_IMAGES.slice(0, 2);
+
+            const pendingReels = this._pendingReels || propertyData.reels || [];
+            const sanitisedReels = pendingReels
+                .filter(r => r && typeof (r.dataUrl || r) === 'string' && !(r.dataUrl || r).startsWith('data:'))
+                .map(r => r.dataUrl || r);
+
+            const newProperty = {
+                title: propertyData.title || `${propertyData.bedrooms || ''} BHK ${propertyData.propertyType || 'Property'} in ${propertyData.area || ''}`.trim(),
+                price: parseFloat(propertyData.price) || 0,
+                bhk: propertyData.bedrooms ? `${propertyData.bedrooms} BHK` : '1 BHK',
+                sqft: parseFloat(propertyData.sqft) || 0,
+                bathrooms: parseInt(propertyData.bathrooms) || 1,
+                address: propertyData.address || `${propertyData.area || ''}, ${propertyData.city || ''}`,
+                city: propertyData.city || 'Lucknow',
+                area: propertyData.area || '',
+                latitude: parseFloat(propertyData.latitude) || 26.8467,
+                longitude: parseFloat(propertyData.longitude) || 80.9462,
+                ownerId: user ? (user.uid || user.id) : 'anonymous',
+                ownerName: propertyData.name || (user ? user.name : 'Seller'),
+                contactNumber: propertyData.phone || propertyData.contactNumber || '',
+                whatsappEnabled: true,
+                verificationStatus: 'under_review',
+                propertyType: propertyData.propertyType || 'flat',
+                listingType: propertyData.listingType || 'sell',
+                furnishing: propertyData.furnished || propertyData.furnishing || 'unfurnished',
+                parking: propertyData.parking || 'no',
+                images: sanitisedImages,
+                reels: sanitisedReels,
+                amenities: ['Parking', 'Security'],
+                yearBuilt: new Date().getFullYear(),
+                featured: false,
+                status: 'published'
+            };
+
+            // ── PRIMARY: Save to Firestore ──────────────────────────────────────
+            if (window.FirebaseService) {
+                try {
+                    const firestoreId = await FirebaseService.addProperty(newProperty);
+                    newProperty.id = firestoreId;
+                    console.log('✅ Property saved to Firestore! ID:', firestoreId);
+
+                    // Clear draft after successful Firestore save
+                    this.clearDraft();
+
+                    // Show success toast
+                    this._showSuccessToast('🎉 Property published! It\'s now live for everyone to see.');
+
+                    setTimeout(() => { window.location.href = 'home.html'; }, 1800);
+                    return;
+                } catch (firestoreErr) {
+                    console.warn('⚠️ Firestore save failed, falling back to localStorage:', firestoreErr);
+                    // Fall through to localStorage fallback
                 }
-
-                // Clear draft
-                this.clearDraft();
-
-                // Also save to localStorage as backup
-                const existingProperties = localStorage.getItem('submittedProperties');
-                const properties = existingProperties ? JSON.parse(existingProperties) : [];
-                properties.push({
-                    id: response.propertyId,
-                    ...propertyData,
-                    status: 'published',
-                    createdAt: new Date().toISOString()
-                });
-                localStorage.setItem('submittedProperties', JSON.stringify(properties));
-
-                // Show success
-                alert('🎉 बधाई हो! आपकी संपत्ति सफलतापूर्वक सूचीबद्ध हो गई है!\n\nCongratulations! Your property has been listed successfully!');
-
-                // Redirect to home
-                setTimeout(() => {
-                    window.location.href = 'home.html';
-                }, 1500);
-            } else {
-                throw new Error(response.error || 'Failed to create property');
             }
 
-        } catch (error) {
-            console.error('❌ Submit failed:', error);
-            alert('⚠️ कुछ गलत हुआ। कृपया फिर से प्रयास करें।\n\nSomething went wrong. Please try again.\n\nError: ' + error.message);
+            // ── FALLBACK: localStorage ──────────────────────────────────────────
+            console.warn('⚠️ Using localStorage fallback (Firebase not available)');
+            newProperty.id = 'prop_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            newProperty.createdAt = new Date().toISOString();
 
-            // Re-enable publish button
+            this.clearDraft();
+            let existingList = [];
+            try {
+                const existingRaw = localStorage.getItem('submittedProperties');
+                existingList = existingRaw ? JSON.parse(existingRaw) : [];
+            } catch (e) { existingList = []; }
+            existingList.push(newProperty);
+            localStorage.setItem('submittedProperties', JSON.stringify(existingList));
+
+            if (window.PropertiesData) {
+                if (typeof window.PropertiesData.clearCache === 'function') window.PropertiesData.clearCache();
+                if (Array.isArray(window.PropertiesData.properties)) window.PropertiesData.properties.unshift(newProperty);
+            }
+
+            alert('🎉 बधाई हो! आपकी संपत्ति सूचीबद्ध हो गई है!\n\nCongratulations! Your property has been listed!');
+            setTimeout(() => { window.location.href = 'home.html'; }, 1500);
+
+        } catch (error) {
+            console.error('❌ Publish failed:', error);
+            alert('⚠️ Something went wrong. Please try again.\n\nError: ' + error.message);
+
             const publishBtn = document.getElementById('publishBtn');
             if (publishBtn) {
                 publishBtn.disabled = false;
                 publishBtn.textContent = '🎉 Publish My Property / मेरी संपत्ति प्रकाशित करें';
             }
         }
+    },
+
+    /**
+     * Show a beautiful success toast (non-blocking, no alert popup)
+     */
+    _showSuccessToast(message) {
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white; padding: 1.2rem 2rem; border-radius: 16px;
+            font-size: 1.05rem; font-weight: 700; z-index: 99999;
+            box-shadow: 0 8px 30px rgba(34,197,94,0.4);
+            animation: slideUp 0.4s ease; max-width: 90vw; text-align: center;
+        `;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 4000);
     },
 
     /**

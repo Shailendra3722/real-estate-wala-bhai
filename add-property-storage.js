@@ -64,6 +64,7 @@ const AddPropertyStorage = (function () {
         const formData = getFormData() || {};
         formData.step4 = {
             images: data.images || [],
+            reels: data.reels || [],
             contactNumber: data.contactNumber,
             whatsappEnabled: data.whatsappEnabled !== false,
             timestamp: new Date().toISOString()
@@ -206,6 +207,7 @@ const AddPropertyStorage = (function () {
                 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800',
                 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800'
             ],
+            reels: step4.reels || [],
             amenities: ['Parking', 'Security'], // Default amenities
             yearBuilt: new Date().getFullYear(),
             featured: false,

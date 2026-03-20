@@ -11,6 +11,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <!-- Global App State -->
     <script src="app-state.js"></script>
+    <!-- Firebase SDK (compat v9) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="firebase-service.js"></script>
     <style>
         * {
             margin: 0;
@@ -414,40 +420,48 @@
 
             <!-- Auth form -->
             <form class="auth-form" id="authForm">
-                <div class="form-group">
+                <div class="form-group" id="nameGroup">
                     <input 
                         type="text" 
                         class="form-input" 
                         id="nameInput"
-                        placeholder="Enter your name"
-                        required
+                        placeholder="Your full name"
                     >
                 </div>
 
                 <div class="form-group">
                     <input 
-                        type="tel" 
+                        type="email" 
                         class="form-input" 
-                        id="phoneInput"
-                        placeholder="Enter your phone number"
+                        id="emailInput"
+                        placeholder="Email address"
                         required
+                        autocomplete="email"
                     >
-                    <div class="helper-text">
-                        <span class="helper-icon">ℹ️</span>
-                        <span>We'll send you a one-time password for verification</span>
-                    </div>
                 </div>
 
                 <div class="form-group">
-                    <select class="form-input" id="roleSelect" required>
-                        <option value="">I am looking to...</option>
+                    <input 
+                        type="password" 
+                        class="form-input" 
+                        id="passwordInput"
+                        placeholder="Password (min 6 characters)"
+                        required
+                        autocomplete="current-password"
+                        minlength="6"
+                    >
+                </div>
+
+                <div class="form-group" id="roleGroup">
+                    <select class="form-input" id="roleSelect">
+                        <option value="">I am looking to... (for new accounts)</option>
                         <option value="buyer">Buy a Property</option>
                         <option value="owner">Sell/Rent a Property</option>
                     </select>
                 </div>
 
-                <button type="submit" class="btn-continue">
-                    Continue
+                <button type="submit" class="btn-continue" id="authBtn">
+                    Sign In / Register
                 </button>
             </form>
 
@@ -481,158 +495,178 @@
     </div>
 
     <script>
-        // Create floating particles
+        // ── Floating particles ──
         const particlesContainer = document.getElementById('particles');
-        const particleCount = 25;
-
-        for (let i = 0; i < particleCount; i++) {
-            const particle = document.createElement('div');
-            particle.className = 'particle';
-            
-            // Random starting position
-            particle.style.left = Math.random() * 100 + '%';
-            particle.style.top = Math.random() * 100 + '%';
-            
-            // Random animation delay and duration
-            particle.style.animationDelay = Math.random() * 20 + 's';
-            particle.style.animationDuration = (Math.random() * 10 + 15) + 's';
-            
-            // Random size
+        for (let i = 0; i < 25; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.style.left = Math.random() * 100 + '%';
+            p.style.top = Math.random() * 100 + '%';
+            p.style.animationDelay = Math.random() * 20 + 's';
+            p.style.animationDuration = (Math.random() * 10 + 15) + 's';
             const size = Math.random() * 4 + 2;
-            particle.style.width = size + 'px';
-            particle.style.height = size + 'px';
-            
-            particlesContainer.appendChild(particle);
+            p.style.width = size + 'px';
+            p.style.height = size + 'px';
+            particlesContainer.appendChild(p);
         }
 
-        // Handle form submission
-        document.getElementById('authForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const userName = document.getElementById('nameInput').value.trim();
-            const phoneNumber = document.getElementById('phoneInput').value.trim();
-            const userRole = document.getElementById('roleSelect').value;
-            
-            // Remove old error if any
-            const oldErr = document.getElementById('formError');
-            if (oldErr) oldErr.remove();
-
-            if (!userName || !phoneNumber || !userRole) {
-                const err = document.createElement('div');
+        // ── Helper: show/hide error ──
+        function showError(msg) {
+            let err = document.getElementById('formError');
+            if (!err) {
+                err = document.createElement('div');
                 err.id = 'formError';
                 err.style.cssText = 'background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.35);color:#fca5a5;padding:0.85rem 1.1rem;border-radius:12px;font-size:0.9rem;margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem;';
-                err.innerHTML = '<span>⚠️</span><span>Please fill in all fields to continue</span>';
                 document.querySelector('.auth-form').prepend(err);
+            }
+            err.innerHTML = '<span>⚠️</span><span>' + msg + '</span>';
+        }
+        function clearError() {
+            const e = document.getElementById('formError');
+            if (e) e.remove();
+        }
+
+        // ── Helper: redirect after login ──
+        function redirectAfterLogin(role) {
+            const intent = AppState.getIntent();
+            let url = 'home.html';
+            if (intent) {
+                if (intent === 'sell' || intent === 'owner') url = 'add-property-step1.html';
+                else if (intent === 'map') url = 'map-explore.html';
+                else if (intent === 'rent') url = 'home.html?filter=rent';
+                else if (intent === 'buy') url = 'home.html?filter=buy';
+                AppState.clearIntent();
+            } else if (role === 'owner') {
+                url = 'add-property-step1.html';
+            }
+            window.location.href = url;
+        }
+
+        // ── Store Firebase user into AppState ──
+        function syncUserToAppState(firebaseUser, profileData) {
+            AppState.setUser({
+                id: firebaseUser.uid,
+                name: profileData.name || firebaseUser.displayName || 'User',
+                email: firebaseUser.email,
+                phone: profileData.phone || '',
+                uid: firebaseUser.uid
+            });
+            AppState.setRole(profileData.role || 'buyer');
+            AppState.setAuthToken(firebaseUser.uid);
+        }
+
+        // ── Check if already logged in → skip login page ──
+        FirebaseService.onAuthChange(function(user) {
+            if (user && window.location.pathname.includes('login')) {
+                // Already logged into Firebase — sync and go home
+                syncUserToAppState({ uid: user.uid, email: user.email, displayName: user.name }, user);
+                redirectAfterLogin(user.role);
+            }
+        });
+
+        // ── Form submit: try login first, register if not found ──
+        document.getElementById('authForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            clearError();
+
+            const email    = document.getElementById('emailInput').value.trim();
+            const password = document.getElementById('passwordInput').value;
+            const name     = document.getElementById('nameInput').value.trim();
+            const role     = document.getElementById('roleSelect').value || 'buyer';
+
+            if (!email || !password) {
+                showError('Please enter your email and password.');
                 return;
             }
-            
-            // Add loading state to button
-            const btn = document.querySelector('.btn-continue');
-            const originalText = btn.textContent;
-            btn.textContent = 'Verifying...';
-            btn.style.opacity = '0.7';
+
+            const btn = document.getElementById('authBtn');
+            btn.textContent = '⏳ Please wait...';
             btn.disabled = true;
-            
-            // Simulate OTP verification process
-            setTimeout(() => {
-                // Generate unique user ID
-                const userId = 'user_' + Date.now();
-                
-                // Store user data in AppState
-                AppState.setUser({
-                    id: userId,
-                    name: userName,
-                    phone: phoneNumber,
-                    email: null, // Can be added later
-                    avatar: null
-                });
-                
-                // Set user role
-                AppState.setRole(userRole);
-                
-                // Generate and store auth token
-                const authToken = 'token_' + Math.random().toString(36).substr(2, 9) + Date.now();
-                AppState.setAuthToken(authToken);
-                
-                // Show success message
-                console.log('✅ Login successful!');
-                console.log('User ID:', userId);
-                console.log('Name:', userName);
-                console.log('Phone:', phoneNumber);
-                console.log('Role:', userRole);
-                
-                // Debug state
-                AppState.debugState();
-                
-                // Check for stored intent and redirect accordingly
-                const intent = AppState.getIntent();
-                console.log('🎯 Stored intent:', intent);
-                
-                let redirectUrl = 'home.html'; // Default
-                
-                if (intent) {
-                    switch(intent) {
-                        case 'buy':
-                            redirectUrl = 'home.html?filter=buy';
-                            console.log('📍 Redirecting to buy properties');
-                            break;
-                        case 'sell':
-                        case 'owner':
-                            redirectUrl = 'add-property-step1.html';
-                            console.log('📍 Redirecting to add property form');
-                            break;
-                        case 'rent':
-                            redirectUrl = 'home.html?filter=rent';
-                            console.log('📍 Redirecting to rent properties');
-                            break;
-                        case 'map':
-                            redirectUrl = 'map-explore.html';
-                            console.log('📍 Redirecting to map explorer');
-                            break;
-                        default:
-                            console.log('📍 Unknown intent, redirecting to home');
+
+            try {
+                // ── Try SIGN IN first ──
+                let userData;
+                try {
+                    userData = await FirebaseService.login(email, password);
+                    console.log('✅ Signed in:', userData);
+                } catch (loginErr) {
+                    if (loginErr.code === 'auth/user-not-found' || loginErr.code === 'auth/invalid-credential' || loginErr.code === 'auth/wrong-password') {
+                        // ── Not found → REGISTER ──
+                        if (!name) {
+                            showError('New user? Please enter your name too.');
+                            btn.textContent = 'Sign In / Register';
+                            btn.disabled = false;
+                            document.getElementById('nameInput').focus();
+                            return;
+                        }
+                        userData = await FirebaseService.register(name, email, password, '', role);
+                        console.log('✅ Registered:', userData);
+                    } else {
+                        throw loginErr;
                     }
-                    
-                    // Clear intent after processing
-                    AppState.clearIntent();
                 }
-                
-                // Redirect to appropriate page
-                window.location.href = redirectUrl;
-                
-            }, 1500);
-        });
 
-        // Phone number formatting (optional enhancement)
-        document.getElementById('phoneInput').addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length > 10) {
-                value = value.slice(0, 10);
+                // ── Sync to AppState (localStorage, for backward compat) ──
+                Firebase_auth_currentUser_temp = firebase.auth().currentUser;
+                syncUserToAppState(Firebase_auth_currentUser_temp || { uid: userData.uid, email, displayName: name }, userData);
+
+                btn.textContent = '✅ Success!';
+                setTimeout(() => redirectAfterLogin(userData.role || role), 800);
+
+            } catch (err) {
+                console.error('Auth error:', err);
+                let msg = 'Something went wrong. Please try again.';
+                if (err.code === 'auth/wrong-password')    msg = 'Wrong password. Please try again.';
+                if (err.code === 'auth/invalid-email')      msg = 'Invalid email address.';
+                if (err.code === 'auth/email-already-in-use') msg = 'Email already registered. Try signing in.';
+                if (err.code === 'auth/weak-password')      msg = 'Password must be at least 6 characters.';
+                if (err.code === 'auth/too-many-requests')  msg = 'Too many attempts. Please try again later.';
+                if (err.code === 'auth/network-request-failed') msg = 'Network error. Check your internet connection.';
+                showError(msg);
+                btn.textContent = 'Sign In / Register';
+                btn.disabled = false;
             }
-            e.target.value = value;
         });
 
-        // Social login handlers
-        function handleGoogleLogin() {
-            const note = document.createElement('div');
-            note.style.cssText = 'background:rgba(102,126,234,0.12);border:1px solid rgba(102,126,234,0.3);color:#a5b4fc;padding:0.75rem 1rem;border-radius:12px;font-size:0.88rem;text-align:center;margin-top:0.75rem;';
-            note.textContent = '🚀 Google login coming soon!';
-            const existing = document.getElementById('socialNote');
-            if (existing) existing.remove();
-            note.id = 'socialNote';
-            document.querySelector('.social-login').after(note);
-            setTimeout(() => note.remove(), 3000);
+        // Temp global needed for auth current user sync
+        let Firebase_auth_currentUser_temp = null;
+
+        // ── Social: Google sign-in ──
+        async function handleGoogleLogin() {
+            try {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                const result = await firebase.auth().signInWithPopup(provider);
+                const firebaseUser = result.user;
+
+                // Check if user doc exists, if not create it
+                const db = firebase.firestore();
+                const userDoc = await db.collection('users').doc(firebaseUser.uid).get();
+                let profileData;
+                if (!userDoc.exists) {
+                    profileData = {
+                        uid: firebaseUser.uid,
+                        name: firebaseUser.displayName || 'User',
+                        email: firebaseUser.email,
+                        phone: '',
+                        role: 'buyer',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+                    await db.collection('users').doc(firebaseUser.uid).set(profileData);
+                } else {
+                    profileData = userDoc.data();
+                }
+
+                syncUserToAppState(firebaseUser, profileData);
+                redirectAfterLogin(profileData.role);
+            } catch (err) {
+                if (err.code !== 'auth/popup-closed-by-user') {
+                    showError('Google sign-in failed: ' + (err.message || 'Please try again.'));
+                }
+            }
         }
 
         function handleEmailLogin() {
-            const note = document.createElement('div');
-            note.style.cssText = 'background:rgba(102,126,234,0.12);border:1px solid rgba(102,126,234,0.3);color:#a5b4fc;padding:0.75rem 1rem;border-radius:12px;font-size:0.88rem;text-align:center;margin-top:0.75rem;';
-            note.textContent = '📧 Email login coming soon!';
-            const existing = document.getElementById('socialNote');
-            if (existing) existing.remove();
-            note.id = 'socialNote';
-            document.querySelector('.social-login').after(note);
-            setTimeout(() => note.remove(), 3000);
+            document.getElementById('emailInput').focus();
         }
     </script>
 </body>

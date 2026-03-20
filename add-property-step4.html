@@ -25,6 +25,21 @@
             border-color: #667eea;
             background: rgba(102, 126, 234, 0.05);
         }
+
+        .reel-upload-zone {
+            border: 3px dashed rgba(255, 100, 120, 0.4);
+            border-radius: 15px;
+            padding: 3rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 80, 100, 0.03);
+        }
+
+        .reel-upload-zone:hover {
+            border-color: #ff6b9d;
+            background: rgba(255, 107, 157, 0.07);
+        }
         
         .photo-upload-icon {
             font-size: 3rem;
@@ -37,6 +52,13 @@
             gap: 1rem;
             margin-top: 1.5rem;
         }
+
+        .reel-preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
         
         .photo-preview {
             position: relative;
@@ -45,6 +67,30 @@
             overflow: hidden;
             border: 2px solid rgba(255, 255, 255, 0.15);
         }
+
+        .reel-preview {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid rgba(255, 107, 157, 0.4);
+            background: #000;
+        }
+
+        .reel-preview video {
+            width: 100%;
+            max-height: 180px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .reel-name {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            padding: 6px 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
         
         .photo-preview img {
             width: 100%;
@@ -52,7 +98,7 @@
             object-fit: cover;
         }
         
-        .photo-remove {
+        .photo-remove, .reel-remove {
             position: absolute;
             top: 5px;
             right: 5px;
@@ -65,6 +111,24 @@
             cursor: pointer;
             font-size: 1.2rem;
             line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .reel-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #ff6b9d, #c44dff);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+            margin-left: 8px;
+            vertical-align: middle;
         }
     </style>
 </head>
@@ -129,14 +193,46 @@
                     <div class="photo-preview-grid" id="photoPreviewGrid"></div>
                 </div>
 
+                <!-- Reels (Video) -->
+                <div class="form-group">
+                    <label class="form-label">
+                        Property Reels <span class="reel-badge">🎬 NEW</span>
+                        <div class="form-label-subtitle">
+                            Add short video reels of your plot/house (Max 3 videos, up to 50 MB each)<br>
+                            अपनी संपत्ति के शॉर्ट वीडियो रील जोड़ें (अधिकतम 3 वीडियो)
+                        </div>
+                    </label>
+
+                    <div class="reel-upload-zone" onclick="document.getElementById('reelInput').click()">
+                        <div class="photo-upload-icon">🎥</div>
+                        <div style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem;">
+                            Click to Upload Video Reels
+                        </div>
+                        <div style="font-size: 0.9rem; color: #94a3b8;">
+                            MP4 · WebM · MOV supported &nbsp;|&nbsp; वीडियो रील अपलोड करें
+                        </div>
+                    </div>
+
+                    <input type="file"
+                           id="reelInput"
+                           accept="video/mp4,video/webm,video/quicktime"
+                           multiple
+                           style="display: none;"
+                           onchange="handleReelUpload(event)">
+
+                    <div class="reel-preview-grid" id="reelPreviewGrid"></div>
+                </div>
+
                 <!-- Help Text -->
                 <div class="help-text">
                     <div class="help-icon">💡</div>
                     <div class="help-content">
                         <div class="help-title">Tip / सुझाव</div>
                         <div class="help-desc">
-                            Good quality photos attract more buyers. Show all rooms and important features!
-                            <br>अच्छी क्वालिटी की फोटो से ज्यादा खरीदार आकर्षित होते हैं। सभी कमरे और जरूरी फीचर दिखाएं!
+                            Good quality photos &amp; reels attract more buyers. A 30–60 sec walk-through reel can
+                            get 3× more inquiries!
+                            <br>अच्छी फोटो और रील से ज्यादा खरीदार आते हैं। 30–60 सेकंड का वॉकथ्रू वीडियो 3× ज्यादा
+                            पूछताछ ला सकता है!
                         </div>
                     </div>
                 </div>
@@ -156,6 +252,7 @@
 
     <script>
         let uploadedPhotos = [];
+        let uploadedReels = []; // { name, dataUrl }
         
         // Update price label based on listing type
         document.addEventListener('DOMContentLoaded', function() {
@@ -169,6 +266,12 @@
             if (draft.step4 && draft.step4.photos) {
                 uploadedPhotos = draft.step4.photos;
                 renderPhotos();
+            }
+
+            // Load saved reels
+            if (draft.step4 && draft.step4.reels) {
+                uploadedReels = draft.step4.reels;
+                renderReels();
             }
         });
         
@@ -198,11 +301,7 @@
                     reader.onload = function(e) {
                         uploadedPhotos.push(e.target.result);
                         renderPhotos();
-                        
-                        // Autosave
-                        const formData = FormUtils.collectCurrentStepData();
-                        formData.photos = uploadedPhotos;
-                        FormUtils.autosave(4, formData);
+                        autosaveStep4();
                     };
                     reader.readAsDataURL(file);
                 }
@@ -229,11 +328,83 @@
         function removePhoto(index) {
             uploadedPhotos.splice(index, 1);
             renderPhotos();
-            
-            // Autosave
+            autosaveStep4();
+        }
+
+        // ─── Reels ───────────────────────────────────────────────────────────
+
+        // Handle reel (video) upload
+        function handleReelUpload(event) {
+            const files = Array.from(event.target.files);
+
+            if (uploadedReels.length + files.length > 3) {
+                alert('⚠️ Maximum 3 reels allowed!\n\nअधिकतम 3 वीडियो रील की अनुमति है!');
+                event.target.value = '';
+                return;
+            }
+
+            files.forEach(file => {
+                const allowedTypes = ['video/mp4', 'video/webm', 'video/quicktime'];
+                if (!allowedTypes.includes(file.type)) {
+                    alert('❌ Only MP4, WebM, or MOV videos are supported.');
+                    return;
+                }
+                if (file.size > 50 * 1024 * 1024) {
+                    alert('❌ Each reel must be under 50 MB.\nप्रत्येक रील 50 MB से कम होनी चाहिए।');
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadedReels.push({ name: file.name, dataUrl: e.target.result });
+                    renderReels();
+                    autosaveStep4();
+                };
+                reader.readAsDataURL(file);
+            });
+
+            // Reset so the same file can be re-selected if needed
+            event.target.value = '';
+        }
+
+        // Render reel previews
+        function renderReels() {
+            const grid = document.getElementById('reelPreviewGrid');
+            grid.innerHTML = '';
+
+            uploadedReels.forEach((reel, index) => {
+                const div = document.createElement('div');
+                div.className = 'reel-preview';
+                div.innerHTML = `
+                    <video src="${reel.dataUrl}" controls muted playsinline></video>
+                    <div class="reel-name">🎬 ${reel.name}</div>
+                    <button class="reel-remove" onclick="removeReel(${index})">×</button>
+                `;
+                grid.appendChild(div);
+            });
+        }
+
+        // Remove reel
+        function removeReel(index) {
+            uploadedReels.splice(index, 1);
+            renderReels();
+            autosaveStep4();
+        }
+
+        // Shared autosave helper for step 4
+        // NOTE: We deliberately do NOT store base64 photo/reel data in the draft
+        // because it would instantly blow the localStorage 5 MB quota.
+        // Only lightweight metadata (count) is saved; the actual arrays stay in memory.
+        function autosaveStep4() {
             const formData = FormUtils.collectCurrentStepData();
-            formData.photos = uploadedPhotos;
+            formData.photoCount = uploadedPhotos.length;
+            formData.reelCount = uploadedReels.length;
+            // Do NOT include formData.photos or formData.reels here!
             FormUtils.autosave(4, formData);
+
+            // Keep the in-memory arrays accessible at submit time
+            FormUtils._pendingPhotos = uploadedPhotos;
+            FormUtils._pendingReels  = uploadedReels;
         }
     </script>
 </body>

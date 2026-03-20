@@ -27,6 +27,12 @@
     <script src="loading-animation.js"></script>
     <!-- Global App State -->
     <script src="app-state.js"></script>
+    <!-- Firebase SDK (compat v9) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="firebase-service.js"></script>
     <!-- API Configuration -->
     <script src="api-config.js"></script>
     <!-- Real Listings Static Data (fallback) -->
@@ -953,37 +959,81 @@
             updateListingCount('...');
             
             try {
-                // Fetch from API (async)
-                const fetchedProperties = await PropertiesData.getVerifiedProperties();
-                allLoadedProperties = fetchedProperties;
+                // ── 1. Load static/demo listings ──────────────────────────────────
+                let staticProperties = [];
+                try {
+                    staticProperties = await PropertiesData.getVerifiedProperties();
+                } catch (e) {
+                    console.warn('Static properties not available:', e);
+                }
+
+                // ── 2. Load from Firestore (user-submitted, permanent) ────────────
+                let firestoreProperties = [];
+                if (window.FirebaseService) {
+                    try {
+                        firestoreProperties = await FirebaseService.getAllProperties();
+                        console.log(`🔥 Loaded ${firestoreProperties.length} properties from Firestore`);
+                    } catch (e) {
+                        console.warn('Firestore load failed, showing static only:', e);
+                    }
+                }
+
+                // ── 3. Also include any localStorage fallback properties ──────────
+                let localProperties = [];
+                try {
+                    const localRaw = localStorage.getItem('submittedProperties');
+                    if (localRaw) {
+                        localProperties = JSON.parse(localRaw) || [];
+                    }
+                } catch (e) {}
+
+                // ── 4. Merge: Firestore first (newest), then static ───────────────
+                // Deduplicate: don't show same ID twice
+                const seenIds = new Set();
+                const merged = [];
+
+                for (const p of [...firestoreProperties, ...localProperties]) {
+                    if (!seenIds.has(p.id)) {
+                        seenIds.add(p.id);
+                        merged.push({ ...p, _userSubmitted: true });
+                    }
+                }
+                for (const p of staticProperties) {
+                    if (!seenIds.has(p.id)) {
+                        seenIds.add(p.id);
+                        merged.push(p);
+                    }
+                }
+
+                allLoadedProperties = merged;
                 
                 // Clear loading skeletons
                 propertyGrid.innerHTML = '';
                 
-                if (fetchedProperties.length === 0) {
+                if (merged.length === 0) {
                     propertyGrid.innerHTML = EmptyStates.getNoPropertiesState();
                     updateListingCount(0);
                     return;
                 }
                 
-                updateListingCount(fetchedProperties.length);
+                updateListingCount(merged.length);
 
                 // Render each property card with fade-in animation
-                fetchedProperties.forEach((property, index) => {
+                merged.forEach((property, index) => {
                     const card = createPropertyCard(property);
                     card.classList.add('fade-in');
                     card.style.animationDelay = `${Math.min(index, 6) * 0.06}s`;
                     propertyGrid.appendChild(card);
                 });
                 
-                console.log(`📦 Loaded ${fetchedProperties.length} verified properties`);
+                console.log(`📦 Total: ${merged.length} properties (${firestoreProperties.length} from Firestore + ${localProperties.length} local + ${staticProperties.length} static)`);
             } catch (error) {
                 console.error('❌ Failed to load properties:', error);
                 propertyGrid.innerHTML = `
                     <div class="empty-state-fresh">
                         <div class="empty-state-icon-wrap">⚠️</div>
                         <p style="font-size:1rem;font-weight:600;color:var(--text-primary);">Failed to load properties</p>
-                        <p style="font-size:0.85rem;color:var(--text-secondary);">Please check if the backend server is running.</p>
+                        <p style="font-size:0.85rem;color:var(--text-secondary);">Please check your internet connection.</p>
                         <button onclick="refreshListings()" style="margin-top:1rem;padding:0.6rem 1.5rem;background:var(--fresh-indigo,#6366f1);color:white;border:none;border-radius:999px;cursor:pointer;font-weight:600;">🔄 Retry</button>
                     </div>
                 `;
