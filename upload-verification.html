@@ -483,13 +483,14 @@
                     </div>
                 </div>
 
-                <!-- Last 4 Digits -->
-                <div class="form-group" id="last4Section" style="display: none;">
-                    <label for="last4Digits">
-                        Last 4 Digits of ID Number
-                        <span class="label-hint">(For verification purposes)</span>
+                <!-- Document Number -->
+                <div class="form-group" id="documentNumberSection" style="display: none;">
+                    <label for="documentNumber">
+                        Full Document Number
+                        <span class="label-hint">(Required for automated AI verification)</span>
                     </label>
-                    <input type="text" id="last4Digits" name="last4Digits" placeholder="e.g., 1234" maxlength="4" pattern="[0-9]{4}" required>
+                    <input type="text" id="documentNumber" name="documentNumber" placeholder="Enter exactly as shown on ID" required style="text-transform: uppercase;">
+                    <div id="docError" style="color: #ef4444; font-size: 13px; margin-top: 8px; display: none;">Invalid document number format.</div>
                 </div>
 
                 <!-- Submit Button -->
@@ -532,8 +533,9 @@
         const previewContainer = document.getElementById('previewContainer');
         const previewImage = document.getElementById('previewImage');
         const changePhotoBtn = document.getElementById('changePhotoBtn');
-        const last4Section = document.getElementById('last4Section');
-        const last4Input = document.getElementById('last4Digits');
+        const documentNumberSection = document.getElementById('documentNumberSection');
+        const documentNumberInput = document.getElementById('documentNumber');
+        const docError = document.getElementById('docError');
         const submitBtn = document.getElementById('submitBtn');
         const successMessage = document.getElementById('successMessage');
 
@@ -608,7 +610,7 @@
                 previewImage.src = e.target.result;
                 uploadArea.style.display = 'none';
                 previewContainer.classList.add('active');
-                last4Section.style.display = 'block';
+                documentNumberSection.style.display = 'block';
                 
                 step2.classList.add('complete');
                 step3.classList.add('active');
@@ -627,16 +629,20 @@
             checkFormComplete();
         });
 
-        // Last 4 Digits Input
-        last4Input.addEventListener('input', function() {
-            // Only allow numbers
-            this.value = this.value.replace(/[^0-9]/g, '');
+        // Document String Input
+        documentNumberInput.addEventListener('input', function() {
+            if (idTypeSelect.value === 'aadhaar') {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            } else {
+                this.value = this.value.toUpperCase();
+            }
+            docError.style.display = 'none';
             checkFormComplete();
         });
 
         // Check if form is complete
         function checkFormComplete() {
-            if (idTypeSelect.value && selectedFile && last4Input.value.length === 4) {
+            if (idTypeSelect.value && selectedFile && documentNumberInput.value.length >= 5) {
                 submitBtn.disabled = false;
                 step3.classList.add('complete');
             } else {
@@ -649,16 +655,41 @@
         form.addEventListener('submit', function(e) {
             e.preventDefault();
 
-            // In production, upload to server
-            // For now, simulate success
-            setTimeout(function() {
-                form.style.display = 'none';
-                successMessage.classList.add('active');
+            const docVal = documentNumberInput.value;
+            const type = idTypeSelect.value;
+            
+            // Strict Validation
+            if (type === 'aadhaar' && !/^\d{12}$/.test(docVal)) {
+                docError.textContent = "Aadhaar must be exactly 12 digits.";
+                docError.style.display = "block";
+                return;
+            }
+            if (type === 'pan' && !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(docVal)) {
+                docError.textContent = "Invalid PAN format (e.g. ABCDE1234F).";
+                docError.style.display = "block";
+                return;
+            }
+            if (docVal.length < 5) {
+                docError.textContent = "Document number is too short.";
+                docError.style.display = "block";
+                return;
+            }
 
-                // Store in localStorage (in production, this comes from backend)
-                localStorage.setItem('verificationStatus', 'pending');
-                localStorage.setItem('verificationSubmittedAt', new Date().toISOString());
-            }, 500);
+            // Simulate serious processing
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = 'Scanning Document ID with AI... 🔄';
+            
+            setTimeout(function() {
+                submitBtn.innerHTML = 'Cross-checking Govt Databases... 🔒';
+                
+                setTimeout(function() {
+                    form.style.display = 'none';
+                    successMessage.classList.add('active');
+    
+                    localStorage.setItem('verificationStatus', 'pending');
+                    localStorage.setItem('verificationSubmittedAt', new Date().toISOString());
+                }, 2000);
+            }, 2000);
         });
     </script>
 </body>
