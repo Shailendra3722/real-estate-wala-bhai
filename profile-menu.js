@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             <div class="profile-popup-item" id="btnAddProperty" style="display: none;">
                 <div class="profile-popup-item-left">
-                    <span class="profile-popup-item-icon">✨</span> List a Property
+                    <span class="profile-popup-item-icon">✨</span> Sell Property
                 </div>
                 <span class="profile-popup-item-chevron">→</span>
             </div>
@@ -110,9 +110,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 badge.innerHTML = '✓';
             }
 
-            if (role === 'owner') {
-                document.getElementById('btnAddProperty').style.display = 'flex';
-            }
+            // Always show Sell Property option to logged-in users
+            document.getElementById('btnAddProperty').style.display = 'flex';
         }
     }
 

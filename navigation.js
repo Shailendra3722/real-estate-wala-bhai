@@ -40,8 +40,7 @@ const Navigation = (function () {
         ADD_PROPERTY_STEP1: {
             url: 'add-property-step1.html',
             title: 'Add Property',
-            requiresAuth: true,
-            requiresOwner: true
+            requiresAuth: true
         },
         VERIFICATION: {
             url: 'upload-verification.html',
