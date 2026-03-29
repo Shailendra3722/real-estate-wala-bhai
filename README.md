@@ -15,7 +15,7 @@ Live web app for finding properties near you with interactive map search.
 - Responsive design (mobile-first)
 
 ## Live Demo
-[Coming soon - will be added after deployment]
+[https://real-estate-app.vercel.app](https://real-estate-app.vercel.app)
 
 ## Local Development
 1. Clone the repository

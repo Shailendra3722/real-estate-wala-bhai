@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Settings - Real Estate Wala Bhai</title>
+    <meta name="description" content="Manage your account settings, profile, and preferences on Real Estate Wala Bhai.">
+    <meta property="og:title" content="Settings - Real Estate Wala Bhai">
+    <meta property="og:description" content="Manage your account on India's trusted property platform.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://real-estate-app.vercel.app/settings.html">
+    <meta property="og:image" content="https://real-estate-app.vercel.app/og-image.png">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏡</text></svg>">
     
     <!-- CSS -->
     <link rel="stylesheet" href="global-styles.css">
@@ -11,6 +18,12 @@
     <link rel="stylesheet" href="fresh-modern.css">
     <link rel="stylesheet" href="luxury-components.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="firebase-service.js"></script>
     
     <style>
         .settings-container {
@@ -375,15 +388,39 @@
                 <div class="toggle-container">
                     <div>
                         <h3 style="margin-bottom: 4px; font-family: 'Outfit';">Two-Factor Authentication</h3>
-                        <p style="color: var(--neutral-500); font-size: 0.9rem; margin:0;">Require an OTP verify code for every login.</p>
+                        <p style="color: var(--neutral-500); font-size: 0.9rem; margin:0;">Require an OTP verify code for every login. <span style="background:#fef3c7;color:#b45309;padding:2px 8px;border-radius:100px;font-size:0.75rem;font-weight:600;">Coming Soon</span></p>
                     </div>
-                    <div class="toggle-switch" onclick="this.classList.toggle('on')"></div>
+                    <div class="toggle-switch" style="opacity:0.4;pointer-events:none;"></div>
+                </div>
+
+                <div class="toggle-container" style="margin-top:12px;">
+                    <div>
+                        <h3 style="margin-bottom: 4px; font-family: 'Outfit';">Change Password</h3>
+                        <p style="color: var(--neutral-500); font-size: 0.9rem; margin:0;">Send a password reset link to your email.</p>
+                    </div>
+                    <button onclick="sendPasswordReset()" style="padding:10px 20px;border-radius:100px;border:1px solid rgba(0,0,0,0.15);background:white;font-family:'Outfit';font-weight:600;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='white'">Send Reset Email</button>
                 </div>
                 
                 <div style="margin-top: 40px; padding: 24px; border-radius: 16px; background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.2);">
                     <h3 style="color: #ef4444; margin-bottom: 8px; font-family: 'Outfit';">Danger Zone</h3>
-                    <p style="color: var(--neutral-600); font-size: 0.95rem; margin-bottom: 16px;">Once you delete your account, there is no going back. Please be certain.</p>
-                    <button class="save-btn" style="background: #ef4444;" onclick="alert('Account deletion request initiated.')">Delete Account</button>
+                    <p style="color: var(--neutral-600); font-size: 0.95rem; margin-bottom: 16px;">Once you delete your account, there is no going back. All your data and listings will be permanently removed.</p>
+                    <button class="save-btn" style="background: #ef4444;" onclick="confirmDeleteAccount()">Delete My Account</button>
+                </div>
+            </div>
+
+            <!-- Delete Account Confirmation Modal -->
+            <div id="deleteModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(6px);z-index:9999;align-items:center;justify-content:center;">
+                <div style="background:white;border-radius:24px;padding:40px;max-width:420px;width:90%;box-shadow:0 25px 60px rgba(0,0,0,0.2);animation:fadeIn 0.3s ease;">
+                    <div style="font-size:3rem;text-align:center;margin-bottom:16px;">⚠️</div>
+                    <h2 style="font-family:'Outfit';font-size:1.5rem;font-weight:700;color:#0f172a;text-align:center;margin-bottom:12px;">Delete Account?</h2>
+                    <p style="color:#64748b;text-align:center;margin-bottom:8px;">This action is <strong>permanent</strong> and cannot be undone.</p>
+                    <p style="color:#64748b;text-align:center;margin-bottom:24px;font-size:0.9rem;">All your listings and saved properties will be deleted.</p>
+                    <label style="display:block;margin-bottom:12px;font-family:'Outfit';font-size:0.9rem;color:#374151;">Type <strong>DELETE</strong> to confirm:</label>
+                    <input type="text" id="deleteConfirmInput" placeholder="Type DELETE here" style="width:100%;padding:14px 16px;border:1px solid #e2e8f0;border-radius:12px;font-family:'Outfit';font-size:1rem;margin-bottom:20px;outline:none;">
+                    <div style="display:flex;gap:12px;">
+                        <button onclick="closeDeleteModal()" style="flex:1;padding:14px;border-radius:100px;border:1px solid #e2e8f0;background:white;font-family:'Outfit';font-weight:600;cursor:pointer;">Cancel</button>
+                        <button onclick="executeDeleteAccount()" style="flex:1;padding:14px;border-radius:100px;border:none;background:#ef4444;color:white;font-family:'Outfit';font-weight:600;cursor:pointer;">Yes, Delete</button>
+                    </div>
                 </div>
             </div>
 
@@ -398,58 +435,126 @@
     <script src="profile-menu.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Load user data into form
-            const user = window.AppState ? window.AppState.getUser() : null;
-            if (user) {
-                document.getElementById('inputName').value = user.name || '';
-                document.getElementById('inputPhone').value = user.phone || '';
-                document.getElementById('inputType').value = user.role === 'owner' ? 'Property Owner / Agent' : 'Buyer / Renter';
-                
-                if (user.name) {
-                    document.getElementById('avatarLarge').textContent = user.name.charAt(0).toUpperCase();
-                    document.querySelector('.avatar-circle').textContent = user.name.charAt(0).toUpperCase();
+            // Load user data: prefer Firebase, fallback to AppState
+            FirebaseService.getCurrentUser().then(firebaseUser => {
+                const localUser = window.AppState ? window.AppState.getUser() : null;
+                const user = firebaseUser || localUser;
+                if (user) {
+                    document.getElementById('inputName').value = user.name || user.displayName || '';
+                    document.getElementById('inputEmail').value = user.email || '';
+                    document.getElementById('inputPhone').value = user.phone || '';
+                    document.getElementById('inputType').value = (user.role === 'owner') ? 'Property Owner / Agent' : 'Buyer / Renter';
+                    const initial = (user.name || user.email || 'U').charAt(0).toUpperCase();
+                    document.getElementById('avatarLarge').textContent = initial;
+                    const avatarCircle = document.querySelector('.avatar-circle');
+                    if (avatarCircle) avatarCircle.textContent = initial;
+                } else {
+                    // Not logged in
+                    window.location.href = 'login.html';
                 }
-            } else {
-                // Redirect to login if perfectly unauthorized 
-                // window.location.href = 'login.html';
-            }
+            }).catch(() => {
+                const user = window.AppState ? window.AppState.getUser() : null;
+                if (!user) window.location.href = 'login.html';
+            });
         });
 
         function switchTab(tabId) {
-            // Update menu visual active state
-            document.querySelectorAll('.settings-menu-item').forEach(el => {
-                el.classList.remove('active');
-            });
+            document.querySelectorAll('.settings-menu-item').forEach(el => el.classList.remove('active'));
             event.currentTarget.classList.add('active');
-            
-            // Show corresponding section
-            document.querySelectorAll('.settings-section').forEach(el => {
-                el.classList.remove('active');
-            });
+            document.querySelectorAll('.settings-section').forEach(el => el.classList.remove('active'));
             document.getElementById('section-' + tabId).classList.add('active');
         }
 
-        function saveSettings(msg) {
+        async function saveSettings(msg) {
             const toast = document.getElementById('toastMessage');
-            toast.textContent = msg;
-            toast.classList.add('show');
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
-            
-            // Save to AppState ideally
-            if (window.AppState) {
-                const user = window.AppState.getUser() || {};
-                user.name = document.getElementById('inputName').value;
-                window.AppState.login(user); // refresh state
-                
-                // Update header avatar
-                if(user.name) {
-                    document.querySelector('.avatar-circle').textContent = user.name.charAt(0).toUpperCase();
-                    document.getElementById('avatarLarge').textContent = user.name.charAt(0).toUpperCase();
+            const newName = document.getElementById('inputName').value.trim();
+
+            if (msg.includes('Profile')) {
+                // ── Save to Firebase ──
+                try {
+                    await FirebaseService.updateUserProfile({ name: newName });
+                    // Also sync AppState for backward compat
+                    if (window.AppState) {
+                        const user = window.AppState.getUser() || {};
+                        user.name = newName;
+                        window.AppState.setUser(user);
+                    }
+                    // Update header avatar
+                    const initial = newName.charAt(0).toUpperCase();
+                    document.getElementById('avatarLarge').textContent = initial;
+                    const avatarCircle = document.querySelector('.avatar-circle');
+                    if (avatarCircle) avatarCircle.textContent = initial;
+                    toast.textContent = '✅ ' + msg;
+                } catch (err) {
+                    console.error('Profile save error:', err);
+                    toast.textContent = '❌ Failed to save. Please log in again.';
                 }
+            } else {
+                toast.textContent = '✅ ' + msg;
+            }
+
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        async function sendPasswordReset() {
+            try {
+                const user = await FirebaseService.getCurrentUser();
+                if (!user || !user.email) { alert('No email found. Please log in again.'); return; }
+                await firebase.auth().sendPasswordResetEmail(user.email);
+                const toast = document.getElementById('toastMessage');
+                toast.textContent = '📧 Reset link sent to ' + user.email;
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 4000);
+            } catch (err) {
+                alert('Error: ' + (err.message || 'Please try again.'));
             }
         }
+
+        function confirmDeleteAccount() {
+            const modal = document.getElementById('deleteModal');
+            modal.style.display = 'flex';
+            document.getElementById('deleteConfirmInput').value = '';
+            document.getElementById('deleteConfirmInput').focus();
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+        }
+
+        async function executeDeleteAccount() {
+            const input = document.getElementById('deleteConfirmInput').value.trim();
+            if (input !== 'DELETE') {
+                document.getElementById('deleteConfirmInput').style.borderColor = '#ef4444';
+                document.getElementById('deleteConfirmInput').focus();
+                return;
+            }
+            try {
+                const currentUser = firebase.auth().currentUser;
+                if (!currentUser) { alert('Please log in again to delete your account.'); return; }
+                // Delete Firestore user doc
+                await firebase.firestore().collection('users').doc(currentUser.uid).delete();
+                // Delete Firebase Auth account
+                await currentUser.delete();
+                // Clear local state
+                if (window.AppState) window.AppState.logout();
+                alert('✅ Your account has been permanently deleted.');
+                window.location.href = 'login.html';
+            } catch (err) {
+                if (err.code === 'auth/requires-recent-login') {
+                    alert('For security, please log out and log back in before deleting your account.');
+                } else {
+                    alert('Error deleting account: ' + (err.message || 'Please try again.'));
+                }
+            }
+            closeDeleteModal();
+        }
+
+        // Close modal on backdrop click
+        document.addEventListener('click', function(e) {
+            const modal = document.getElementById('deleteModal');
+            if (e.target === modal) closeDeleteModal();
+        });
     </script>
 </body>
 </html>
