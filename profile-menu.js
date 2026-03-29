@@ -7,7 +7,7 @@
  * Closes when clicking outside.
  */
 
-window.addEventListener('load', () => {
+document.addEventListener('DOMContentLoaded', () => {
     // We expect the profile icon to have the class .user-profile
     const profileIcon = document.querySelector('.user-profile');
     if (!profileIcon) return;

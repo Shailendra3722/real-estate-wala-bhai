@@ -31,21 +31,7 @@
     <link rel="stylesheet" href="ux-components.css">
     <!-- Smooth Evolution Layer -->
     <link rel="stylesheet" href="smooth-evolution.css">
-    <!-- Scripts: loaded with defer so they never block page render -->
-    <script src="app-state.js" defer></script>
-    <!-- Firebase SDK (compat v9) -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js" defer></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js" defer></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js" defer></script>
-    <script src="firebase-config.js" defer></script>
-    <script src="firebase-service.js" defer></script>
-    <script src="api-config.js" defer></script>
-    <script src="real-listings-data.js" defer></script>
-    <script src="properties-data-api.js" defer></script>
-    <script src="navigation.js" defer></script>
-    <script src="mock-api.js" defer></script>
-    <script src="empty-states.js" defer></script>
-    <script src="toast.js" defer></script>
+
     <style>
         /* Luxury specific overrides for home page */
         
@@ -885,49 +871,28 @@
             if (live) live.textContent = `${count} properties live`;
         }
 
-        // Check if user is logged in on page load
-        // Using 'load' (not DOMContentLoaded) because all scripts are deferred
-        // and DOMContentLoaded fires BEFORE deferred scripts execute
-        window.addEventListener('load', function() {
-            // Check if logged in to determine what to show
+        // ==================== INITIALIZATION ====================
+        // Scripts are at end of body — DOM is ready, just call init directly
+        function startApp() {
             const isLoggedIn = AppState.isLoggedIn();
-
             updateHeroGreeting();
-            
+
             if (isLoggedIn) {
-                // Get user data
-                const user = AppState.getUser();
-                const role = AppState.getRole();
-                
-                // Update user profile display
                 updateUserProfile();
-                
-                // Check for URL parameters (e.g., ?filter=buy or ?filter=rent)
                 const urlParams = new URLSearchParams(window.location.search);
                 const filterType = urlParams.get('filter');
-                
-                if (filterType === 'buy') {
-                    handleAction('buy');
-                } else if (filterType === 'rent') {
-                    handleAction('rent');
-                } else {
-                    // Load all verified properties
-                    loadAllProperties();
-                }
+                if (filterType === 'buy') handleAction('buy');
+                else if (filterType === 'rent') handleAction('rent');
+                else loadAllProperties();
             } else {
-                // User not logged in - show properties with limited functionality
-                
-                // Show generic user icon
                 const userProfileIcon = document.querySelector('.user-profile');
                 if (userProfileIcon) {
                     userProfileIcon.textContent = '👤';
                     userProfileIcon.onclick = handleGuestProfileClick;
                 }
-                
-                // Load properties even for guest users
                 loadAllProperties();
             }
-        });
+        }
         
         // ==================== LOAD PROPERTIES ====================
         
@@ -1446,5 +1411,28 @@
         }
     })();
     </script>
+
+    <!-- =====================================================
+         ALL SCRIPTS AT END OF BODY = fastest load pattern
+         DOM is already parsed when these run, no events needed
+         ===================================================== -->
+    <script src="app-state.js"></script>
+    <!-- Firebase SDK (compat v9) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="firebase-service.js"></script>
+    <script src="api-config.js"></script>
+    <script src="real-listings-data.js"></script>
+    <script src="properties-data-api.js"></script>
+    <script src="navigation.js"></script>
+    <script src="mock-api.js"></script>
+    <script src="empty-states.js"></script>
+    <script src="toast.js"></script>
+    <script src="theme-manager.js"></script>
+    <script src="profile-menu.js"></script>
+    <!-- Start the app — DOM + all scripts are ready at this point -->
+    <script>startApp();</script>
 </body>
 </html>
