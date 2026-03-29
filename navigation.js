@@ -15,7 +15,7 @@ const Navigation = (function () {
         HOME: {
             url: 'home.html',
             title: 'Home',
-            requiresAuth: true
+            requiresAuth: false  // Anyone can browse listings
         },
         LOGIN: {
             url: 'login.html',
@@ -25,22 +25,22 @@ const Navigation = (function () {
         MAP: {
             url: 'map-explore.html',
             title: 'Explore on Map',
-            requiresAuth: true
+            requiresAuth: false  // Anyone can explore the map
         },
         PROPERTY_LIST: {
             url: 'property-list.html',
             title: 'Properties',
-            requiresAuth: true
+            requiresAuth: false  // Anyone can view listings
         },
         PROPERTY_DETAIL: {
             url: 'property-detail.html',
             title: 'Property Details',
-            requiresAuth: true
+            requiresAuth: false  // Anyone can view property details
         },
         ADD_PROPERTY_STEP1: {
             url: 'add-property-step1.html',
             title: 'Add Property',
-            requiresAuth: true
+            requiresAuth: true  // Must be logged in to list a property
         },
         VERIFICATION: {
             url: 'upload-verification.html',
