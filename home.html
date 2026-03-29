@@ -24,6 +24,8 @@
     <link rel="stylesheet" href="loading-animation.css">
     <!-- UX Components -->
     <link rel="stylesheet" href="ux-components.css">
+    <!-- Smooth Evolution Layer -->
+    <link rel="stylesheet" href="smooth-evolution.css">
     <script src="loading-animation.js"></script>
     <!-- Global App State -->
     <script src="app-state.js"></script>
@@ -872,7 +874,9 @@
 
             props.forEach((property, index) => {
                 const card = createPropertyCard(property);
-                card.style.animationDelay = `${Math.min(index, 6) * 0.06}s`;
+                const stagger = Math.min(index, 11);
+                card.style.setProperty('--card-index', stagger);
+                card.style.animationDelay = `${stagger * 60}ms`;
                 grid.appendChild(card);
             });
         }
@@ -1316,6 +1320,139 @@
                     break;
             }
         }
+    </script>
+
+    <!-- ====== SMOOTH EVOLUTION INTERACTIONS ====== -->
+    <script>
+    (function() {
+        'use strict';
+
+        /* ── 1. RIPPLE EFFECT ── */
+        function addRipple(el) {
+            el.classList.add('ripple-host');
+            el.addEventListener('pointerdown', function(e) {
+                const rect = el.getBoundingClientRect();
+                const wave = document.createElement('span');
+                wave.className = 'ripple-wave';
+                wave.style.left = (e.clientX - rect.left) + 'px';
+                wave.style.top  = (e.clientY - rect.top)  + 'px';
+                el.appendChild(wave);
+                wave.addEventListener('animationend', () => wave.remove(), { once: true });
+            });
+        }
+
+        function applyRipples() {
+            document.querySelectorAll(
+                '.btn-3d-primary, .btn-3d-crystal, .btn-view-details, .filter-pill, .stat-chip, .btn-refresh'
+            ).forEach(addRipple);
+        }
+
+        /* ── 2. MAGNETIC CARD TILT ── */
+        function applyMagneticTilt() {
+            document.querySelectorAll('.property-card, .property-card-3d').forEach(card => {
+                card.addEventListener('mousemove', function(e) {
+                    const rect = card.getBoundingClientRect();
+                    const cx = rect.left + rect.width  / 2;
+                    const cy = rect.top  + rect.height / 2;
+                    const dx = (e.clientX - cx) / (rect.width  / 2);
+                    const dy = (e.clientY - cy) / (rect.height / 2);
+                    const tiltX =  dy * 4;  // max 4°
+                    const tiltY = -dx * 4;
+                    card.style.transform = `translateY(-10px) scale(1.015) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+                });
+                card.addEventListener('mouseleave', function() {
+                    card.style.transform = '';
+                });
+            });
+        }
+
+        /* ── 3. ANIMATED COUNTER (on number change) ── */
+        window._prevListingCount = 0;
+        const origUpdateCount = window.updateListingCount;
+        function animateCounter(el, newVal) {
+            el.classList.remove('flip');
+            void el.offsetWidth; // reflow
+            el.classList.add('flip');
+            el.textContent = newVal;
+            setTimeout(() => el.classList.remove('flip'), 300);
+        }
+
+        // Observe listing count changes via MutationObserver
+        const countEl = document.getElementById('listingCountNum');
+        if (countEl) {
+            const obs = new MutationObserver(() => {
+                animateCounter(countEl, countEl.textContent);
+            });
+            obs.observe(countEl, { childList: true, characterData: true, subtree: true });
+        }
+
+        /* ── 4. SECTION TITLE UNDERLINE (IntersectionObserver) ── */
+        function observeSectionTitles() {
+            const titles = document.querySelectorAll('.section-title-3d');
+            if (!titles.length) return;
+            const io = new IntersectionObserver((entries) => {
+                entries.forEach(e => {
+                    if (e.isIntersecting) {
+                        e.target.classList.add('in-view');
+                        io.unobserve(e.target);
+                    }
+                });
+            }, { threshold: 0.3 });
+            titles.forEach(t => io.observe(t));
+        }
+
+        /* ── 5. THEME TOGGLE SPIN ── */
+        function applyThemeToggleSpin() {
+            const btn = document.querySelector('.theme-toggle-btn');
+            if (!btn) return;
+            btn.addEventListener('click', function() {
+                btn.classList.add('spinning');
+                setTimeout(() => btn.classList.remove('spinning'), 450);
+            });
+        }
+
+        /* ── 6. CARD STAGGER INDEX (dynamic cards from JS) ── */
+        window._applyCardStagger = function() {
+            const grid = document.getElementById('propertyGrid');
+            if (!grid) return;
+            Array.from(grid.children).forEach((card, i) => {
+                card.style.setProperty('--card-index', i);
+                // Re-trigger animation
+                card.style.animation = 'none';
+                void card.offsetWidth;
+                card.style.animation = '';
+            });
+            // Re-apply magnetic + ripple for new cards
+            applyMagneticTilt();
+            applyRipples();
+        };
+
+        /* ── INIT (after DOM ready) ── */
+        function init() {
+            applyRipples();
+            applyMagneticTilt();
+            observeSectionTitles();
+            applyThemeToggleSpin();
+
+            // Re-run on property grid mutations (dynamic loads)
+            const grid = document.getElementById('propertyGrid');
+            if (grid) {
+                new MutationObserver(() => {
+                    setTimeout(() => {
+                        applyMagneticTilt();
+                        applyRipples();
+                        observeSectionTitles();
+                    }, 80);
+                }).observe(grid, { childList: true });
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    })();
     </script>
 </body>
 </html>

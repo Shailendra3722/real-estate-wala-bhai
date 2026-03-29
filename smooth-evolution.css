@@ -1,0 +1,636 @@
+/**
+ * ====================================================
+ *  SMOOTH EVOLUTION LAYER
+ *  Real Estate Wala Bhai — Next-Level Fluid Edition
+ * ====================================================
+ *
+ *  Enhancements:
+ *  - Page entry cinematic reveal
+ *  - Ultra-smooth spring easing tokens
+ *  - Staggered card reveal with 3D entry
+ *  - Magnetic tilt card effect (via JS)
+ *  - Morphing background orbs (fluid blur)
+ *  - Animated gradient text on hero
+ *  - Ripple press effect on all interactive elements
+ *  - Smooth filter tab ink underline transition
+ *  - Premium scrollbar styling
+ *  - Glow-on-hover cards
+ *  - Floating label on search focus
+ *  - Shimmer skeleton with iridescent effect
+ * ====================================================
+ */
+
+/* ====================================================
+   ENHANCED EASING TOKENS
+==================================================== */
+
+:root {
+    --ease-expo-out:   cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-expo-in:    cubic-bezier(0.7, 0, 0.84, 0);
+    --ease-back-out:   cubic-bezier(0.34, 1.56, 0.64, 1);
+    --ease-back-soft:  cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    --ease-silk:       cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --ease-magnetic:   cubic-bezier(0.23, 1, 0.32, 1);
+
+    /* Durations */
+    --dur-instant:  80ms;
+    --dur-fast:     150ms;
+    --dur-base:     260ms;
+    --dur-slow:     420ms;
+    --dur-slower:   680ms;
+    --dur-dramatic: 1000ms;
+}
+
+/* ====================================================
+   PAGE CINEMATIC ENTRY
+==================================================== */
+
+@keyframes pageReveal {
+    0%   { opacity: 0; transform: translateY(16px); filter: blur(4px); }
+    60%  { filter: blur(0); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pageRevealFast {
+    0%   { opacity: 0; transform: translateY(8px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+body {
+    animation: pageReveal 0.55s var(--ease-expo-out) both;
+}
+
+/* Staggered section entries */
+.header {
+    animation: pageRevealFast 0.4s var(--ease-expo-out) 0.05s both !important;
+}
+
+.hero-greeting {
+    animation: pageRevealFast 0.5s var(--ease-expo-out) 0.1s both !important;
+}
+
+.city-stats {
+    animation: pageRevealFast 0.45s var(--ease-expo-out) 0.18s both !important;
+}
+
+.search-section {
+    animation: pageRevealFast 0.45s var(--ease-expo-out) 0.25s both !important;
+}
+
+.quick-section {
+    animation: pageRevealFast 0.45s var(--ease-expo-out) 0.32s both !important;
+}
+
+.featured-section {
+    animation: pageRevealFast 0.45s var(--ease-expo-out) 0.4s both !important;
+}
+
+/* ====================================================
+   STAGGERED PROPERTY CARD REVEAL
+==================================================== */
+
+@keyframes cardReveal3D {
+    0% {
+        opacity: 0;
+        transform: translateY(32px) scale(0.95) rotateX(4deg);
+        filter: blur(2px);
+    }
+    60% {
+        filter: blur(0);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1) rotateX(0deg);
+    }
+}
+
+.property-card,
+.property-card-3d {
+    animation: cardReveal3D 0.5s var(--ease-expo-out) both;
+    animation-delay: calc(var(--card-index, 0) * 60ms);
+    transform-origin: center bottom;
+    perspective: 1000px;
+}
+
+/* Stagger via nth-child as fallback */
+.property-grid > *:nth-child(1)  { --card-index: 0; }
+.property-grid > *:nth-child(2)  { --card-index: 1; }
+.property-grid > *:nth-child(3)  { --card-index: 2; }
+.property-grid > *:nth-child(4)  { --card-index: 3; }
+.property-grid > *:nth-child(5)  { --card-index: 4; }
+.property-grid > *:nth-child(6)  { --card-index: 5; }
+.property-grid > *:nth-child(7)  { --card-index: 6; }
+.property-grid > *:nth-child(8)  { --card-index: 7; }
+.property-grid > *:nth-child(9)  { --card-index: 8; }
+.property-grid > *:nth-child(10) { --card-index: 9; }
+.property-grid > *:nth-child(11) { --card-index: 10; }
+.property-grid > *:nth-child(12) { --card-index: 11; }
+
+/* ====================================================
+   ULTRA-SMOOTH CARD HOVER (evolved)
+==================================================== */
+
+.property-card,
+.property-card-3d {
+    transition:
+        transform var(--dur-slow) var(--ease-expo-out),
+        box-shadow var(--dur-slow) var(--ease-expo-out),
+        border-color var(--dur-base) ease !important;
+    will-change: transform, box-shadow;
+}
+
+.property-card:hover,
+.property-card-3d:hover {
+    transform: translateY(-10px) scale(1.015) !important;
+    box-shadow:
+        0 2px 0px rgba(255,255,255,0.9) inset,
+        0 10px 30px rgba(15,23,42,0.1),
+        0 24px 64px rgba(99,102,241,0.12),
+        0 4px 8px rgba(0,0,0,0.04),
+        0 0 0 1.5px rgba(99,102,241,0.1) !important;
+}
+
+/* Card image zoom — silkier */
+.property-card:hover .property-image img,
+.property-card-3d:hover .property-image img {
+    transform: scale(1.08) !important;
+    transition: transform 0.65s var(--ease-silk) !important;
+}
+
+.property-image img {
+    transition: transform 0.5s var(--ease-silk) !important;
+}
+
+/* ====================================================
+   MAGNETIC TILT CARD (toggled by JS class)
+==================================================== */
+
+.card-tilting {
+    transition: transform 0.1s var(--ease-magnetic) !important;
+}
+
+/* ====================================================
+   ENHANCED QUICK ACTION CRYSTALS
+==================================================== */
+
+.btn-3d-crystal {
+    transition:
+        transform var(--dur-slow) var(--ease-back-out),
+        box-shadow var(--dur-slow) var(--ease-expo-out) !important;
+}
+
+.btn-3d-crystal:hover {
+    transform: translateY(-8px) scale(1.03) !important;
+}
+
+/* ====================================================
+   HERO ANIMATED GRADIENT TEXT (shimmer sweep)
+==================================================== */
+
+@keyframes heroTextShimmer {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.hero-title span {
+    background: linear-gradient(
+        90deg,
+        #fff 0%,
+        #c7d2fe 30%,
+        #a5b4fc 50%,
+        #c7d2fe 70%,
+        #fff 100%
+    ) !important;
+    background-size: 200% 100% !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    animation: heroTextShimmer 3s ease-in-out infinite;
+}
+
+/* ====================================================
+   MORPHING BACKGROUND ORBS (fluid, evolved)
+==================================================== */
+
+@keyframes orbMorph1 {
+    0%   { transform: translate(0, 0) scale(1); border-radius: 50%; filter: blur(80px); }
+    33%  { transform: translate(60px, 40px) scale(1.12); border-radius: 40% 60% 55% 45%; filter: blur(95px); }
+    66%  { transform: translate(30px, 80px) scale(0.92); border-radius: 55% 45% 40% 60%; filter: blur(70px); }
+    100% { transform: translate(0, 0) scale(1); border-radius: 50%; filter: blur(80px); }
+}
+
+@keyframes orbMorph2 {
+    0%   { transform: translate(0, 0) scale(1.1); border-radius: 50%; filter: blur(80px); }
+    33%  { transform: translate(-50px, 60px) scale(0.9); border-radius: 60% 40% 50% 50%; filter: blur(100px); }
+    66%  { transform: translate(-20px, 30px) scale(1.05); border-radius: 45% 55% 60% 40%; filter: blur(75px); }
+    100% { transform: translate(0, 0) scale(1.1); border-radius: 50%; filter: blur(80px); }
+}
+
+@keyframes orbMorph3 {
+    0%   { transform: translate(0, 0) scale(0.95); border-radius: 50%; filter: blur(80px); }
+    50%  { transform: translate(50px, -40px) scale(1.08); border-radius: 55% 45% 35% 65%; filter: blur(90px); }
+    100% { transform: translate(0, 0) scale(0.95); border-radius: 50%; filter: blur(80px); }
+}
+
+.orb-1 {
+    animation: orbMorph1 28s ease-in-out infinite !important;
+}
+
+.orb-2 {
+    animation: orbMorph2 22s ease-in-out infinite !important;
+}
+
+.orb-3 {
+    animation: orbMorph3 32s ease-in-out infinite !important;
+}
+
+/* ====================================================
+   RIPPLE PRESS EFFECT (all interactive elements)
+==================================================== */
+
+.ripple-host {
+    position: relative;
+    overflow: hidden;
+}
+
+@keyframes rippleExpand {
+    0%   { transform: scale(0); opacity: 0.4; }
+    100% { transform: scale(4); opacity: 0; }
+}
+
+.ripple-wave {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.45);
+    width: 80px;
+    height: 80px;
+    margin-top: -40px;
+    margin-left: -40px;
+    pointer-events: none;
+    animation: rippleExpand 0.55s var(--ease-expo-out) forwards;
+    z-index: 10;
+}
+
+/* ====================================================
+   SMOOTH FILTER PILL TRANSITIONS (ink underline)
+==================================================== */
+
+.filter-pill {
+    position: relative;
+    transition:
+        color var(--dur-base) var(--ease-expo-out),
+        background var(--dur-base) var(--ease-expo-out),
+        border-color var(--dur-base) ease,
+        transform var(--dur-fast) var(--ease-back-soft),
+        box-shadow var(--dur-base) ease !important;
+}
+
+.filter-pill:hover {
+    transform: translateY(-2px) !important;
+}
+
+.filter-pill:active {
+    transform: translateY(0) scale(0.95) !important;
+}
+
+.filter-pill.active {
+    animation: pillActivate 0.3s var(--ease-back-out) both;
+}
+
+@keyframes pillActivate {
+    0%   { transform: scale(0.9); }
+    60%  { transform: scale(1.06); }
+    100% { transform: scale(1); }
+}
+
+/* City stat chips — same treatment */
+.stat-chip {
+    transition:
+        transform var(--dur-base) var(--ease-back-soft),
+        box-shadow var(--dur-base) ease,
+        border-color var(--dur-base) ease,
+        background var(--dur-base) ease !important;
+}
+
+.stat-chip:hover {
+    transform: translateY(-3px) !important;
+}
+
+.stat-chip.active {
+    animation: pillActivate 0.3s var(--ease-back-out) both;
+}
+
+/* ====================================================
+   SEARCH BAR — FLUID EXPANSION
+==================================================== */
+
+.search-input {
+    transition:
+        transform var(--dur-slow) var(--ease-expo-out),
+        box-shadow var(--dur-slow) var(--ease-expo-out),
+        border-color var(--dur-base) ease !important;
+}
+
+.search-input:focus {
+    transform: translateY(-3px) !important;
+    box-shadow:
+        0 1px 0px rgba(255,255,255,1) inset,
+        0 0 0 4px rgba(99,102,241,0.1),
+        0 12px 32px rgba(99,102,241,0.14),
+        0 20px 60px rgba(15,23,42,0.08) !important;
+    border-color: rgba(99,102,241,0.5) !important;
+}
+
+/* ====================================================
+   STICKY HEADER — SMOOTHER MORPHING
+==================================================== */
+
+.header {
+    transition:
+        padding var(--dur-slow) var(--ease-expo-out),
+        background var(--dur-slow) ease,
+        box-shadow var(--dur-slow) ease !important;
+}
+
+.header.scrolled {
+    animation: none !important;
+    backdrop-filter: blur(24px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+}
+
+/* ====================================================
+   LOGO — SMOOTH HOVER PULSE
+==================================================== */
+
+.logo-icon-3d {
+    transition:
+        transform var(--dur-slow) var(--ease-back-out),
+        box-shadow var(--dur-slow) ease !important;
+}
+
+.logo-icon-3d:hover {
+    transform: translateY(-2px) scale(1.08) rotate(-3deg) !important;
+}
+
+/* ====================================================
+   PROFILE AVATAR — SPRING SCALE
+==================================================== */
+
+.user-profile-3d {
+    transition:
+        transform var(--dur-slow) var(--ease-back-out),
+        box-shadow var(--dur-slow) ease !important;
+}
+
+.user-profile-3d:hover {
+    transform: translateY(-3px) scale(1.12) !important;
+}
+
+/* ====================================================
+   FAB SCROLL-TO-TOP — BOUNCE IN/OUT
+==================================================== */
+
+@keyframes fabBounceIn {
+    0%   { opacity: 0; transform: translateY(20px) scale(0.7); }
+    60%  { transform: translateY(-6px) scale(1.05); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes fabBounceOut {
+    0%   { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: translateY(20px) scale(0.7); }
+}
+
+.fab-scroll-top.visible {
+    animation: fabBounceIn 0.4s var(--ease-back-out) both;
+}
+
+/* ====================================================
+   ANIMATED COUNTER FLIP
+==================================================== */
+
+@keyframes counterFlip {
+    from { transform: translateY(-8px); opacity: 0.5; }
+    to   { transform: translateY(0); opacity: 1; }
+}
+
+.listing-count-number.flip {
+    animation: counterFlip 0.25s var(--ease-expo-out) both;
+}
+
+/* ====================================================
+   SKELETON — IRIDESCENT SHIMMER
+==================================================== */
+
+@keyframes iridShimmer {
+    0%   { background-position: -200% center; }
+    100% { background-position: 200% center; }
+}
+
+.skeleton-fresh,
+.skeleton-3d {
+    background: linear-gradient(
+        105deg,
+        #f1f5f9 0%,
+        #e2e8f0 20%,
+        #e8edff 35%,
+        #ede9fe 50%,
+        #e8edff 65%,
+        #e2e8f0 80%,
+        #f1f5f9 100%
+    ) !important;
+    background-size: 400% 100% !important;
+    animation: iridShimmer 1.8s ease-in-out infinite !important;
+}
+
+[data-theme="dark"] .skeleton-fresh,
+[data-theme="dark"] .skeleton-3d {
+    background: linear-gradient(
+        105deg,
+        rgba(30,41,59,0.8) 0%,
+        rgba(51,65,85,0.8) 20%,
+        rgba(67,56,202,0.2) 35%,
+        rgba(91,33,182,0.15) 50%,
+        rgba(67,56,202,0.2) 65%,
+        rgba(51,65,85,0.8) 80%,
+        rgba(30,41,59,0.8) 100%
+    ) !important;
+    background-size: 400% 100% !important;
+}
+
+/* ====================================================
+   PROPERTY BADGE — FLOAT IN
+==================================================== */
+
+@keyframes badgeFloat {
+    0%   { opacity: 0; transform: translateY(-6px) scale(0.85); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.property-badge {
+    animation: badgeFloat 0.35s var(--ease-back-out) 0.3s both;
+}
+
+/* ====================================================
+   VIEW DETAILS BUTTON — SHIMMER ON HOVER
+==================================================== */
+
+.btn-view-details {
+    position: relative;
+    overflow: hidden;
+    transition:
+        transform var(--dur-base) var(--ease-expo-out),
+        box-shadow var(--dur-base) ease !important;
+}
+
+.btn-view-details::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255,255,255,0.25) 50%,
+        transparent 100%
+    );
+    transform: skewX(-20deg);
+    transition: left 0.5s var(--ease-expo-out);
+    pointer-events: none;
+}
+
+.btn-view-details:hover::after {
+    left: 160%;
+}
+
+.btn-view-details:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 24px rgba(37,99,235,0.35) !important;
+}
+
+/* ====================================================
+   LIVE BADGE — ENHANCED PULSE
+==================================================== */
+
+@keyframes livePulseEnhanced {
+    0%   { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.8); transform: scale(1); }
+    50%  { transform: scale(1.1); }
+    70%  { box-shadow: 0 0 0 8px rgba(74, 222, 128, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); transform: scale(1); }
+}
+
+.live-dot {
+    animation: livePulseEnhanced 2s ease-in-out infinite !important;
+}
+
+/* ====================================================
+   THEME TOGGLE BUTTON — SPIN ON CLICK
+==================================================== */
+
+.theme-toggle-btn {
+    transition:
+        transform var(--dur-slow) var(--ease-back-out) !important;
+}
+
+.theme-toggle-btn:hover {
+    transform: rotate(20deg) scale(1.15) !important;
+}
+
+.theme-toggle-btn.spinning {
+    animation: spinHalf 0.4s var(--ease-expo-out) both;
+}
+
+@keyframes spinHalf {
+    from { transform: rotate(0deg) scale(0.8); }
+    to   { transform: rotate(360deg) scale(1); }
+}
+
+/* ====================================================
+   REFRESHED SMOOTH SCROLLBAR
+==================================================== */
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(99, 102, 241, 0.25);
+    border-radius: 999px;
+    transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(99, 102, 241, 0.5);
+}
+
+/* Hide horizontal scrollbar on city stats */
+.city-stats::-webkit-scrollbar {
+    display: none;
+}
+
+/* ====================================================
+   SECTION TITLE — ANIMATED UNDERLINE
+==================================================== */
+
+.section-title-3d::after {
+    background: linear-gradient(90deg, #6366f1, #8b5cf6, #a78bfa, transparent) !important;
+    transition: width var(--dur-slow) var(--ease-expo-out);
+    width: 0%;
+}
+
+.section-title-3d.in-view::after {
+    width: 40%;
+}
+
+/* ====================================================
+   DARK MODE — SMOOTHER TRANSITIONS
+==================================================== */
+
+[data-theme="dark"] .property-card,
+[data-theme="dark"] .property-card-3d {
+    transition:
+        transform var(--dur-slow) var(--ease-expo-out),
+        box-shadow var(--dur-slow) var(--ease-expo-out),
+        border-color var(--dur-base) ease !important;
+}
+
+[data-theme="dark"] .property-card:hover,
+[data-theme="dark"] .property-card-3d:hover {
+    box-shadow:
+        0 1px 0px rgba(255,255,255,0.08) inset,
+        0 10px 30px rgba(0,0,0,0.4),
+        0 24px 64px rgba(0,0,0,0.3),
+        0 40px 100px rgba(99,102,241,0.15) !important;
+}
+
+/* ====================================================
+   MOBILE — REDUCE MOTION (a11y)
+==================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ====================================================
+   RESPONSIVE POLISH
+==================================================== */
+
+@media (max-width: 768px) {
+    .property-card:hover,
+    .property-card-3d:hover {
+        transform: translateY(-5px) scale(1.01) !important;
+    }
+}
