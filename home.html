@@ -16,21 +16,11 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏡</text></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Luxury Design System -->
-    <link rel="stylesheet" href="luxury-design-system.css">
-    <link rel="stylesheet" href="luxury-components.css">
-    <link rel="stylesheet" href="luxury-animations.css">
-    <!-- 3D Modern Design System -->
-    <link rel="stylesheet" href="3d-modern.css">
-    <!-- Fresh Modern Design System -->
-    <link rel="stylesheet" href="fresh-modern.css">
-    <!-- Premium Loading Animation -->
-    <link rel="stylesheet" href="loading-animation.css">
-    <!-- UX Components -->
-    <link rel="stylesheet" href="ux-components.css">
-    <!-- Smooth Evolution Layer -->
-    <link rel="stylesheet" href="smooth-evolution.css">
+    <!-- Google Fonts loaded async so it never blocks render -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet"></noscript>
+    <!-- Single combined CSS file: 8 files → 1 request -->
+    <link rel="stylesheet" href="all-styles.css">
 
     <style>
         /* Luxury specific overrides for home page */
