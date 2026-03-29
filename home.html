@@ -31,29 +31,21 @@
     <link rel="stylesheet" href="ux-components.css">
     <!-- Smooth Evolution Layer -->
     <link rel="stylesheet" href="smooth-evolution.css">
-    <script src="loading-animation.js"></script>
-    <!-- Global App State -->
-    <script src="app-state.js"></script>
+    <!-- Scripts: loaded with defer so they never block page render -->
+    <script src="app-state.js" defer></script>
     <!-- Firebase SDK (compat v9) -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <script src="firebase-config.js"></script>
-    <script src="firebase-service.js"></script>
-    <!-- API Configuration -->
-    <script src="api-config.js"></script>
-    <!-- Real Listings Static Data (fallback) -->
-    <script src="real-listings-data.js"></script>
-    <!-- Properties API Service -->
-    <script src="properties-data-api.js"></script>
-    <!-- Navigation Service -->
-    <script src="navigation.js"></script>
-    <!-- Mock API for Contact Forms -->
-    <script src="mock-api.js"></script>
-    <!-- Empty States System -->
-    <script src="empty-states.js"></script>
-    <!-- Toast Notifications -->
-    <script src="toast.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js" defer></script>
+    <script src="firebase-config.js" defer></script>
+    <script src="firebase-service.js" defer></script>
+    <script src="api-config.js" defer></script>
+    <script src="real-listings-data.js" defer></script>
+    <script src="properties-data-api.js" defer></script>
+    <script src="navigation.js" defer></script>
+    <script src="mock-api.js" defer></script>
+    <script src="empty-states.js" defer></script>
+    <script src="toast.js" defer></script>
     <style>
         /* Luxury specific overrides for home page */
         
@@ -570,13 +562,10 @@
             }
         }
     </style>
-    <!-- Premium Smooth Scroll -->
-    <script src="https://unpkg.com/@studio-freight/lenis@1.0.35/dist/lenis.min.js"></script>
-    <script src="smooth-scroll.js"></script>
     <!-- Theme Manager -->
-    <script src="theme-manager.js"></script>
+    <script src="theme-manager.js" defer></script>
     <!-- Profile Menu -->
-    <script src="profile-menu.js"></script>
+    <script src="profile-menu.js" defer></script>
 </head>
 <body>
     <!-- Animated background -->
@@ -764,7 +753,7 @@
         </div>
     </nav>
 
-    <script src="navigation.js"></script>
+    <!-- navigation.js loaded in head with defer, not duplicated here -->
     <script>
         // ==================== FRESH STATE ====================
         let allLoadedProperties = [];
