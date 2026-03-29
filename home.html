@@ -886,7 +886,9 @@
         }
 
         // Check if user is logged in on page load
-        window.addEventListener('DOMContentLoaded', function() {
+        // Using 'load' (not DOMContentLoaded) because all scripts are deferred
+        // and DOMContentLoaded fires BEFORE deferred scripts execute
+        window.addEventListener('load', function() {
             // Check if logged in to determine what to show
             const isLoggedIn = AppState.isLoggedIn();
 
@@ -897,9 +899,6 @@
                 const user = AppState.getUser();
                 const role = AppState.getRole();
                 
-                console.log('✅ User logged in:', user);
-                console.log('📋 User role:', role);
-                
                 // Update user profile display
                 updateUserProfile();
                 
@@ -908,10 +907,8 @@
                 const filterType = urlParams.get('filter');
                 
                 if (filterType === 'buy') {
-                    console.log('🔍 Applying buy filter from URL');
                     handleAction('buy');
                 } else if (filterType === 'rent') {
-                    console.log('🔍 Applying rent filter from URL');
                     handleAction('rent');
                 } else {
                     // Load all verified properties
@@ -919,12 +916,13 @@
                 }
             } else {
                 // User not logged in - show properties with limited functionality
-                console.log('ℹ️ User not logged in - showing properties in guest mode');
                 
                 // Show generic user icon
                 const userProfileIcon = document.querySelector('.user-profile');
-                userProfileIcon.textContent = '👤';
-                userProfileIcon.onclick = handleGuestProfileClick;
+                if (userProfileIcon) {
+                    userProfileIcon.textContent = '👤';
+                    userProfileIcon.onclick = handleGuestProfileClick;
+                }
                 
                 // Load properties even for guest users
                 loadAllProperties();
