@@ -538,10 +538,6 @@
             }
         }
     </style>
-    <!-- Theme Manager -->
-    <script src="theme-manager.js" defer></script>
-    <!-- Profile Menu -->
-    <script src="profile-menu.js" defer></script>
 </head>
 <body>
     <!-- Animated background -->
@@ -1423,6 +1419,22 @@
     <script src="theme-manager.js"></script>
     <script src="profile-menu.js"></script>
     <!-- Start the app — DOM + all scripts are ready at this point -->
-    <script>startApp();</script>
+    <script>
+        // Guard to prevent double-init
+        let _appStarted = false;
+        function safeStartApp() {
+            if (_appStarted) return;
+            _appStarted = true;
+            if (typeof AppState === 'undefined' || typeof PropertiesData === 'undefined' || typeof EmptyStates === 'undefined') {
+                console.error('❌ Critical scripts not loaded! Globals missing.');
+                document.getElementById('propertyGrid').innerHTML = '<div style="text-align:center;padding:3rem;color:#666"><div style="font-size:3rem">⚠️</div><p style="font-size:1rem;font-weight:600;margin-top:1rem">Could not load app scripts</p><p style="font-size:0.85rem;margin-top:0.5rem">Please hard-refresh (Ctrl+Shift+R)</p><button onclick="location.reload(true)" style="margin-top:1rem;padding:0.6rem 1.5rem;background:#2563EB;color:white;border:none;border-radius:999px;cursor:pointer;font-weight:600">🔄 Reload</button></div>';
+                return;
+            }
+            startApp();
+        }
+        // Scripts are sync at bottom of body, so DOM + scripts are ready now
+        // Use a tiny delay to ensure all script init() calls have finished
+        setTimeout(safeStartApp, 0);
+    </script>
 </body>
 </html>

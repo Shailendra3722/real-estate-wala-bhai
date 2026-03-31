@@ -114,14 +114,6 @@ const Navigation = (function () {
             return false;
         }
 
-        // Verify property exists
-        const property = PropertiesData.getPropertyById(propertyId);
-        if (!property) {
-            console.error('❌ Property not found:', propertyId);
-            alert('Property not found');
-            return false;
-        }
-
         // Store in AppState
         AppState.setPropertyId(propertyId);
 
