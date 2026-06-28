@@ -725,7 +725,29 @@
         </div>
     </nav>
 
-    <!-- navigation.js loaded in head with defer, not duplicated here -->
+    <!-- =====================================================
+         EXTERNAL SCRIPTS — must load BEFORE inline app logic
+         ===================================================== -->
+    <script src="app-state.js"></script>
+    <!-- Firebase SDK (compat v9) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="firebase-service.js"></script>
+    <script src="api-config.js"></script>
+    <script src="real-listings-data.js"></script>
+    <script src="properties-data-api.js"></script>
+    <script src="navigation.js"></script>
+    <script src="mock-api.js"></script>
+    <script src="empty-states.js"></script>
+    <script src="toast.js"></script>
+    <script src="theme-manager.js"></script>
+    <script src="profile-menu.js"></script>
+
+    <!-- =====================================================
+         INLINE APP LOGIC — dependencies above are now loaded
+         ===================================================== -->
     <script>
         // ==================== FRESH STATE ====================
         let allLoadedProperties = [];
@@ -887,6 +909,11 @@
             const propertyGrid = document.getElementById('propertyGrid') || document.querySelector('.property-grid');
             const sectionTitle = document.getElementById('propertySectionTitle') || document.querySelector('.featured-section .section-title');
             
+            if (!propertyGrid || !sectionTitle) {
+                console.warn('loadAllProperties: missing propertyGrid or sectionTitle', { propertyGrid, sectionTitle });
+                return;
+            }
+
             // Reset title
             sectionTitle.textContent = 'All Properties';
 
@@ -914,14 +941,29 @@
                     console.warn('Static properties not available:', e);
                 }
 
+                // If verified properties are empty, fall back directly to global demo listings
+                if (!staticProperties || staticProperties.length === 0) {
+                    staticProperties = window.REAL_LISTINGS || [];
+                }
+
                 // ── 2. Load from Firestore (user-submitted, permanent) ────────────
                 let firestoreProperties = [];
                 if (window.FirebaseService) {
                     try {
-                        firestoreProperties = await FirebaseService.getAllProperties();
+                        const timeoutPromise = new Promise((_, reject) => {
+                            setTimeout(() => reject(new Error('Firestore request timed out after 5s')), 5000);
+                        });
+                        firestoreProperties = await Promise.race([
+                            FirebaseService.getAllProperties(),
+                            timeoutPromise
+                        ]);
                         console.log(`🔥 Loaded ${firestoreProperties.length} properties from Firestore`);
                     } catch (e) {
                         console.warn('Firestore load failed, showing static only:', e);
+                        if (typeof Toast !== 'undefined') {
+                            Toast.info('Firestore is taking too long. Showing demo listings for now.', 5000);
+                        }
+                        firestoreProperties = [];
                     }
                 }
 
@@ -1398,26 +1440,6 @@
     })();
     </script>
 
-    <!-- =====================================================
-         ALL SCRIPTS AT END OF BODY = fastest load pattern
-         DOM is already parsed when these run, no events needed
-         ===================================================== -->
-    <script src="app-state.js"></script>
-    <!-- Firebase SDK (compat v9) -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <script src="firebase-config.js"></script>
-    <script src="firebase-service.js"></script>
-    <script src="api-config.js"></script>
-    <script src="real-listings-data.js"></script>
-    <script src="properties-data-api.js"></script>
-    <script src="navigation.js"></script>
-    <script src="mock-api.js"></script>
-    <script src="empty-states.js"></script>
-    <script src="toast.js"></script>
-    <script src="theme-manager.js"></script>
-    <script src="profile-menu.js"></script>
     <!-- Start the app — DOM + all scripts are ready at this point -->
     <script>
         // Guard to prevent double-init
@@ -1427,13 +1449,13 @@
             _appStarted = true;
             if (typeof AppState === 'undefined' || typeof PropertiesData === 'undefined' || typeof EmptyStates === 'undefined') {
                 console.error('❌ Critical scripts not loaded! Globals missing.');
-                document.getElementById('propertyGrid').innerHTML = '<div style="text-align:center;padding:3rem;color:#666"><div style="font-size:3rem">⚠️</div><p style="font-size:1rem;font-weight:600;margin-top:1rem">Could not load app scripts</p><p style="font-size:0.85rem;margin-top:0.5rem">Please hard-refresh (Ctrl+Shift+R)</p><button onclick="location.reload(true)" style="margin-top:1rem;padding:0.6rem 1.5rem;background:#2563EB;color:white;border:none;border-radius:999px;cursor:pointer;font-weight:600">🔄 Reload</button></div>';
+                const grid = document.getElementById('propertyGrid');
+                if (grid) grid.innerHTML = '<div style="text-align:center;padding:3rem;color:#666"><div style="font-size:3rem">⚠️</div><p style="font-size:1rem;font-weight:600;margin-top:1rem">Could not load app scripts</p><p style="font-size:0.85rem;margin-top:0.5rem">Please hard-refresh (Ctrl+Shift+R)</p><button onclick="location.reload(true)" style="margin-top:1rem;padding:0.6rem 1.5rem;background:#2563EB;color:white;border:none;border-radius:999px;cursor:pointer;font-weight:600">🔄 Reload</button></div>';
                 return;
             }
             startApp();
         }
-        // Scripts are sync at bottom of body, so DOM + scripts are ready now
-        // Use a tiny delay to ensure all script init() calls have finished
+        // All external scripts are already loaded above — safe to call directly
         setTimeout(safeStartApp, 0);
     </script>
 </body>
