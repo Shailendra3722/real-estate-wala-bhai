@@ -22,6 +22,9 @@
     <!-- Single combined CSS file: 8 files → 1 request -->
     <link rel="stylesheet" href="../css/all-styles.css">
 
+    <!-- Leaflet CSS for Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+
     <style>
         /* Luxury specific overrides for home page */
         
@@ -254,10 +257,49 @@
             box-shadow: var(--shadow-xl), var(--glow-royal);
         }
 
-        /* Featured section */
+        /* Featured section & Split View Layout */
         .featured-section {
             margin-bottom: var(--space-12);
             animation: fadeInUp var(--duration-slow) var(--ease-smooth) 0.3s backwards;
+        }
+
+        .split-view-container {
+            display: flex;
+            gap: var(--space-6);
+            height: 800px; /* Fixed height for the split view */
+            position: relative;
+        }
+
+        .split-list {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: var(--space-4);
+            /* custom scrollbar */
+        }
+        
+        .split-list::-webkit-scrollbar {
+            width: 8px;
+        }
+        .split-list::-webkit-scrollbar-thumb {
+            background: var(--border-medium);
+            border-radius: 4px;
+        }
+
+        .split-map {
+            flex: 1;
+            position: sticky;
+            top: 100px;
+            height: 100%;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-subtle);
+            z-index: 10;
+        }
+
+        #propertyMap {
+            width: 100%;
+            height: 100%;
         }
 
         .featured-header {
@@ -282,7 +324,7 @@
         /* Property cards - Luxury styling */
         .property-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: var(--space-6);
         }
 
@@ -442,6 +484,23 @@
         }
 
         /* Responsive design */
+        @media (max-width: 992px) {
+            .split-view-container {
+                flex-direction: column;
+                height: auto;
+            }
+            .split-map {
+                height: 400px;
+                position: relative;
+                top: 0;
+            }
+            .split-list {
+                max-height: none;
+                overflow-y: visible;
+                padding-right: 0;
+            }
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: var(--space-4);
@@ -656,18 +715,49 @@
         </section>
 
         <!-- All properties -->
-        <section class="featured-section">
+        <section class="featured-section" id="exploreSection">
             <div class="featured-header">
-                <h2 class="section-title section-title-3d" id="propertySectionTitle">All Properties</h2>
+                <h2 class="section-title section-title-3d" id="propertySectionTitle">Explore Properties</h2>
             </div>
 
-            <!-- Filter bar -->
-            <div class="filter-bar" id="filterBar">
-                <button class="filter-pill active" id="filterAll" onclick="applyFilter('all')">🏘️ All</button>
-                <button class="filter-pill" id="filterBuy" onclick="applyFilter('buy')">🏠 Buy</button>
-                <button class="filter-pill" id="filterRent" onclick="applyFilter('rent')">🔑 Rent</button>
-                <button class="filter-pill" id="filterVerified" onclick="applyFilter('verified')">✅ Verified</button>
-                <button class="filter-pill" id="filterFeatured" onclick="applyFilter('featured')">⭐ Featured</button>
+            <!-- Advanced Filter Bar (NEW) -->
+            <div class="advanced-filter-bar" style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+                <select id="advFilterCity" onchange="currentCityFilter = this.value; filterByCity(this.value);" style="padding: 10px; border-radius: 8px; border: 1px solid var(--border-subtle); background: var(--bg-elevated); color: var(--text-primary);">
+                    <option value="all">All Cities</option>
+                    <option value="Mumbai">Mumbai</option>
+                    <option value="Delhi">Delhi</option>
+                    <option value="Bangalore">Bangalore</option>
+                    <option value="Hyderabad">Hyderabad</option>
+                    <option value="Pune">Pune</option>
+                    <option value="Jaipur">Jaipur</option>
+                </select>
+                <select id="advFilterType" onchange="applyAdvancedFilters()" style="padding: 10px; border-radius: 8px; border: 1px solid var(--border-subtle); background: var(--bg-elevated); color: var(--text-primary);">
+                    <option value="all">All Types</option>
+                    <option value="flat">Flat</option>
+                    <option value="house">House</option>
+                    <option value="villa">Villa</option>
+                </select>
+                <select id="advFilterBhk" onchange="applyAdvancedFilters()" style="padding: 10px; border-radius: 8px; border: 1px solid var(--border-subtle); background: var(--bg-elevated); color: var(--text-primary);">
+                    <option value="all">Any BHK</option>
+                    <option value="1">1 BHK</option>
+                    <option value="2">2 BHK</option>
+                    <option value="3">3 BHK</option>
+                    <option value="4">4+ BHK</option>
+                </select>
+                <select id="advFilterBathrooms" onchange="applyAdvancedFilters()" style="padding: 10px; border-radius: 8px; border: 1px solid var(--border-subtle); background: var(--bg-elevated); color: var(--text-primary);">
+                    <option value="all">Any Bathrooms</option>
+                    <option value="1">1+ Bathrooms</option>
+                    <option value="2">2+ Bathrooms</option>
+                    <option value="3">3+ Bathrooms</option>
+                </select>
+                <select id="advFilterListing" onchange="applyAdvancedFilters()" style="padding: 10px; border-radius: 8px; border: 1px solid var(--border-subtle); background: var(--bg-elevated); color: var(--text-primary);">
+                    <option value="all">Buy & Rent</option>
+                    <option value="sell">Buy</option>
+                    <option value="rent">Rent</option>
+                </select>
+                <input type="number" id="advFilterMinPrice" placeholder="Min Price" oninput="applyAdvancedFilters()" style="padding: 10px; border-radius: 8px; border: 1px solid var(--border-subtle); background: var(--bg-elevated); color: var(--text-primary); max-width: 120px;">
+                <input type="number" id="advFilterMaxPrice" placeholder="Max Price" oninput="applyAdvancedFilters()" style="padding: 10px; border-radius: 8px; border: 1px solid var(--border-subtle); background: var(--bg-elevated); color: var(--text-primary); max-width: 120px;">
+                <button onclick="clearAdvancedFilters()" style="padding: 10px 15px; border-radius: 8px; background: transparent; border: 1px solid var(--text-tertiary); color: var(--text-secondary); cursor: pointer;">Clear</button>
             </div>
 
             <!-- Listing toolbar -->
@@ -680,22 +770,28 @@
                 <div style="display:flex;gap:0.6rem;align-items:center;">
                     <div class="sort-dropdown">
                         <span>↕️</span>
-                        <select id="sortSelect" onchange="applySortAndRender()">
+                        <select id="sortSelect" onchange="applyAdvancedFilters()">
                             <option value="default">Default</option>
                             <option value="price-asc">Price: Low → High</option>
                             <option value="price-desc">Price: High → Low</option>
                             <option value="sqft">Largest First</option>
                         </select>
                     </div>
-                    <button class="btn-refresh" id="refreshBtn" onclick="refreshListings()">
-                        <span class="refresh-icon">🔄</span>
-                        <span>Refresh</span>
-                    </button>
                 </div>
             </div>
 
-            <div class="property-grid" id="propertyGrid">
-                <!-- Properties will be loaded dynamically from PropertiesData -->
+            <!-- Split View Area -->
+            <div class="split-view-container">
+                <!-- Left: Property List -->
+                <div class="split-list">
+                    <div class="property-grid" id="propertyGrid">
+                        <!-- Properties will be loaded dynamically -->
+                    </div>
+                </div>
+                <!-- Right: Interactive Leaflet Map -->
+                <div class="split-map">
+                    <div id="propertyMap"></div>
+                </div>
             </div>
         </section>
     </div>
@@ -745,6 +841,9 @@
     <script src="../js/services/themeManager.js"></script>
     <script src="profile-menu.js"></script>
 
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
     <!-- =====================================================
          INLINE APP LOGIC — dependencies above are now loaded
          ===================================================== -->
@@ -787,57 +886,135 @@
             }
         }
 
+        // ==================== MAP & FILTERS STATE ====================
+        let mapInstance = null;
+        let propertyMarkers = [];
+
+        function initMap() {
+            if (mapInstance) return;
+            // Center map on India initially
+            mapInstance = L.map('propertyMap').setView([22.5937, 78.9629], 5);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© OpenStreetMap'
+            }).addTo(mapInstance);
+        }
+
+        function updateMapMarkers(properties) {
+            if (!mapInstance) initMap();
+            
+            // Clear old markers
+            propertyMarkers.forEach(m => mapInstance.removeLayer(m));
+            propertyMarkers = [];
+
+            if (properties.length === 0) return;
+
+            const bounds = L.latLngBounds();
+
+            properties.forEach(p => {
+                if (!p.latitude || !p.longitude) return;
+
+                // Create custom premium pin marker
+                const customIcon = L.divIcon({
+                    className: 'custom-pin',
+                    html: \`
+                        <div style="background: linear-gradient(135deg, var(--royal-600) 0%, var(--royal-700) 100%); width: 40px; height: 40px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); border: 2px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center;">
+                            <div style="transform: rotate(45deg); font-size: 1.2rem; color: white;">₹</div>
+                        </div>
+                    \`,
+                    iconSize: [40, 40],
+                    iconAnchor: [20, 40],
+                    popupAnchor: [0, -40]
+                });
+
+                const marker = L.marker([p.latitude, p.longitude], { icon: customIcon })
+                    .addTo(mapInstance)
+                    .bindPopup(\`
+                        <div style="width: 200px; font-family: 'Outfit', sans-serif;">
+                            <img src="\${p.images[0]}" style="width: 100%; height: 120px; object-fit: cover; border-radius: 8px; margin-bottom: 8px;">
+                            <h4 style="margin: 0 0 4px 0; font-size: 14px; font-weight: 700;">₹ \${p.price.toLocaleString()}</h4>
+                            <p style="margin: 0 0 8px 0; font-size: 12px; color: #64748b;">\${p.title.substring(0, 30)}...</p>
+                            <button onclick="window.location.href='property-detail.html?id=\${p.id}'" style="width: 100%; padding: 8px; background: var(--royal-600); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">View Details</button>
+                        </div>
+                    \`);
+                
+                marker._propertyId = p.id;
+                propertyMarkers.push(marker);
+                bounds.extend([p.latitude, p.longitude]);
+            });
+
+            // Fit map to markers bounds
+            if (propertyMarkers.length > 0) {
+                mapInstance.fitBounds(bounds, { padding: [50, 50], maxZoom: 14 });
+            }
+        }
+
+        window.focusMapOnProperty = function(propertyId, lat, lng) {
+            if (!mapInstance || !lat || !lng) return;
+            mapInstance.flyTo([lat, lng], 16, { animate: true, duration: 1 });
+            
+            // Open popup for the hovered property
+            const marker = propertyMarkers.find(m => m._propertyId === propertyId);
+            if (marker) {
+                marker.openPopup();
+            }
+        };
+
         // ===== CITY FILTER CHIPS =====
         function filterByCity(city) {
             currentCityFilter = city;
             document.querySelectorAll('.stat-chip').forEach(chip => {
                 chip.classList.toggle('active', chip.dataset.city === city);
             });
-            renderFiltered();
+            const citySelect = document.getElementById('advFilterCity');
+            if (citySelect) citySelect.value = city;
+            applyAdvancedFilters();
         }
 
-        // ===== FILTER PILLS =====
-        function applyFilter(type) {
-            currentTypeFilter = type;
-            document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
-            const btn = document.getElementById('filter' + type.charAt(0).toUpperCase() + type.slice(1));
-            if (btn) btn.classList.add('active');
-            renderFiltered();
-        }
-
-        // ===== SORT =====
-        function applySortAndRender() {
-            currentSort = document.getElementById('sortSelect').value;
-            renderFiltered();
-        }
-
-        // ===== REFRESH BUTTON =====
-        async function refreshListings() {
-            const btn = document.getElementById('refreshBtn');
-            btn.classList.add('is-spinning');
-            btn.disabled = true;
-            setTimeout(() => { btn.classList.remove('is-spinning'); btn.disabled = false; }, 800);
-            await loadAllProperties();
-        }
-
-        // ===== RENDER FILTERED + SORTED =====
-        function renderFiltered() {
+        // ===== ADVANCED FILTERS =====
+        function applyAdvancedFilters() {
             let props = [...allLoadedProperties];
 
-            // City filter
+            // City filter (combines chip/dropdown sync)
             if (currentCityFilter !== 'all') {
-                props = props.filter(p => p.city && p.city.toLowerCase().includes(currentCityFilter.toLowerCase()));
+                props = props.filter(p => p.city && p.city.toLowerCase() === currentCityFilter.toLowerCase());
             }
 
+            // Get filter values
+            const type = document.getElementById('advFilterType')?.value || 'all';
+            const bhk = document.getElementById('advFilterBhk')?.value || 'all';
+            const bathrooms = document.getElementById('advFilterBathrooms')?.value || 'all';
+            const listing = document.getElementById('advFilterListing')?.value || 'all';
+            const minPrice = document.getElementById('advFilterMinPrice')?.value || '';
+            const maxPrice = document.getElementById('advFilterMaxPrice')?.value || '';
+            currentSort = document.getElementById('sortSelect')?.value || 'default';
+
             // Type filter
-            if (currentTypeFilter === 'buy') {
-                props = props.filter(p => p.listingType === 'sale' || p.listingType === 'buy');
-            } else if (currentTypeFilter === 'rent') {
-                props = props.filter(p => p.listingType === 'rent');
-            } else if (currentTypeFilter === 'verified') {
-                props = props.filter(p => p.verificationStatus === (PropertiesData.VERIFICATION_STATUS && PropertiesData.VERIFICATION_STATUS.VERIFIED || 'verified'));
-            } else if (currentTypeFilter === 'featured') {
-                props = props.filter(p => p.featured);
+            if (type !== 'all') {
+                props = props.filter(p => p.propertyType === type);
+            }
+
+            // BHK filter
+            if (bhk !== 'all') {
+                props = props.filter(p => p.bhk >= parseInt(bhk));
+            }
+
+            // Bathrooms filter
+            if (bathrooms !== 'all') {
+                props = props.filter(p => p.bathrooms >= parseInt(bathrooms));
+            }
+
+            // Listing filter
+            if (listing !== 'all') {
+                props = props.filter(p => p.listingType === listing);
+            }
+
+            // Price filter
+            if (minPrice) {
+                props = props.filter(p => p.price >= parseInt(minPrice));
+            }
+            if (maxPrice) {
+                props = props.filter(p => p.price <= parseInt(maxPrice));
             }
 
             // Sort
@@ -845,17 +1022,20 @@
             if (currentSort === 'price-desc') props.sort((a,b) => b.price - a.price);
             if (currentSort === 'sqft')       props.sort((a,b) => (b.sqft||0) - (a.sqft||0));
 
-            const grid = document.getElementById('propertyGrid') || document.querySelector('.property-grid');
+            const grid = document.getElementById('propertyGrid');
             grid.innerHTML = '';
 
             updateListingCount(props.length);
+            
+            // Update Map
+            updateMapMarkers(props);
 
             if (props.length === 0) {
                 grid.innerHTML = `
                     <div class="empty-state-fresh">
                         <div class="empty-state-icon-wrap">🏚️</div>
                         <p style="font-size:1rem;font-weight:600;color:var(--text-primary);">No properties found</p>
-                        <p style="font-size:0.85rem;color:var(--text-secondary);">Try a different city or filter</p>
+                        <p style="font-size:0.85rem;color:var(--text-secondary);">Try loosening your filters</p>
                     </div>`;
                 return;
             }
@@ -865,8 +1045,31 @@
                 const stagger = Math.min(index, 11);
                 card.style.setProperty('--card-index', stagger);
                 card.style.animationDelay = `${stagger * 60}ms`;
+                
+                // Add hover listener for map sync
+                if (property.latitude && property.longitude) {
+                    card.addEventListener('mouseenter', () => {
+                        window.focusMapOnProperty(property.id, property.latitude, property.longitude);
+                    });
+                }
+                
                 grid.appendChild(card);
             });
+        }
+        
+        function clearAdvancedFilters() {
+            currentCityFilter = 'all';
+            document.querySelectorAll('.stat-chip').forEach(chip => {
+                chip.classList.toggle('active', chip.dataset.city === 'all');
+            });
+            if(document.getElementById('advFilterCity')) document.getElementById('advFilterCity').value = 'all';
+            if(document.getElementById('advFilterType')) document.getElementById('advFilterType').value = 'all';
+            if(document.getElementById('advFilterBhk')) document.getElementById('advFilterBhk').value = 'all';
+            if(document.getElementById('advFilterBathrooms')) document.getElementById('advFilterBathrooms').value = 'all';
+            if(document.getElementById('advFilterListing')) document.getElementById('advFilterListing').value = 'all';
+            if(document.getElementById('advFilterMinPrice')) document.getElementById('advFilterMinPrice').value = '';
+            if(document.getElementById('advFilterMaxPrice')) document.getElementById('advFilterMaxPrice').value = '';
+            applyAdvancedFilters();
         }
 
         // ===== UPDATE COUNT =====
@@ -1005,15 +1208,7 @@
                     return;
                 }
                 
-                updateListingCount(merged.length);
-
-                // Render each property card with fade-in animation
-                merged.forEach((property, index) => {
-                    const card = createPropertyCard(property);
-                    card.classList.add('fade-in');
-                    card.style.animationDelay = `${Math.min(index, 6) * 0.06}s`;
-                    propertyGrid.appendChild(card);
-                });
+                applyAdvancedFilters();
                 
                 console.log(`📦 Total: ${merged.length} properties (${firestoreProperties.length} from Firestore + ${localProperties.length} local + ${staticProperties.length} static)`);
             } catch (error) {

@@ -10,6 +10,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/ux-components.css">
+    
+    <!-- Leaflet CSS for Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
     <style>
         * {
             margin: 0;
@@ -384,7 +387,7 @@
         <!-- 📍 Location Section -->
         <div class="section">
             <h2 class="section-title">📍 Property Location</h2>
-            <div class="map-preview">🗺️</div>
+            <div class="map-preview" id="detailMap" style="height: 250px; border-radius: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.12); position: relative; z-index: 1;"></div>
             <div class="location-address">
                 <span>📍</span>
                 <span id="location-address">Alambagh, Lucknow - Easy access to main roads and public transport</span>
@@ -532,6 +535,9 @@
     <script src="../js/api/mockApi.js"></script>
     <script src="../js/services/toastService.js"></script>
 
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
     <script>
         // ==================== PROPERTY DATA LOADING ====================
         
@@ -658,6 +664,30 @@
                         `<span style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);padding:0.4rem 0.9rem;border-radius:20px;font-size:0.85rem;color:#cbd5e1;">${a}</span>`
                     ).join('');
                 }
+            }
+
+            // Initialize Leaflet Map
+            if (property.latitude && property.longitude) {
+                setTimeout(() => {
+                    const detailMap = L.map('detailMap', { zoomControl: true }).setView([property.latitude, property.longitude], 15);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        maxZoom: 19,
+                        attribution: '© OpenStreetMap'
+                    }).addTo(detailMap);
+
+                    const customIcon = L.divIcon({
+                        className: 'custom-pin',
+                        html: `
+                            <div style="background: linear-gradient(135deg, var(--royal-600) 0%, var(--royal-700) 100%); width: 40px; height: 40px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); border: 2px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center;">
+                                <div style="transform: rotate(45deg); font-size: 1.2rem; color: white;">🏡</div>
+                            </div>
+                        `,
+                        iconSize: [40, 40],
+                        iconAnchor: [20, 40]
+                    });
+
+                    L.marker([property.latitude, property.longitude], { icon: customIcon }).addTo(detailMap);
+                }, 100);
             }
             
             console.log('✅ UI updated with property data');

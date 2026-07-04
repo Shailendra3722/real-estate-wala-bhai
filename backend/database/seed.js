@@ -36,74 +36,19 @@ const SAMPLE_USERS = [
     }
 ];
 
-const SAMPLE_PROPERTIES = [
-    {
-        id: 'prop_001',
-        title: '3 BHK Flat in Gomti Nagar',
-        description: 'Spacious 3 BHK apartment with modern amenities in prime location',
-        propertyType: 'flat',
-        listingType: 'sell',
-        bhk: '3 BHK',
-        bathrooms: 2,
-        sqft: 1450,
-        furnishing: 'semi-furnished',
-        price: 8500000,
-        latitude: 26.8467,
-        longitude: 80.9462,
-        address: 'Sector 12, Gomti Nagar Extension, Lucknow',
-        city: 'Lucknow',
-        area: 'Gomti Nagar',
-        pincode: '226010',
-        amenities: ['Parking', 'Lift', 'Security', 'Park', 'Gym'],
-        images: ['/images/prop_001_1.jpg', '/images/prop_001_2.jpg', '/images/prop_001_3.jpg'],
-        yearBuilt: 2020,
-        ownerId: 'user_001'
-    },
-    {
-        id: 'prop_002',
-        title: '2 BHK Apartment in Alambagh',
-        description: 'Affordable 2 BHK apartment near bus station',
-        propertyType: 'flat',
-        listingType: 'sell',
-        bhk: '2 BHK',
-        bathrooms: 2,
-        sqft: 980,
-        furnishing: 'unfurnished',
-        price: 4500000,
-        latitude: 26.8205,
-        longitude: 80.8869,
-        address: 'Kanpur Road, Alambagh, Lucknow',
-        city: 'Lucknow',
-        area: 'Alambagh',
-        pincode: '226005',
-        amenities: ['Parking', 'Lift', 'Security'],
-        images: ['/images/prop_002_1.jpg', '/images/prop_002_2.jpg'],
-        yearBuilt: 2018,
-        ownerId: 'user_002'
-    },
-    {
-        id: 'prop_003',
-        title: 'Luxury 4 BHK Villa in Hazratganj',
-        description: 'Premium villa with world-class amenities',
-        propertyType: 'villa',
-        listingType: 'sell',
-        bhk: '4 BHK',
-        bathrooms: 4,
-        sqft: 3200,
-        furnishing: 'fully-furnished',
-        price: 25000000,
-        latitude: 26.8547,
-        longitude: 80.9470,
-        address: 'MG Marg, Hazratganj, Lucknow',
-        city: 'Lucknow',
-        area: 'Hazratganj',
-        pincode: '226001',
-        amenities: ['Parking', 'Swimming Pool', 'Garden', 'Security', 'Gym', 'Home Theater'],
-        images: ['/images/prop_003_1.jpg', '/images/prop_003_2.jpg', '/images/prop_003_3.jpg', '/images/prop_003_4.jpg'],
-        yearBuilt: 2022,
-        ownerId: 'user_001'
-    }
-];
+let SAMPLE_PROPERTIES = [];
+try {
+    const rawProperties = require('../../frontend/js/api/realListingsData');
+    const userIds = SAMPLE_USERS.map(u => u.id);
+    SAMPLE_PROPERTIES = rawProperties.map((prop, idx) => ({
+        ...prop,
+        bhk: `${prop.bhk} BHK`,
+        ownerId: userIds[idx % userIds.length] // Assign owner to existing seeded user
+    }));
+    console.log(`Loaded ${SAMPLE_PROPERTIES.length} properties for database seeding.`);
+} catch (e) {
+    console.error('⚠️ Could not load realListingsData for seeding:', e);
+}
 
 async function seedDatabase() {
     console.log('🌱 Starting database seeding...\n');
