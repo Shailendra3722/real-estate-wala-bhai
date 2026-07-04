@@ -1,39 +1,29 @@
 {
   "version": 2,
-  "builds": [
+  "rewrites": [
     {
-      "src": "backend/server.js",
-      "use": "@vercel/node"
+      "source": "/api/(.*)",
+      "destination": "/api/index.js"
     },
     {
-      "src": "frontend/**",
-      "use": "@vercel/static"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "backend/server.js"
+      "source": "/health",
+      "destination": "/api/index.js"
     },
     {
-      "src": "/health",
-      "dest": "backend/server.js"
+      "source": "/(css|js|assets)/(.*)",
+      "destination": "/frontend/$1/$2"
     },
     {
-      "src": "/(css|js|assets)/(.*)",
-      "dest": "frontend/$1/$2"
+      "source": "/pages/(.*)",
+      "destination": "/frontend/pages/$1"
     },
     {
-      "src": "/pages/(.*)",
-      "dest": "frontend/pages/$1"
+      "source": "/index.html",
+      "destination": "/frontend/index.html"
     },
     {
-      "src": "/index.html",
-      "dest": "frontend/index.html"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "frontend/index.html"
+      "source": "/(.*)",
+      "destination": "/frontend/index.html"
     }
   ]
 }
