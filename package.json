@@ -1,27 +1,29 @@
 {
-  "name": "real-estate-api",
+  "name": "real-estate-wala-bhai",
   "version": "1.0.0",
-  "description": "Real Estate App - API Server with Map Support",
-  "main": "simple-api-server.js",
+  "description": "Real Estate App - Clean, refactored MVC architecture with geospatial maps support",
+  "main": "backend/server.js",
   "scripts": {
-    "start": "node simple-api-server.js",
-    "dev": "nodemon simple-api-server.js",
-    "test": "node test-api.js"
+    "start": "node backend/server.js",
+    "dev": "nodemon backend/server.js",
+    "seed": "node backend/database/seed.js"
   },
   "keywords": [
     "real-estate",
     "map",
     "geospatial",
-    "api"
+    "mvc",
+    "fullstack"
   ],
-  "author": "",
+  "author": "Real Estate Wala Bhai",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.18.2",
+    "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
-    "pg": "^8.11.3",
     "dotenv": "^16.3.1",
-    "bcrypt": "^5.1.1"
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.11.3"
   },
   "devDependencies": {
     "nodemon": "^3.0.2"
