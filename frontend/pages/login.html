@@ -17,11 +17,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <!-- Global App State -->
     <script src="../js/services/appState.js"></script>
-    <!-- Firebase SDK (compat v9) -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <script src="../js/config/firebaseConfig.js"></script>
+    <!-- API Config & Auth Service -->
+    <script src="../js/api/apiConfig.js"></script>
     <script src="../js/services/firebaseService.js"></script>
     <style>
         * {
@@ -550,22 +547,22 @@
 
         // ── Store Firebase user into AppState ──
         function syncUserToAppState(firebaseUser, profileData) {
+        // ── Store user into AppState ──
+        function syncUserToAppState(userData) {
             AppState.setUser({
-                id: firebaseUser.uid,
-                name: profileData.name || firebaseUser.displayName || 'User',
-                email: firebaseUser.email,
-                phone: profileData.phone || '',
-                uid: firebaseUser.uid
+                id: userData.id || userData.uid,
+                name: userData.name || 'User',
+                email: userData.email,
+                phone: userData.phone || '',
+                uid: userData.id || userData.uid
             });
-            AppState.setRole(profileData.role || 'buyer');
-            AppState.setAuthToken(firebaseUser.uid);
+            AppState.setRole(userData.role || 'buyer');
         }
 
         // ── Check if already logged in → skip login page ──
         FirebaseService.onAuthChange(function(user) {
             if (user && window.location.pathname.includes('login')) {
-                // Already logged into Firebase — sync and go home
-                syncUserToAppState({ uid: user.uid, email: user.email, displayName: user.name }, user);
+                syncUserToAppState(user);
                 redirectAfterLogin(user.role);
             }
         });
@@ -596,25 +593,20 @@
                     userData = await FirebaseService.login(email, password);
                     console.log('✅ Signed in:', userData);
                 } catch (loginErr) {
-                    if (loginErr.code === 'auth/user-not-found' || loginErr.code === 'auth/invalid-credential' || loginErr.code === 'auth/wrong-password') {
-                        // ── Not found → REGISTER ──
-                        if (!name) {
-                            showError('New user? Please enter your name too.');
-                            btn.textContent = 'Sign In / Register';
-                            btn.disabled = false;
-                            document.getElementById('nameInput').focus();
-                            return;
-                        }
-                        userData = await FirebaseService.register(name, email, password, '', role);
-                        console.log('✅ Registered:', userData);
-                    } else {
-                        throw loginErr;
+                    // ── Not found → REGISTER ──
+                    if (!name) {
+                        showError('New user? Please enter your name too.');
+                        btn.textContent = 'Sign In / Register';
+                        btn.disabled = false;
+                        document.getElementById('nameInput').focus();
+                        return;
                     }
+                    userData = await FirebaseService.register(name, email, password, '', role);
+                    console.log('✅ Registered:', userData);
                 }
 
-                // ── Sync to AppState (localStorage, for backward compat) ──
-                Firebase_auth_currentUser_temp = firebase.auth().currentUser;
-                syncUserToAppState(Firebase_auth_currentUser_temp || { uid: userData.uid, email, displayName: name }, userData);
+                // ── Sync to AppState ──
+                syncUserToAppState(userData);
 
                 btn.textContent = '✅ Success!';
                 setTimeout(() => redirectAfterLogin(userData.role || role), 800);
@@ -634,41 +626,9 @@
             }
         });
 
-        // Temp global needed for auth current user sync
-        let Firebase_auth_currentUser_temp = null;
-
         // ── Social: Google sign-in ──
         async function handleGoogleLogin() {
-            try {
-                const provider = new firebase.auth.GoogleAuthProvider();
-                const result = await firebase.auth().signInWithPopup(provider);
-                const firebaseUser = result.user;
-
-                // Check if user doc exists, if not create it
-                const db = firebase.firestore();
-                const userDoc = await db.collection('users').doc(firebaseUser.uid).get();
-                let profileData;
-                if (!userDoc.exists) {
-                    profileData = {
-                        uid: firebaseUser.uid,
-                        name: firebaseUser.displayName || 'User',
-                        email: firebaseUser.email,
-                        phone: '',
-                        role: 'buyer',
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                    };
-                    await db.collection('users').doc(firebaseUser.uid).set(profileData);
-                } else {
-                    profileData = userDoc.data();
-                }
-
-                syncUserToAppState(firebaseUser, profileData);
-                redirectAfterLogin(profileData.role);
-            } catch (err) {
-                if (err.code !== 'auth/popup-closed-by-user') {
-                    showError('Google sign-in failed: ' + (err.message || 'Please try again.'));
-                }
-            }
+            showError('Google Login is currently disabled while we upgrade our systems.');
         }
 
         function handleEmailLogin() {

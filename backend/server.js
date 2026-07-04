@@ -66,9 +66,11 @@ app.get('/', (req, res) => {
 const authRoutes = require('./routes/authRoutes');
 const propertyRoutes = require('./routes/propertyRoutes');
 const inquiryRoutes = require('./routes/inquiryRoutes');
+const favoritesRoutes = require('./routes/favoritesRoutes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/properties', propertyRoutes);
+app.use('/api/favorites', favoritesRoutes);
 app.use('/api', inquiryRoutes); // Matches POST /api/contact and GET /api/inquiries
 
 // ── HEALTH CHECK ─────────────────────────────────────────────────────────────

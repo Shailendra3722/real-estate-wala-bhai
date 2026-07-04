@@ -31,6 +31,11 @@ const ApiConfig = {
 
     // API Endpoints
     endpoints: {
+        // Auth
+        login: '/api/auth/login',
+        register: '/api/auth/register',
+        getMe: '/api/auth/me',
+
         // Properties
         getAllProperties: '/api/properties',
         getPropertyById: (id) => `/api/properties/${id}`,
@@ -40,7 +45,7 @@ const ApiConfig = {
         // Contact
         submitContact: '/api/contact',
 
-        // Future endpoints
+        // Favorites
         getFavorites: '/api/favorites',
         addFavorite: '/api/favorites',
         removeFavorite: (id) => `/api/favorites/${id}`,
@@ -63,12 +68,22 @@ const ApiConfig = {
     // Helper method to make API calls
     async fetch(endpoint, options = {}) {
         const url = this.getUrl(endpoint);
+        const headers = {
+            ...this.defaultHeaders,
+            ...options.headers,
+        };
+
+        // Automatically inject auth token if logged in
+        if (typeof window !== 'undefined' && window.AppState) {
+            const token = window.AppState.getAuthToken();
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+        }
+
         const config = {
             ...options,
-            headers: {
-                ...this.defaultHeaders,
-                ...options.headers,
-            },
+            headers,
         };
 
         try {
