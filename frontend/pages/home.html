@@ -1036,13 +1036,13 @@
             <!-- Right: Actions -->
             <div class="nav-actions">
                 <!-- Search Trigger -->
-                <button class="nav-action-btn search-trigger-btn" aria-label="Search" title="Search" onclick="focusHeroSearch()">🔍</button>
+                <button class="nav-action-btn search-trigger-btn" aria-label="Search" title="Search" onclick="toggleNavSearch()">🔍</button>
 
                 <!-- Theme Toggle -->
-                <button class="nav-action-btn theme-toggle-btn" aria-label="Toggle Theme" title="Toggle Theme">🌙</button>
+                <button class="nav-action-btn theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Theme" title="Toggle Theme" onclick="toggleTheme()">🌙</button>
                 
                 <!-- Notification Bell -->
-                <button class="nav-action-btn notification-btn" aria-label="Notifications" title="Notifications" onclick="Toast.info('You have no new notifications')">
+                <button class="nav-action-btn notification-btn" aria-label="Notifications" title="Notifications" onclick="if(window.Toast) Toast.info('You have no new notifications'); else showMiniToast('No new notifications')">
                     🔔
                     <span class="notification-badge"></span>
                 </button>
@@ -1064,6 +1064,34 @@
                 <a href="#" class="nav-mobile-link" onclick="if(window.Navigation) window.Navigation.goToAddProperty(); toggleMobileMenu(); return false;">Sell</a>
                 <a href="map-explore.html" class="nav-mobile-link" onclick="toggleMobileMenu()">Map</a>
                 <a href="mailto:support@realestatewala.com?subject=Inquiry" class="nav-mobile-link" onclick="toggleMobileMenu()">Contact</a>
+            </div>
+
+            <!-- Inline Nav Search Bar -->
+            <div id="navSearchOverlay" style="
+                display:none; position:absolute; top:72px; left:0; right:0;
+                background:var(--glass-bg); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px);
+                border-bottom:1px solid var(--color-border); padding:var(--sp-3) var(--sp-6);
+                z-index:998; animation:slideDown var(--dur-base) var(--ease-out) both;
+            ">
+                <div style="max-width:600px; margin:0 auto; position:relative;">
+                    <input id="searchInput" type="text" placeholder="Search by city, area, property type..."
+                        style="
+                            width:100%; padding:var(--sp-3) var(--sp-5) var(--sp-3) var(--sp-10);
+                            background:var(--color-bg-alt); border:1px solid var(--color-border-strong);
+                            border-radius:var(--r-full); font-family:var(--font-sans);
+                            font-size:var(--text-sm); color:var(--color-text-primary);
+                            outline:none; transition:all var(--dur-base);
+                        "
+                        onfocus="this.style.borderColor='var(--brand-500)'; this.style.boxShadow='0 0 0 3px rgba(79,70,229,0.15)'"
+                        onblur="this.style.borderColor=''; this.style.boxShadow=''"
+                    >
+                    <span style="position:absolute;left:var(--sp-3);top:50%;transform:translateY(-50%);font-size:1rem;opacity:0.5;">🔍</span>
+                    <button onclick="document.getElementById('searchInput').value=''; loadAllProperties(); toggleNavSearch()" style="
+                        position:absolute;right:var(--sp-3);top:50%;transform:translateY(-50%);
+                        background:none;border:none;cursor:pointer;font-size:1.1rem;opacity:0.5;
+                        color:var(--color-text-primary); transition:opacity var(--dur-fast);
+                    " title="Clear search">✕</button>
+                </div>
             </div>
         </header>
 
@@ -1213,25 +1241,35 @@
         </section>
 
         <!-- Quick actions -->
-        <section class="quick-section">
+        <section class="quick-section" id="quickActionsSection">
             <h2 class="section-title">What are you looking for?</h2>
             <div class="quick-actions">
-                <div class="action-btn" onclick="handleAction('buy')">
+                <div class="action-btn" id="qaBtn-buy" onclick="handleAction('buy'); setActiveQA('buy')">
                     <div class="action-btn-content">
                         <span class="action-icon">🏠</span>
                         <div class="action-text">Buy</div>
+                        <div style="font-size:var(--text-xs);color:var(--color-text-muted);margin-top:var(--sp-1);">Find your dream home</div>
                     </div>
                 </div>
-                <div class="action-btn" onclick="handleAction('rent')">
+                <div class="action-btn" id="qaBtn-rent" onclick="handleAction('rent'); setActiveQA('rent')">
                     <div class="action-btn-content">
                         <span class="action-icon">🔑</span>
                         <div class="action-text">Rent</div>
+                        <div style="font-size:var(--text-xs);color:var(--color-text-muted);margin-top:var(--sp-1);">Flexible living options</div>
                     </div>
                 </div>
-                <div class="action-btn map-btn" onclick="handleAction('map')">
+                <div class="action-btn" id="qaBtn-sell" onclick="if(window.Navigation) Navigation.goToAddProperty()">
+                    <div class="action-btn-content">
+                        <span class="action-icon">📋</span>
+                        <div class="action-text">Sell / List</div>
+                        <div style="font-size:var(--text-xs);color:var(--color-text-muted);margin-top:var(--sp-1);">Zero brokerage listing</div>
+                    </div>
+                </div>
+                <div class="action-btn map-btn" id="qaBtn-map" onclick="handleAction('map')">
                     <div class="action-btn-content">
                         <span class="action-icon">🗺️</span>
                         <div class="action-text">Explore on Map</div>
+                        <div style="font-size:var(--text-xs);color:rgba(255,255,255,0.6);margin-top:var(--sp-1);">Browse by location</div>
                     </div>
                 </div>
             </div>
@@ -1240,8 +1278,35 @@
         <!-- All properties -->
         <section class="featured-section">
             <div class="featured-header">
-                <h2 class="section-title">All Properties</h2>
-                <a href="#" class="view-all" onclick="toggleAdvancedFilters(); return false;">Filter →</a>
+                <div>
+                    <h2 class="section-title" style="margin-bottom:var(--sp-1);">All Properties</h2>
+                    <p style="font-size:var(--text-sm);color:var(--color-text-muted);margin:0;">Discover verified direct-owner listings</p>
+                </div>
+                <div style="display:flex;gap:var(--sp-3);align-items:center;">
+                    <div style="
+                        display:flex;gap:0;background:var(--color-bg-alt);
+                        border:1px solid var(--color-border);border-radius:var(--r-full);padding:3px;
+                    ">
+                        <button id="tabAll" class="tab-btn tab-active" onclick="tabFilter('all')" style="
+                            padding:var(--sp-1) var(--sp-4);border-radius:var(--r-full);border:none;
+                            font-size:var(--text-xs);font-weight:var(--fw-semi);cursor:pointer;
+                            font-family:var(--font-sans);transition:all var(--dur-base);
+                        ">All</button>
+                        <button id="tabBuy" class="tab-btn" onclick="tabFilter('sell')" style="
+                            padding:var(--sp-1) var(--sp-4);border-radius:var(--r-full);border:none;
+                            font-size:var(--text-xs);font-weight:var(--fw-semi);cursor:pointer;
+                            font-family:var(--font-sans);transition:all var(--dur-base);
+                            background:transparent;color:var(--color-text-secondary);
+                        ">For Sale</button>
+                        <button id="tabRent" class="tab-btn" onclick="tabFilter('rent')" style="
+                            padding:var(--sp-1) var(--sp-4);border-radius:var(--r-full);border:none;
+                            font-size:var(--text-xs);font-weight:var(--fw-semi);cursor:pointer;
+                            font-family:var(--font-sans);transition:all var(--dur-base);
+                            background:transparent;color:var(--color-text-secondary);
+                        ">For Rent</button>
+                    </div>
+                    <a href="#" class="view-all" onclick="toggleAdvancedFilters(); return false;">⚙️ Filter</a>
+                </div>
             </div>
             
             <!-- Advanced Filters -->
@@ -1292,6 +1357,75 @@
                 <!-- Properties will be loaded dynamically from PropertiesData -->
             </div>
         </section>
+
+        <!-- Premium Footer -->
+        <footer style="
+            margin-top: var(--sp-16);
+            margin-left: calc(-1 * var(--sp-6));
+            margin-right: calc(-1 * var(--sp-6));
+            padding: var(--sp-12) var(--sp-6) var(--sp-6);
+            background: var(--glass-bg);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-top: 1px solid var(--color-border);
+        ">
+            <div style="max-width:1280px;margin:0 auto;">
+                <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:var(--sp-10);margin-bottom:var(--sp-10);">
+                    <!-- Brand col -->
+                    <div>
+                        <div style="display:flex;align-items:center;gap:var(--sp-3);margin-bottom:var(--sp-4);">
+                            <div style="width:40px;height:40px;background:linear-gradient(135deg,var(--brand-600),var(--violet-500));border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;font-size:1.25rem;box-shadow:var(--shadow-glow-brand);">🏡</div>
+                            <span style="font-weight:var(--fw-bold);font-size:var(--text-lg);letter-spacing:-0.02em;background:linear-gradient(135deg,var(--brand-500),var(--violet-500));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Real Estate Wala Bhai</span>
+                        </div>
+                        <p style="font-size:var(--text-sm);color:var(--color-text-muted);line-height:1.7;max-width:280px;margin-bottom:var(--sp-5);">India's most trusted PropTech platform. Zero brokerage, verified listings, direct owner contact.</p>
+                        <div style="display:flex;gap:var(--sp-3);">
+                            <a href="#" style="width:36px;height:36px;background:var(--color-bg-alt);border:1px solid var(--color-border);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:0.9rem;transition:all var(--dur-base);" onmouseover="this.style.borderColor='var(--brand-500)'; this.style.background='rgba(79,70,229,0.1)'" onmouseout="this.style.borderColor=''; this.style.background=''">𝕏</a>
+                            <a href="#" style="width:36px;height:36px;background:var(--color-bg-alt);border:1px solid var(--color-border);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:0.9rem;transition:all var(--dur-base);" onmouseover="this.style.borderColor='var(--brand-500)'; this.style.background='rgba(79,70,229,0.1)'" onmouseout="this.style.borderColor=''; this.style.background=''">in</a>
+                            <a href="#" style="width:36px;height:36px;background:var(--color-bg-alt);border:1px solid var(--color-border);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:0.9rem;transition:all var(--dur-base);" onmouseover="this.style.borderColor='var(--brand-500)'; this.style.background='rgba(79,70,229,0.1)'" onmouseout="this.style.borderColor=''; this.style.background=''">📘</a>
+                        </div>
+                    </div>
+                    <!-- Properties col -->
+                    <div>
+                        <h4 style="font-size:var(--text-sm);font-weight:var(--fw-semi);color:var(--color-text-primary);margin-bottom:var(--sp-4);letter-spacing:-0.01em;">Properties</h4>
+                        <div style="display:flex;flex-direction:column;gap:var(--sp-3);">
+                            <a href="#" onclick="handleAction('buy'); scrollToProperties(); return false;" style="font-size:var(--text-sm);color:var(--color-text-muted);text-decoration:none;transition:color var(--dur-fast);" onmouseover="this.style.color='var(--brand-400)'" onmouseout="this.style.color=''">Buy Property</a>
+                            <a href="#" onclick="handleAction('rent'); scrollToProperties(); return false;" style="font-size:var(--text-sm);color:var(--color-text-muted);text-decoration:none;transition:color var(--dur-fast);" onmouseover="this.style.color='var(--brand-400)'" onmouseout="this.style.color=''">Rent Property</a>
+                            <a href="#" onclick="if(window.Navigation) Navigation.goToAddProperty(); return false;" style="font-size:var(--text-sm);color:var(--color-text-muted);text-decoration:none;transition:color var(--dur-fast);" onmouseover="this.style.color='var(--brand-400)'" onmouseout="this.style.color=''">List Property</a>
+                            <a href="map-explore.html" style="font-size:var(--text-sm);color:var(--color-text-muted);text-decoration:none;transition:color var(--dur-fast);" onmouseover="this.style.color='var(--brand-400)'" onmouseout="this.style.color=''">Map Explore</a>
+                        </div>
+                    </div>
+                    <!-- Cities col -->
+                    <div>
+                        <h4 style="font-size:var(--text-sm);font-weight:var(--fw-semi);color:var(--color-text-primary);margin-bottom:var(--sp-4);letter-spacing:-0.01em;">Top Cities</h4>
+                        <div style="display:flex;flex-direction:column;gap:var(--sp-3);">
+                            <a href="#" onclick="searchCity('Mumbai'); return false;" style="font-size:var(--text-sm);color:var(--color-text-muted);text-decoration:none;transition:color var(--dur-fast);" onmouseover="this.style.color='var(--brand-400)'" onmouseout="this.style.color=''">Mumbai</a>
+                            <a href="#" onclick="searchCity('Delhi'); return false;" style="font-size:var(--text-sm);color:var(--color-text-muted);text-decoration:none;transition:color var(--dur-fast);" onmouseover="this.style.color='var(--brand-400)'" onmouseout="this.style.color=''">Delhi</a>
+                            <a href="#" onclick="searchCity('Bangalore'); return false;" style="font-size:var(--text-sm);color:var(--color-text-muted);text-decoration:none;transition:color var(--dur-fast);" onmouseover="this.style.color='var(--brand-400)'" onmouseout="this.style.color=''">Bangalore</a>
+                            <a href="#" onclick="searchCity('Hyderabad'); return false;" style="font-size:var(--text-sm);color:var(--color-text-muted);text-decoration:none;transition:color var(--dur-fast);" onmouseover="this.style.color='var(--brand-400)'" onmouseout="this.style.color=''">Hyderabad</a>
+                            <a href="#" onclick="searchCity('Pune'); return false;" style="font-size:var(--text-sm);color:var(--color-text-muted);text-decoration:none;transition:color var(--dur-fast);" onmouseover="this.style.color='var(--brand-400)'" onmouseout="this.style.color=''">Pune</a>
+                        </div>
+                    </div>
+                    <!-- Company col -->
+                    <div>
+                        <h4 style="font-size:var(--text-sm);font-weight:var(--fw-semi);color:var(--color-text-primary);margin-bottom:var(--sp-4);letter-spacing:-0.01em;">Company</h4>
+                        <div style="display:flex;flex-direction:column;gap:var(--sp-3);">
+                            <a href="mailto:support@realestatewala.com" style="font-size:var(--text-sm);color:var(--color-text-muted);text-decoration:none;transition:color var(--dur-fast);" onmouseover="this.style.color='var(--brand-400)'" onmouseout="this.style.color=''">Contact Us</a>
+                            <a href="privacy.html" style="font-size:var(--text-sm);color:var(--color-text-muted);text-decoration:none;transition:color var(--dur-fast);" onmouseover="this.style.color='var(--brand-400)'" onmouseout="this.style.color=''">Privacy Policy</a>
+                            <a href="terms.html" style="font-size:var(--text-sm);color:var(--color-text-muted);text-decoration:none;transition:color var(--dur-fast);" onmouseover="this.style.color='var(--brand-400)'" onmouseout="this.style.color=''">Terms of Service</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Footer bottom -->
+                <div style="display:flex;justify-content:space-between;align-items:center;padding-top:var(--sp-6);border-top:1px solid var(--color-border);flex-wrap:wrap;gap:var(--sp-3);">
+                    <p style="font-size:var(--text-xs);color:var(--color-text-muted);margin:0;">© 2026 Real Estate Wala Bhai. All rights reserved. Made with ❤️ in India.</p>
+                    <div style="display:flex;gap:var(--sp-4);">
+                        <span style="display:flex;align-items:center;gap:var(--sp-2);font-size:var(--text-xs);color:var(--color-text-muted);">🛡️ <span>Secure Platform</span></span>
+                        <span style="display:flex;align-items:center;gap:var(--sp-2);font-size:var(--text-xs);color:var(--color-text-muted);">✅ <span>Verified Listings</span></span>
+                        <span style="display:flex;align-items:center;gap:var(--sp-2);font-size:var(--text-xs);color:var(--color-text-muted);">💰 <span>Zero Brokerage</span></span>
+                    </div>
+                </div>
+            </div>
+        </footer>
     </div>
 
     <!-- Bottom Navigation (Mobile) -->
@@ -1934,27 +2068,108 @@
         else if (sel.toLowerCase().includes('logout') || sel === '8') Navigation.logout();
     }
 
+    // ── Nav Search Toggle ─────────────────────────────────────────
+    function toggleNavSearch() {
+        const overlay = document.getElementById('navSearchOverlay');
+        if (!overlay) return;
+        const isHidden = overlay.style.display === 'none' || !overlay.style.display;
+        overlay.style.display = isHidden ? 'block' : 'none';
+        if (isHidden) {
+            setTimeout(() => {
+                const inp = document.getElementById('searchInput');
+                if (inp) inp.focus();
+            }, 80);
+        }
+    }
+
+    // ── Theme Toggle ──────────────────────────────────────────────
+    function toggleTheme() {
+        const html = document.documentElement;
+        const current = html.getAttribute('data-theme') || 'dark';
+        const next = current === 'dark' ? 'light' : 'dark';
+        html.setAttribute('data-theme', next);
+        const btn = document.getElementById('themeToggleBtn');
+        if (btn) btn.textContent = next === 'dark' ? '🌙' : '☀️';
+        try { localStorage.setItem('rewb_theme', next); } catch { }
+    }
+    // Restore saved theme on load
+    try {
+        const saved = localStorage.getItem('rewb_theme');
+        if (saved) {
+            document.documentElement.setAttribute('data-theme', saved);
+            const btn = document.getElementById('themeToggleBtn');
+            if (btn) btn.textContent = saved === 'dark' ? '🌙' : '☀️';
+        }
+    } catch { }
+
+    // ── Property Tab Filter ───────────────────────────────────────
+    function tabFilter(type) {
+        // Update tab active styling
+        ['tabAll','tabBuy','tabRent'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.style.background = 'transparent';
+                el.style.color = 'var(--color-text-secondary)';
+                el.style.boxShadow = 'none';
+            }
+        });
+        const activeMap = { all: 'tabAll', sell: 'tabBuy', rent: 'tabRent' };
+        const activeEl = document.getElementById(activeMap[type]);
+        if (activeEl) {
+            activeEl.style.background = 'var(--color-surface)';
+            activeEl.style.color = 'var(--color-text-primary)';
+            activeEl.style.boxShadow = 'var(--shadow-sm)';
+        }
+
+        // Filter properties
+        const title = document.querySelector('.featured-section .section-title');
+        if (type === 'all') {
+            if (title) title.textContent = 'All Properties';
+            renderPropertyGrid(allLoadedProperties);
+            updateMapMarkers(allLoadedProperties);
+        } else {
+            const filtered = allLoadedProperties.filter(p => p.listingType === type);
+            if (title) title.textContent = type === 'sell' ? 'Properties For Sale' : 'Properties For Rent';
+            renderPropertyGrid(filtered);
+            updateMapMarkers(filtered);
+        }
+    }
+
+    // ── Quick Action Active State ─────────────────────────────────
+    function setActiveQA(mode) {
+        ['qaBtn-buy','qaBtn-rent','qaBtn-sell','qaBtn-map'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.borderColor = '';
+        });
+        const btn = document.getElementById('qaBtn-' + mode);
+        if (btn) btn.style.borderColor = 'var(--brand-400)';
+    }
+
     // ── Search ────────────────────────────────────────────────────
     let searchTimeout;
-    document.getElementById('searchInput').addEventListener('input', function (e) {
-        const query = e.target.value.trim();
-        clearTimeout(searchTimeout);
+    const searchInputEl = document.getElementById('searchInput');
+    if (searchInputEl) {
+        searchInputEl.addEventListener('input', function (e) {
+            const query = e.target.value.trim();
+            clearTimeout(searchTimeout);
 
-        if (query.length === 0) {
-            loadAllProperties();
-            return;
-        }
-        if (query.length < 2) return;
+            if (query.length === 0) {
+                loadAllProperties();
+                return;
+            }
+            if (query.length < 2) return;
 
-        searchTimeout = setTimeout(async () => {
-            if (!window.PropertiesData) return;
-            const results = await window.PropertiesData.searchProperties(query);
-            const title = document.querySelector('.featured-section .section-title');
-            title.textContent = `Search: "${query}" (${results.length} found)`;
-            renderPropertyGrid(results);
-            updateMapMarkers(results);
-        }, 300);
-    });
+            searchTimeout = setTimeout(async () => {
+                if (!window.PropertiesData) return;
+                const results = await window.PropertiesData.searchProperties(query);
+                const title = document.querySelector('.featured-section .section-title');
+                if (title) title.textContent = `Search: "${query}" (${results.length} found)`;
+                renderPropertyGrid(results);
+                updateMapMarkers(results);
+                scrollToProperties();
+            }, 300);
+        });
+    }
 
     // ── Skeleton loader ───────────────────────────────────────────
     function showSkeletons(grid, count) {
@@ -2009,6 +2224,33 @@
         document.body.appendChild(t);
         setTimeout(() => t.remove(), 5000);
     }
+
+    // ── Footer responsive ──────────────────────────────────────────
+    (function() {
+        const style = document.createElement('style');
+        style.textContent = `
+            @media (max-width: 768px) {
+                footer > div > div:first-of-type {
+                    grid-template-columns: 1fr 1fr !important;
+                }
+            }
+            @media (max-width: 480px) {
+                footer > div > div:first-of-type {
+                    grid-template-columns: 1fr !important;
+                }
+                footer > div > div:last-of-type {
+                    flex-direction: column !important;
+                    align-items: flex-start !important;
+                }
+            }
+            .tab-active {
+                background: var(--color-surface) !important;
+                color: var(--color-text-primary) !important;
+                box-shadow: var(--shadow-sm) !important;
+            }
+        `;
+        document.head.appendChild(style);
+    })();
 
     // ── Bottom nav ────────────────────────────────────────────────
     document.querySelectorAll('.nav-item').forEach(item => {
