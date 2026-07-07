@@ -45,22 +45,21 @@
         .header {
             position: sticky;
             top: 0;
-            z-index: 100;
+            z-index: 1000;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 0 0 0;
-            margin-bottom: var(--sp-10);
-            height: 64px;
+            height: 72px;
             background: var(--glass-bg);
             backdrop-filter: blur(24px);
             -webkit-backdrop-filter: blur(24px);
             border-bottom: 1px solid var(--color-border);
-            animation: fadeUp var(--dur-slow) var(--ease-out) both;
+            animation: fadeIn var(--dur-base) var(--ease-out) both;
             margin-left: calc(-1 * var(--sp-6));
             margin-right: calc(-1 * var(--sp-6));
             padding-left: var(--sp-6);
             padding-right: var(--sp-6);
+            transition: all var(--dur-base) var(--ease-out);
         }
 
         .logo {
@@ -71,14 +70,14 @@
         }
 
         .logo-icon {
-            width: 38px;
-            height: 38px;
+            width: 40px;
+            height: 40px;
             background: linear-gradient(135deg, var(--brand-600), var(--violet-500));
             border-radius: var(--r-md);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem;
+            font-size: 1.25rem;
             box-shadow: var(--shadow-sm), var(--shadow-glow-brand);
             transition: transform var(--dur-base) var(--ease-spring);
         }
@@ -88,10 +87,101 @@
         }
 
         .logo-text {
-            font-weight: var(--fw-semi);
-            font-size: var(--text-base);
+            font-weight: var(--fw-bold);
+            font-size: var(--text-lg);
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, var(--brand-600), var(--violet-500));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Desktop Navigation Links */
+        .nav-desktop-links {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-6);
+        }
+
+        .nav-desktop-link {
+            text-decoration: none;
+            color: var(--color-text-secondary);
+            font-size: var(--text-sm);
+            font-weight: var(--fw-medium);
+            padding: var(--sp-2) 0;
+            position: relative;
+            transition: color var(--dur-fast) var(--ease-out);
+        }
+
+        .nav-desktop-link:hover {
             color: var(--color-text-primary);
-            letter-spacing: -0.01em;
+        }
+
+        .nav-desktop-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--brand-500);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform var(--dur-base) var(--ease-out);
+        }
+
+        .nav-desktop-link:hover::after,
+        .nav-desktop-link.active::after {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        .nav-desktop-link.active {
+            color: var(--brand-500);
+        }
+
+        /* Actions block */
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-4);
+        }
+
+        .nav-action-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 1.25rem;
+            color: var(--color-text-secondary);
+            width: 38px;
+            height: 38px;
+            border-radius: var(--r-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: all var(--dur-base) var(--ease-out);
+        }
+
+        .nav-action-btn:hover {
+            background: var(--color-bg-alt);
+            color: var(--color-text-primary);
+            transform: scale(1.05);
+        }
+
+        .notification-btn {
+            position: relative;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            background: var(--rose-500);
+            border-radius: var(--r-full);
+            border: 1.5px solid var(--color-surface);
         }
 
         .user-profile {
@@ -108,12 +198,67 @@
             box-shadow: var(--shadow-sm);
             color: white;
             font-weight: var(--fw-semi);
-            transition: all var(--dur-base) var(--ease-out);
+            transition: all var(--dur-base) var(--ease-spring);
         }
 
         .user-profile:hover {
-            transform: scale(1.06);
+            transform: scale(1.08);
             box-shadow: var(--shadow-md), var(--shadow-glow-brand);
+        }
+
+        .mobile-menu-toggle {
+            display: none;
+            font-size: 1.5rem;
+            color: var(--color-text-primary);
+        }
+
+        /* Mobile Dropdown styling */
+        .nav-mobile-dropdown {
+            display: none;
+            position: absolute;
+            top: 72px;
+            left: 0;
+            width: 100%;
+            background: var(--glass-bg);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-bottom: 1px solid var(--color-border);
+            padding: var(--sp-4) var(--sp-6);
+            flex-direction: column;
+            gap: var(--sp-3);
+            z-index: 999;
+            box-shadow: var(--shadow-md);
+            animation: slideDown var(--dur-base) var(--ease-out) both;
+        }
+
+        .nav-mobile-link {
+            text-decoration: none;
+            color: var(--color-text-secondary);
+            font-size: var(--text-base);
+            font-weight: var(--fw-medium);
+            padding: var(--sp-2) 0;
+            transition: color var(--dur-fast);
+        }
+
+        .nav-mobile-link:hover,
+        .nav-mobile-link.active {
+            color: var(--brand-500);
+        }
+
+        /* Responsive Navbar Rules */
+        @media (max-width: 768px) {
+            .nav-desktop-links {
+                display: none;
+            }
+            .mobile-menu-toggle {
+                display: flex;
+            }
+            .header {
+                margin-left: calc(-1 * var(--sp-4));
+                margin-right: calc(-1 * var(--sp-4));
+                padding-left: var(--sp-4);
+                padding-right: var(--sp-4);
+            }
         }
 
         .container {
@@ -125,44 +270,297 @@
         }
 
         /* ===== SEARCH ===== */
-        .search-section {
-            margin-bottom: var(--sp-10);
-            animation: fadeUp var(--dur-slow) var(--ease-out) 80ms both;
+        /* ===== HERO SECTION ===== */
+        .pds-hero {
+            position: relative;
+            min-height: calc(100vh - 72px);
+            display: flex;
+            align-items: center;
+            margin-left: calc(-1 * var(--sp-6));
+            margin-right: calc(-1 * var(--sp-6));
+            padding: var(--sp-20) var(--sp-6);
+            overflow: hidden;
+            background: #000;
+            margin-bottom: var(--sp-12);
         }
 
-        .search-container { position: relative; }
+        .hero-bg-wrapper {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+        }
 
-        .search-icon {
+        .hero-bg-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.65;
+            transform: scale(1.02);
+            filter: brightness(0.8);
+            transition: transform 6s ease;
+        }
+
+        .pds-hero:hover .hero-bg-img {
+            transform: scale(1.05);
+        }
+
+        .hero-bg-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(8, 15, 31, 0.9) 0%, rgba(5, 8, 20, 0.8) 50%, rgba(8, 15, 31, 0.95) 100%);
+        }
+
+        .hero-content-container {
+            position: relative;
+            z-index: 2;
+            display: grid;
+            grid-template-columns: 1.25fr 0.75fr;
+            gap: var(--sp-12);
+            align-items: center;
+            width: 100%;
+        }
+
+        .hero-text-block {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            animation: fadeUp var(--dur-slow) var(--ease-out) both;
+        }
+
+        .hero-trust-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--sp-2);
+            padding: var(--sp-2) var(--sp-4);
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: var(--r-full);
+            font-size: var(--text-xs);
+            font-weight: var(--fw-semi);
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: var(--sp-6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .hero-main-title {
+            font-size: 3.5rem;
+            font-weight: var(--fw-extrabold);
+            line-height: 1.15;
+            color: #fff;
+            margin-bottom: var(--sp-4);
+            letter-spacing: -0.03em;
+        }
+
+        .hero-subtitle {
+            font-size: var(--text-lg);
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: var(--sp-8);
+            max-width: 540px;
+        }
+
+        .hero-cta-group {
+            display: flex;
+            gap: var(--sp-4);
+            margin-bottom: var(--sp-12);
+        }
+
+        /* Floating statistics styling */
+        .hero-stats-row {
+            display: flex;
+            gap: var(--sp-6);
+        }
+
+        .hero-stat-card {
+            padding: var(--sp-4) var(--sp-6);
+            border-radius: var(--r-lg);
+            text-align: left;
+            min-width: 140px;
+        }
+
+        .hero-stat-num {
+            display: block;
+            font-size: var(--text-2xl);
+            font-weight: var(--fw-bold);
+            color: #fff;
+            margin-bottom: var(--sp-1);
+        }
+
+        .hero-stat-label {
+            font-size: var(--text-xs);
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: var(--fw-medium);
+        }
+
+        /* Right Side: Search Panel */
+        .hero-search-panel-wrap {
+            display: flex;
+            justify-content: flex-end;
+            animation: fadeUp var(--dur-slow) var(--ease-out) 100ms both;
+        }
+
+        .hero-search-panel {
+            width: 100%;
+            max-width: 420px;
+            padding: var(--sp-6);
+            border-radius: var(--r-2xl);
+            box-shadow: var(--shadow-2xl);
+        }
+
+        .hero-search-tabs {
+            display: flex;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px;
+            border-radius: var(--r-lg);
+            margin-bottom: var(--sp-5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .hero-search-tab {
+            flex: 1;
+            padding: var(--sp-2) 0;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: var(--text-sm);
+            font-weight: var(--fw-medium);
+            cursor: pointer;
+            border-radius: var(--r-md);
+            transition: all var(--dur-base) var(--ease-out);
+        }
+
+        .hero-search-tab.active {
+            background: var(--brand-500);
+            color: #fff;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .hero-search-field-wrap {
+            position: relative;
+            margin-bottom: var(--sp-5);
+        }
+
+        .hero-search-field-icon {
             position: absolute;
             left: var(--sp-4);
             top: 50%;
             transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.4);
             font-size: 1.1rem;
-            color: var(--color-text-muted);
             pointer-events: none;
-            z-index: 1;
         }
 
-        .search-input {
+        .hero-search-panel .pds-search-input {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.12);
+            color: #fff;
+            padding: var(--sp-3) var(--sp-4) var(--sp-3) 3rem;
+            border-radius: var(--r-xl);
+            box-shadow: none;
             width: 100%;
-            padding: var(--sp-4) var(--sp-6) var(--sp-4) 3.25rem;
-            background: var(--color-surface);
-            border: 1.5px solid var(--color-border-strong);
-            border-radius: 9999px;
-            font-size: var(--text-base);
-            color: var(--color-text-primary);
-            font-family: var(--font-sans);
-            transition: all var(--dur-base) var(--ease-out);
             outline: none;
-            box-shadow: var(--shadow-sm);
+            font-size: var(--text-sm);
+            transition: all var(--dur-base);
         }
 
-        .search-input::placeholder { color: var(--color-text-muted); }
+        .hero-search-panel .pds-search-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
 
-        .search-input:focus {
+        .hero-search-panel .pds-search-input:focus {
             border-color: var(--brand-500);
-            box-shadow: var(--shadow-glow-brand), var(--shadow-md);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.25);
+        }
+
+        /* Popular Cities Chips */
+        .hero-popular-cities {
+            display: flex;
+            flex-direction: column;
+            gap: var(--sp-2);
+        }
+
+        .hero-popular-cities-label {
+            font-size: var(--text-xs);
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: var(--fw-medium);
+        }
+
+        .hero-city-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--sp-2);
+        }
+
+        .hero-city-chip {
+            padding: var(--sp-1) var(--sp-3);
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--r-full);
+            font-size: var(--text-xs);
+            color: rgba(255, 255, 255, 0.8);
+            cursor: pointer;
+            transition: all var(--dur-base) var(--ease-out);
+        }
+
+        .hero-city-chip:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.25);
+            color: #fff;
             transform: translateY(-1px);
+        }
+
+        /* Scroll indicator */
+        .hero-scroll-indicator {
+            position: absolute;
+            bottom: var(--sp-6);
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--sp-2);
+            color: rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            z-index: 2;
+            transition: color var(--dur-base);
+        }
+
+        .hero-scroll-indicator:hover {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .scroll-mouse {
+            width: 20px;
+            height: 32px;
+            border: 1.5px solid currentColor;
+            border-radius: 10px;
+            position: relative;
+            display: block;
+        }
+
+        .scroll-wheel {
+            width: 3px;
+            height: 6px;
+            background: currentColor;
+            border-radius: var(--r-full);
+            position: absolute;
+            top: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: scrollWheel 1.5s infinite;
+        }
+
+        .scroll-text {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: var(--fw-semi);
+        }
+
+        @keyframes scrollWheel {
+            0% { opacity: 1; transform: translate(-50%, 0); }
+            100% { opacity: 0; transform: translate(-50%, 8px); }
         }
 
         /* ===== ADVANCED FILTER BAR ===== */
@@ -176,6 +574,7 @@
             border: 1px solid var(--color-border);
             box-shadow: var(--shadow-xs);
             margin-top: var(--sp-3);
+            margin-bottom: var(--sp-6);
             animation: slideDown var(--dur-base) var(--ease-out);
         }
 
@@ -197,7 +596,41 @@
         #advancedFiltersContainer select:focus,
         #advancedFiltersContainer input:focus {
             border-color: var(--brand-500);
-            box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+        }
+
+        /* Responsive Hero Rules */
+        @media (max-width: 1024px) {
+            .hero-main-title { font-size: 2.75rem; }
+            .hero-content-container { gap: var(--sp-8); }
+        }
+
+        @media (max-width: 768px) {
+            .pds-hero {
+                min-height: auto;
+                padding: var(--sp-12) var(--sp-4);
+            }
+            .hero-content-container {
+                grid-template-columns: 1fr;
+                gap: var(--sp-10);
+            }
+            .hero-text-block {
+                align-items: center;
+                text-align: center;
+            }
+            .hero-cta-group {
+                justify-content: center;
+            }
+            .hero-stats-row {
+                justify-content: center;
+                width: 100%;
+            }
+            .hero-search-panel-wrap {
+                justify-content: center;
+            }
+            .hero-scroll-indicator {
+                display: none;
+            }
         }
 
         /* ===== QUICK ACTIONS ===== */
@@ -593,25 +1026,171 @@
     <div class="container">
         <!-- Header -->
         <header class="header">
-            <div class="logo">
+            <!-- Left: Logo -->
+            <a href="home.html" class="logo">
                 <div class="logo-icon">🏡</div>
                 <span class="logo-text">Real Estate Wala Bhai</span>
+            </a>
+            
+            <!-- Center: Navigation Links (Desktop) -->
+            <div class="nav-desktop-links">
+                <a href="home.html" class="nav-desktop-link active">Home</a>
+                <a href="map-explore.html" class="nav-desktop-link">Map Search</a>
+                <a href="property-list.html" class="nav-desktop-link">Listings</a>
+                <a href="settings.html" class="nav-desktop-link">Settings</a>
             </div>
-            <div class="user-profile">👤</div>
+
+            <!-- Right: Actions -->
+            <div class="nav-actions">
+                <!-- Theme Toggle -->
+                <button class="nav-action-btn theme-toggle-btn" aria-label="Toggle Theme" title="Toggle Theme">🌙</button>
+                
+                <!-- Notification Bell -->
+                <button class="nav-action-btn notification-btn" aria-label="Notifications" title="Notifications" onclick="Toast.info('You have no new notifications')">
+                    🔔
+                    <span class="notification-badge"></span>
+                </button>
+                
+                <!-- User Profile -->
+                <div class="user-profile">👤</div>
+
+                <!-- Mobile Menu Toggle Button -->
+                <button class="nav-action-btn mobile-menu-toggle" aria-label="Toggle Menu" onclick="toggleMobileMenu()">
+                    ☰
+                </button>
+            </div>
+
+            <!-- Mobile Dropdown Menu -->
+            <div class="nav-mobile-dropdown" id="navMobileDropdown">
+                <a href="home.html" class="nav-mobile-link active" onclick="toggleMobileMenu()">Home</a>
+                <a href="map-explore.html" class="nav-mobile-link" onclick="toggleMobileMenu()">Map Search</a>
+                <a href="property-list.html" class="nav-mobile-link" onclick="toggleMobileMenu()">Listings</a>
+                <a href="settings.html" class="nav-mobile-link" onclick="toggleMobileMenu()">Settings</a>
+            </div>
         </header>
 
-        <!-- Search section -->
-        <section class="search-section">
-            <div class="search-container">
-                <span class="search-icon">🔍</span>
-                <input 
-                    type="text" 
-                    class="search-input" 
-                    placeholder="Search by area, city, or landmark"
-                    id="searchInput"
-                >
+        <!-- Premium Hero Section -->
+        <section class="pds-hero">
+            <!-- Background Image -->
+            <div class="hero-bg-wrapper">
+                <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600&auto=format&fit=crop" class="hero-bg-img" alt="Luxury Modern Villa">
+                <div class="hero-bg-overlay"></div>
             </div>
 
+            <!-- Content Container -->
+            <div class="hero-content-container pds-container">
+                <!-- Left/Top Side: Headings & Statistics & Badges -->
+                <div class="hero-text-block">
+                    <div class="hero-trust-badge">
+                        <span class="hero-trust-badge-icon">🛡️</span>
+                        <span>100% Direct Owner Listings • Zero Brokerage</span>
+                    </div>
+                    <h1 class="hero-main-title">
+                        Discover Your <span class="text-gradient">Dream Masterpiece</span> Home
+                    </h1>
+                    <p class="hero-subtitle">
+                        Find premium villas, penthouses, and apartments across India with no middleman.
+                    </p>
+                    
+                    <!-- CTA buttons -->
+                    <div class="hero-cta-group">
+                        <button class="pds-btn pds-btn-primary pds-btn-lg" onclick="scrollToProperties()">Explore Listings</button>
+                        <button class="pds-btn pds-btn-outline pds-btn-lg" style="color:white; border-color:rgba(255,255,255,0.4);" onclick="if(window.Navigation) window.Navigation.goToAddProperty()">List Your Property</button>
+                    </div>
+
+                    <!-- Floating stats -->
+                    <div class="hero-stats-row">
+                        <div class="hero-stat-card glass">
+                            <span class="hero-stat-num">12K+</span>
+                            <span class="hero-stat-label">Active Listings</span>
+                        </div>
+                        <div class="hero-stat-card glass">
+                            <span class="hero-stat-num">4.9★</span>
+                            <span class="hero-stat-label">Customer Rating</span>
+                        </div>
+                        <div class="hero-stat-card glass">
+                            <span class="hero-stat-num">₹0</span>
+                            <span class="hero-stat-label">Brokerage Paid</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right/Bottom Side: Glass Search Panel -->
+                <div class="hero-search-panel-wrap">
+                    <div class="hero-search-panel glass-dark">
+                        <!-- Tabs -->
+                        <div class="hero-search-tabs">
+                            <button class="hero-search-tab active" id="heroTabBuy" onclick="setHeroTab('buy')">Buy</button>
+                            <button class="hero-search-tab" id="heroTabRent" onclick="setHeroTab('rent')">Rent</button>
+                            <button class="hero-search-tab" id="heroTabComm" onclick="setHeroTab('commercial')">Commercial</button>
+                        </div>
+                        
+                        <!-- Search input box -->
+                        <div class="hero-search-field-wrap">
+                            <span class="hero-search-field-icon">🔍</span>
+                            <input 
+                                type="text" 
+                                class="pds-search-input" 
+                                placeholder="Search by area, city, or landmark"
+                                id="searchInput"
+                            >
+                        </div>
+
+                        <!-- Popular cities -->
+                        <div class="hero-popular-cities">
+                            <span class="hero-popular-cities-label">Popular Cities:</span>
+                            <div class="hero-city-chips">
+                                <span class="hero-city-chip" onclick="searchCity('Mumbai')">Mumbai</span>
+                                <span class="hero-city-chip" onclick="searchCity('Delhi')">Delhi</span>
+                                <span class="hero-city-chip" onclick="searchCity('Bangalore')">Bangalore</span>
+                                <span class="hero-city-chip" onclick="searchCity('Pune')">Pune</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scroll indicator -->
+            <div class="hero-scroll-indicator" onclick="scrollToProperties()">
+                <span class="scroll-mouse">
+                    <span class="scroll-wheel"></span>
+                </span>
+                <span class="scroll-text">Scroll to explore</span>
+            </div>
+        </section>
+
+        <!-- Quick actions -->
+        <section class="quick-section">
+            <h2 class="section-title">What are you looking for?</h2>
+            <div class="quick-actions">
+                <div class="action-btn" onclick="handleAction('buy')">
+                    <div class="action-btn-content">
+                        <span class="action-icon">🏠</span>
+                        <div class="action-text">Buy</div>
+                    </div>
+                </div>
+                <div class="action-btn" onclick="handleAction('rent')">
+                    <div class="action-btn-content">
+                        <span class="action-icon">🔑</span>
+                        <div class="action-text">Rent</div>
+                    </div>
+                </div>
+                <div class="action-btn map-btn" onclick="handleAction('map')">
+                    <div class="action-btn-content">
+                        <span class="action-icon">🗺️</span>
+                        <div class="action-text">Explore on Map</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- All properties -->
+        <section class="featured-section">
+            <div class="featured-header">
+                <h2 class="section-title">All Properties</h2>
+                <a href="#" class="view-all" onclick="toggleAdvancedFilters(); return false;">Filter →</a>
+            </div>
+            
             <!-- Advanced Filters -->
             <div id="advancedFiltersContainer" style="display: none; margin-top: 1rem; padding: 1.5rem; background: rgba(30, 41, 59, 0.5); border-radius: var(--radius-lg); border: 1px solid rgba(255,255,255,0.05); gap: 1rem; flex-wrap: wrap;">
                 <select id="advFilterListingType" class="search-input" style="flex: 1; min-width: 140px; background: rgba(15, 23, 42, 0.8);" onchange="applyAdvancedFilters()">
@@ -653,39 +1232,6 @@
                 <input type="number" id="advFilterMinPrice" class="search-input" placeholder="Min Price (&#8377;)" style="flex: 1; min-width: 130px; background: rgba(15, 23, 42, 0.8);" oninput="applyAdvancedFilters()">
                 <input type="number" id="advFilterMaxPrice" class="search-input" placeholder="Max Price (&#8377;)" style="flex: 1; min-width: 130px; background: rgba(15, 23, 42, 0.8);" oninput="applyAdvancedFilters()">
             </div>
-        </section>
-
-        <!-- Quick actions -->
-        <section class="quick-section">
-            <h2 class="section-title">What are you looking for?</h2>
-            <div class="quick-actions">
-                <div class="action-btn" onclick="handleAction('buy')">
-                    <div class="action-btn-content">
-                        <span class="action-icon">🏠</span>
-                        <div class="action-text">Buy</div>
-                    </div>
-                </div>
-                <div class="action-btn" onclick="handleAction('rent')">
-                    <div class="action-btn-content">
-                        <span class="action-icon">🔑</span>
-                        <div class="action-text">Rent</div>
-                    </div>
-                </div>
-                <div class="action-btn map-btn" onclick="handleAction('map')">
-                    <div class="action-btn-content">
-                        <span class="action-icon">🗺️</span>
-                        <div class="action-text">Explore on Map</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- All properties -->
-        <section class="featured-section">
-            <div class="featured-header">
-                <h2 class="section-title">All Properties</h2>
-                <a href="#" class="view-all" onclick="toggleAdvancedFilters(); return false;">Filter →</a>
-            </div>
             
             <!-- Leaflet Map Container -->
             <div id="homeMap" style="width: 100%; height: 400px; border-radius: 15px; margin-bottom: 2rem; border: 1px solid rgba(255,255,255,0.05); z-index: 1;"></div>
@@ -726,6 +1272,54 @@
     //  All property data is fetched from the backend API.
     //  Newly published properties appear instantly without refresh.
     // ============================================================
+
+    // ── Mobile Menu Toggle ───────────────────────────────────────
+    function toggleMobileMenu() {
+        const dropdown = document.getElementById('navMobileDropdown');
+        if (dropdown) {
+            const isHidden = dropdown.style.display === 'none' || !dropdown.style.display;
+            dropdown.style.display = isHidden ? 'flex' : 'none';
+        }
+    }
+
+    // ── Hero Functions ───────────────────────────────────────────
+    function setHeroTab(mode) {
+        const tabs = ['Buy', 'Rent', 'Comm'];
+        tabs.forEach(t => {
+            const btn = document.getElementById('heroTab' + t);
+            if (btn) btn.classList.remove('active');
+        });
+        const activeTab = document.getElementById('heroTab' + (mode === 'buy' ? 'Buy' : mode === 'rent' ? 'Rent' : 'Comm'));
+        if (activeTab) activeTab.classList.add('active');
+
+        if (mode === 'buy') {
+            handleAction('buy');
+        } else if (mode === 'rent') {
+            handleAction('rent');
+        } else {
+            const title = document.querySelector('.featured-section .section-title');
+            if (title) title.textContent = 'Commercial Properties';
+            const filtered = allLoadedProperties.filter(p => p.propertyType === 'commercial' || p.title.toLowerCase().includes('office') || p.title.toLowerCase().includes('shop'));
+            renderPropertyGrid(filtered);
+            updateMapMarkers(filtered);
+        }
+    }
+
+    function searchCity(city) {
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.value = city;
+            searchInput.dispatchEvent(new Event('input'));
+            scrollToProperties();
+        }
+    }
+
+    function scrollToProperties() {
+        const target = document.querySelector('.featured-section');
+        if (target) {
+            target.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
 
     // ── State ────────────────────────────────────────────────────
     let homeMap       = null;
