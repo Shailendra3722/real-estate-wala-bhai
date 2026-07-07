@@ -8,334 +8,302 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏡</text></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/ux-components.css">
-    
+    <!-- Premium 2026 Design System -->
+    <link rel="stylesheet" href="../css/premium-design-system.css">
     <!-- Leaflet CSS for Map -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        /* ===== PROPERTY DETAIL - PREMIUM 2026 ===== */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            font-family: 'Outfit', sans-serif;
-            background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+            font-family: var(--font-sans);
+            background: var(--color-bg);
             min-height: 100vh;
-            color: #ffffff;
+            color: var(--color-text-primary);
             padding-bottom: 100px;
         }
 
-        .gradient-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%);
-            background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
-            opacity: 0.08;
-            z-index: 0;
-        }
-
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
+        .gradient-bg { display: none; }
 
         .container {
             position: relative;
             z-index: 10;
             max-width: 900px;
             margin: 0 auto;
-            padding: 1.5rem;
+            padding: var(--sp-5) var(--sp-5);
+        }
+
+        /* Back Button */
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--sp-2);
+            padding: var(--sp-2) var(--sp-4);
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--r-lg);
+            font-size: var(--text-sm);
+            font-weight: var(--fw-medium);
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            font-family: var(--font-sans);
+            transition: all var(--dur-base) var(--ease-out);
+            margin-bottom: var(--sp-5);
+            box-shadow: var(--shadow-xs);
+        }
+
+        .back-btn:hover {
+            background: var(--color-bg-alt);
+            color: var(--color-text-primary);
+            border-color: var(--color-border-strong);
+            transform: translateX(-2px);
         }
 
         /* Image Gallery */
         .image-gallery {
             width: 100%;
-            height: 300px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 25px;
-            margin-bottom: 1.5rem;
+            height: 340px;
+            background: var(--color-bg-alt);
+            border-radius: var(--r-2xl);
+            margin-bottom: var(--sp-5);
             position: relative;
             overflow: hidden;
+            box-shadow: var(--shadow-card);
         }
 
         .gallery-badge {
             position: absolute;
-            top: 1rem;
-            left: 1rem;
-            padding: 0.6rem 1.2rem;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(10px);
-            border-radius: 12px;
-            font-size: 0.85rem;
-            font-weight: 700;
+            top: var(--sp-4);
+            left: var(--sp-4);
+            padding: var(--sp-1) var(--sp-4);
+            background: rgba(16,185,129,0.88);
+            backdrop-filter: blur(12px);
+            border-radius: var(--r-full);
+            font-size: var(--text-xs);
+            font-weight: var(--fw-semi);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.25);
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: var(--sp-2);
+            z-index: 2;
         }
 
         /* Section */
         .section {
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 1.75rem;
-            margin-bottom: 1.25rem;
-            backdrop-filter: blur(10px);
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--r-xl);
+            padding: var(--sp-6);
+            margin-bottom: var(--sp-4);
+            box-shadow: var(--shadow-card);
+            transition: box-shadow var(--dur-base) var(--ease-out);
         }
+
+        .section:hover { box-shadow: var(--shadow-md); }
 
         .section-title {
-            font-size: 1.3rem;
-            font-weight: 700;
-            margin-bottom: 1.25rem;
+            font-size: var(--text-lg);
+            font-weight: var(--fw-semi);
+            margin-bottom: var(--sp-5);
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: var(--sp-2);
+            color: var(--color-text-primary);
+            letter-spacing: -0.01em;
         }
 
-        /* Overview Section */
+        /* Overview Grid */
         .overview-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.25rem;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: var(--sp-4);
         }
 
         .overview-item {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 1.25rem;
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: var(--color-bg-alt);
+            padding: var(--sp-4);
+            border-radius: var(--r-lg);
+            border: 1px solid var(--color-border);
         }
 
         .overview-label {
-            font-size: 0.85rem;
-            color: #94a3b8;
-            margin-bottom: 0.5rem;
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+            margin-bottom: var(--sp-2);
+            font-weight: var(--fw-medium);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
         }
 
         .overview-value {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: #ffffff;
+            font-size: var(--text-xl);
+            font-weight: var(--fw-bold);
+            color: var(--color-text-primary);
         }
 
         .overview-value.price {
-            font-size: 1.8rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-size: var(--text-2xl);
+            background: linear-gradient(135deg, var(--brand-600), var(--violet-500));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
-        /* Location Section */
+        /* Map Section */
         .map-preview {
             width: 100%;
-            height: 200px;
-            background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
-            border-radius: 15px;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #64748b;
-            font-size: 3rem;
+            height: 240px;
+            background: var(--color-bg-alt);
+            border-radius: var(--r-lg);
+            margin-bottom: var(--sp-4);
+            border: 1px solid var(--color-border);
+            overflow: hidden;
         }
 
         .location-address {
             display: flex;
             align-items: flex-start;
-            gap: 0.75rem;
-            margin-bottom: 1rem;
-            color: #cbd5e1;
-            font-size: 1rem;
+            gap: var(--sp-2);
+            margin-bottom: var(--sp-4);
+            color: var(--color-text-secondary);
+            font-size: var(--text-sm);
         }
 
         /* EMI Calculator */
-        .calculator-form {
-            display: flex;
-            flex-direction: column;
-            gap: 1.25rem;
-        }
+        .calculator-form { display: flex; flex-direction: column; gap: var(--sp-4); }
 
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
+        .form-group { display: flex; flex-direction: column; gap: var(--sp-2); }
 
         .form-label {
-            font-size: 0.9rem;
-            color: #cbd5e1;
-            font-weight: 600;
+            font-size: var(--text-sm);
+            color: var(--color-text-secondary);
+            font-weight: var(--fw-medium);
         }
 
-        .form-input,
-        .form-select {
-            padding: 1rem 1.25rem;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 12px;
-            font-size: 0.95rem;
-            color: #ffffff;
-            font-family: 'Outfit', sans-serif;
+        .form-input, .form-select {
+            padding: var(--sp-3) var(--sp-4);
+            background: var(--color-bg-alt);
+            border: 1.5px solid var(--color-border-strong);
+            border-radius: var(--r-lg);
+            font-size: var(--text-sm);
+            color: var(--color-text-primary);
+            font-family: var(--font-sans);
             outline: none;
-            transition: all 0.3s ease;
+            transition: all var(--dur-base) var(--ease-out);
         }
 
-        .form-input::placeholder {
-            color: #64748b;
+        .form-input::placeholder { color: var(--color-text-muted); }
+
+        .form-input:focus, .form-select:focus {
+            background: var(--color-surface);
+            border-color: var(--brand-500);
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
         }
 
-        .form-input:focus,
-        .form-select:focus {
-            background: rgba(255, 255, 255, 0.12);
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
+        .form-select option { background: var(--color-surface); }
 
-        .form-select option {
-            background: #1e293b;
-            color: #ffffff;
-        }
-
-        .helper-text {
-            font-size: 0.8rem;
-            color: #94a3b8;
-        }
+        .helper-text { font-size: var(--text-xs); color: var(--color-text-muted); }
 
         .emi-result {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
-            border: 1px solid rgba(102, 126, 234, 0.3);
-            padding: 1.5rem;
-            border-radius: 15px;
+            background: linear-gradient(135deg, rgba(37,99,235,0.06) 0%, rgba(124,58,237,0.06) 100%);
+            border: 1px solid rgba(37,99,235,0.2);
+            padding: var(--sp-5);
+            border-radius: var(--r-lg);
             text-align: center;
         }
 
-        .emi-label {
-            font-size: 0.9rem;
-            color: #cbd5e1;
-            margin-bottom: 0.5rem;
-        }
+        .emi-label { font-size: var(--text-sm); color: var(--color-text-muted); margin-bottom: var(--sp-2); }
+        .emi-amount { font-size: var(--text-3xl); font-weight: var(--fw-extrabold); color: var(--color-text-primary); letter-spacing: -0.03em; }
 
-        .emi-amount {
-            font-size: 2rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        /* Trust Section */
-        .trust-badges {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
+        /* Trust Badges */
+        .trust-badges { display: flex; gap: var(--sp-3); margin-bottom: var(--sp-3); flex-wrap: wrap; }
 
         .badge {
-            padding: 0.75rem 1.25rem;
-            border-radius: 12px;
-            font-size: 0.9rem;
-            font-weight: 600;
+            padding: var(--sp-2) var(--sp-4);
+            border-radius: var(--r-md);
+            font-size: var(--text-xs);
+            font-weight: var(--fw-semi);
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: var(--sp-2);
         }
 
         .badge-verified {
-            background: linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(22, 163, 74, 0.2) 100%);
-            border: 1px solid rgba(34, 197, 94, 0.4);
-            color: #86efac;
+            background: rgba(16,185,129,0.1);
+            border: 1px solid rgba(16,185,129,0.3);
+            color: var(--emerald-600);
         }
 
         .badge-review {
-            background: linear-gradient(135deg, rgba(251, 191, 36, 0.2) 0%, rgba(245, 158, 11, 0.2) 100%);
-            border: 1px solid rgba(251, 191, 36, 0.4);
-            color: #fde047;
+            background: rgba(245,158,11,0.1);
+            border: 1px solid rgba(245,158,11,0.3);
+            color: #92400e;
         }
 
-        /* Contact Section */
+        /* Contact Buttons */
         .contact-buttons {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: var(--sp-3);
+            margin-bottom: var(--sp-4);
         }
 
         .btn {
-            padding: 1.1rem 1.5rem;
-            border-radius: 15px;
-            font-size: 1rem;
-            font-weight: 700;
+            padding: var(--sp-3) var(--sp-5);
+            border-radius: var(--r-lg);
+            font-size: var(--text-sm);
+            font-weight: var(--fw-semi);
             cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: 'Outfit', sans-serif;
+            transition: all var(--dur-base) var(--ease-out);
+            font-family: var(--font-sans);
             border: none;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.75rem;
+            gap: var(--sp-2);
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #ffffff;
+            background: linear-gradient(135deg, var(--brand-600) 0%, var(--brand-700) 100%);
+            color: #fff;
+            box-shadow: var(--shadow-sm), var(--shadow-glow-brand);
         }
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
-        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: var(--shadow-md), var(--shadow-glow-brand); }
 
         .btn-whatsapp {
             background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
-            color: #ffffff;
+            color: #fff;
+            box-shadow: var(--shadow-sm);
         }
-
-        .btn-whatsapp:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(37, 211, 102, 0.4);
-        }
+        .btn-whatsapp:hover { transform: translateY(-2px); box-shadow: var(--shadow-md), 0 4px 16px rgba(37,211,102,0.35); }
 
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: #e2e8f0;
+            background: var(--color-bg-alt);
+            border: 1px solid var(--color-border-strong);
+            color: var(--color-text-secondary);
         }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.12);
-            transform: translateY(-2px);
-        }
+        .btn-secondary:hover { background: var(--color-surface); transform: translateY(-1px); border-color: var(--color-border-strong); }
 
         .contact-note {
-            background: rgba(251, 191, 36, 0.1);
-            border: 1px solid rgba(251, 191, 36, 0.2);
-            padding: 1rem;
-            border-radius: 12px;
-            font-size: 0.85rem;
-            color: #fde047;
+            background: rgba(245,158,11,0.08);
+            border: 1px solid rgba(245,158,11,0.2);
+            padding: var(--sp-3) var(--sp-4);
+            border-radius: var(--r-lg);
+            font-size: var(--text-xs);
+            color: #92400e;
             display: flex;
             align-items: flex-start;
-            gap: 0.75rem;
+            gap: var(--sp-2);
         }
 
         @media (max-width: 640px) {
-            .overview-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .contact-buttons {
-                grid-template-columns: 1fr;
-            }
+            .overview-grid { grid-template-columns: 1fr; }
+            .contact-buttons { grid-template-columns: 1fr; }
+            .image-gallery { height: 240px; }
         }
     </style>
     <!-- Premium Smooth Scroll -->
@@ -351,11 +319,9 @@
 
     <div class="container">
         <!-- Back Button -->
-        <div style="margin-bottom:1rem;">
-            <button onclick="window.history.back()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#e2e8f0;padding:0.6rem 1.2rem;border-radius:12px;font-size:0.9rem;font-family:'Outfit',sans-serif;cursor:pointer;display:flex;align-items:center;gap:0.5rem;transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.14)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">
-                &larr; Back
-            </button>
-        </div>
+        <button class="back-btn" onclick="window.history.back()">
+            ← Back
+        </button>
 
         <!-- Image Gallery -->
         <div class="image-gallery" id="imageGallery">
@@ -366,7 +332,7 @@
 
         <!-- 🏷 Overview Section -->
         <div class="section">
-            <h1 id="property-title" style="font-size:1.5rem;font-weight:700;margin-bottom:1.25rem;color:#f8fafc;line-height:1.3;">Loading...</h1>
+            <h1 id="property-title" style="font-size:1.5rem;font-weight:700;margin-bottom:1.25rem;color:var(--color-text-primary);line-height:1.3;">Loading...</h1>
             <h2 class="section-title">🏷 Property Overview</h2>
             <div class="overview-grid">
                 <div class="overview-item">
@@ -387,7 +353,7 @@
         <!-- 📍 Location Section -->
         <div class="section">
             <h2 class="section-title">📍 Property Location</h2>
-            <div class="map-preview" id="detailMap" style="height: 250px; border-radius: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.12); position: relative; z-index: 1;"></div>
+            <div class="map-preview" id="detailMap" style="height: 250px; position: relative; z-index: 1;"></div>
             <div class="location-address">
                 <span>📍</span>
                 <span id="location-address">Alambagh, Lucknow - Easy access to main roads and public transport</span>

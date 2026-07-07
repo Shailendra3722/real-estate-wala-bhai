@@ -41,6 +41,7 @@ const ApiConfig = {
         getPropertyById: (id) => `/api/properties/${id}`,
         getNearbyProperties: '/api/properties/nearby',
         searchProperties: '/api/properties/search',
+        createProperty: '/api/properties',
 
         // Contact
         submitContact: '/api/contact',

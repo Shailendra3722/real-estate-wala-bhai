@@ -1,14 +1,15 @@
 /**
  * Real Estate Wala Bhai - API Service Layer for Properties
- * 
- * This module provides centralized property data access through backend API.
- * Features: Caching, error handling, fallback to static data, utility functions.
+ *
+ * Provides centralized property data access through the backend API.
+ * Features: Caching, error handling, fallback to static data, full CRUD.
  */
 
 const PropertiesData = (function () {
     'use strict';
 
-    // Verification status constants
+    // ── Constants ──────────────────────────────────────────────────────────────
+
     const VERIFICATION_STATUS = {
         PENDING: 'pending',
         VERIFIED: 'verified',
@@ -17,47 +18,104 @@ const PropertiesData = (function () {
         UNDER_REVIEW: 'under_review'
     };
 
-    // Property types
     const PROPERTY_TYPES = {
-        FLAT: 'flat',
-        HOUSE: 'house',
-        VILLA: 'villa',
-        PLOT: 'plot',
-        COMMERCIAL: 'commercial'
+        FLAT: 'flat', HOUSE: 'house', VILLA: 'villa', PLOT: 'plot', COMMERCIAL: 'commercial'
     };
 
-    // Listing types
-    const LISTING_TYPES = {
-        SELL: 'sell',
-        RENT: 'rent'
-    };
+    const LISTING_TYPES = { SELL: 'sell', RENT: 'rent' };
 
-    // Cache configuration
-    const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-    let propertiesCache = {
-        data: null,
-        timestamp: null
-    };
+    // ── Cache ──────────────────────────────────────────────────────────────────
 
-    // ==================== API METHODS ====================
+    const CACHE_DURATION = 3 * 60 * 1000; // 3 minutes (shorter for live feel)
+    let propertiesCache = { data: null, timestamp: null };
 
-    /**
-     * Check if cache is still valid
-     */
     function isCacheValid() {
-        if (!propertiesCache.data || !propertiesCache.timestamp) {
-            return false;
-        }
-        const now = Date.now();
-        return (now - propertiesCache.timestamp) < CACHE_DURATION;
+        if (!propertiesCache.data || !propertiesCache.timestamp) return false;
+        return (Date.now() - propertiesCache.timestamp) < CACHE_DURATION;
     }
 
+    function setCache(data) {
+        propertiesCache = { data, timestamp: Date.now() };
+    }
+
+    function clearCache() {
+        propertiesCache = { data: null, timestamp: null };
+        console.log('🗑️ Properties cache cleared');
+    }
+
+    // ── Transform ──────────────────────────────────────────────────────────────
+
     /**
-     * Fetch all properties from API
-     * @returns {Promise<Array>} Properties array
+     * Transform an API property response to the canonical frontend shape.
+     * Handles both flat (from in-memory) and nested (from PostgreSQL) formats.
+     */
+    function transformApiProperty(p) {
+        // Resolve images
+        let images = p.images || [];
+        if (typeof images === 'string') { try { images = JSON.parse(images); } catch { images = []; } }
+
+        // Resolve amenities
+        let amenities = p.amenities || [];
+        if (typeof amenities === 'string') { try { amenities = JSON.parse(amenities); } catch { amenities = []; } }
+
+        return {
+            id: p.id,
+            title: p.title || '',
+            description: p.description || '',
+            price: p.price || 0,
+            priceFormatted: p.priceFormatted || formatPrice(p.price, p.listingType),
+            bhk: p.bhk,
+            bedrooms: p.bedrooms || parseInt(String(p.bhk || '1')) || 1,
+            bathrooms: p.bathrooms || 0,
+            sqft: p.sqft || 0,
+            furnishing: p.furnishing || 'unfurnished',
+            parking: p.parking || 'no',
+
+            // Location (flat fields — most reliable for the home page)
+            address: p.address || p.location?.address || '',
+            city: p.city || p.location?.city || '',
+            area: p.area || p.location?.area || '',
+            state: p.state || p.location?.state || '',
+            country: p.country || p.location?.country || 'India',
+            pincode: p.pincode || p.location?.pincode || '',
+            latitude: parseFloat(p.latitude || p.location?.latitude) || 0,
+            longitude: parseFloat(p.longitude || p.location?.longitude) || 0,
+
+            // Media
+            images,
+            featuredImage: p.featuredImage || (images.length > 0 ? images[0] : null),
+
+            // Amenities
+            amenities,
+
+            // Owner / Agent
+            ownerId: p.ownerId || p.owner?.id || '',
+            ownerPhone: p.ownerPhone || p.owner?.phone || '',
+            ownerEmail: p.ownerEmail || p.owner?.email || '',
+            agentName: p.agentName || p.owner?.name || p.ownerName || 'Seller',
+            owner: p.owner || { name: p.ownerName || p.agentName || 'Seller', phone: p.ownerPhone || '', email: p.ownerEmail || '' },
+
+            // Status / Meta
+            verificationStatus: p.verificationStatus || 'under_review',
+            isVerified: p.isVerified || p.verificationStatus === 'verified',
+            propertyType: p.propertyType || 'flat',
+            listingType: p.listingType || 'sell',
+            isFeatured: p.isFeatured || p.featured || false,
+            status: p.status || 'active',
+            yearBuilt: p.yearBuilt,
+            featured: p.isFeatured || p.featured || false,
+            viewCount: p.viewCount || 0,
+            contactCount: p.contactCount || 0,
+            createdAt: p.createdAt ? new Date(p.createdAt) : new Date(),
+        };
+    }
+
+    // ── Fetch / GET methods ────────────────────────────────────────────────────
+
+    /**
+     * Fetch all properties from the API (with caching + static fallback).
      */
     async function fetchAllProperties() {
-        // Return cached data if valid
         if (isCacheValid()) {
             console.log('📦 Returning cached properties');
             return propertiesCache.data;
@@ -65,303 +123,208 @@ const PropertiesData = (function () {
 
         try {
             console.log('🌐 Fetching properties from API...');
-            const response = await ApiConfig.get(ApiConfig.endpoints.getAllProperties);
+            const response = await ApiConfig.get(ApiConfig.endpoints.getAllProperties, { limit: 100 });
 
             if (response.success && response.properties) {
-                // Transform API response to match frontend format
                 const properties = response.properties.map(transformApiProperty);
-
-                // Update cache
-                propertiesCache = {
-                    data: properties,
-                    timestamp: Date.now()
-                };
-
+                setCache(properties);
                 console.log(`✅ Loaded ${properties.length} properties from API`);
                 return properties;
-            } else {
-                throw new Error('Invalid API response format');
             }
-        } catch (error) {
-            console.error('❌ Failed to fetch properties from API:', error);
+            throw new Error('Invalid API response format');
 
-            // Fallback to static data from REAL_LISTINGS (loaded via real-listings-data.js)
+        } catch (error) {
+            console.error('❌ Failed to fetch from API:', error);
+
+            // Fallback: static REAL_LISTINGS
             if (typeof window !== 'undefined' && window.REAL_LISTINGS && window.REAL_LISTINGS.length > 0) {
-                console.warn('⚠️ Using fallback: static REAL_LISTINGS data');
-                const fallbackData = window.REAL_LISTINGS.map(p => ({
-                    id: p.id,
-                    title: p.title,
-                    description: p.description,
-                    price: p.price,
-                    bhk: p.bhk,
-                    sqft: p.sqft,
-                    address: p.address,
-                    city: p.city,
-                    area: p.area,
-                    pincode: p.pincode,
-                    latitude: p.latitude,
-                    longitude: p.longitude,
-                    ownerId: p.owner?.id,
-                    ownerPhone: p.owner?.phone,
-                    agentName: p.owner?.name,
-                    verificationStatus: p.verificationStatus,
-                    propertyType: p.propertyType,
-                    listingType: p.listingType,
-                    furnishing: p.furnishing,
-                    bathrooms: p.bathrooms,
-                    images: p.images || [],
-                    amenities: p.amenities || [],
-                    yearBuilt: p.yearBuilt,
-                    featured: p.isFeatured || false,
-                    createdAt: p.createdAt ? new Date(p.createdAt) : new Date(),
-                    viewCount: p.viewCount || 0,
-                    contactCount: p.contactCount || 0
-                }));
-                propertiesCache = { data: fallbackData, timestamp: Date.now() };
-                console.log(`✅ Loaded ${fallbackData.length} properties from static fallback`);
-                return fallbackData;
+                console.warn('⚠️ Falling back to static REAL_LISTINGS data');
+                const fallback = window.REAL_LISTINGS.map(transformApiProperty);
+                setCache(fallback);
+                return fallback;
             }
 
-            console.warn('⚠️ No fallback data available, returning empty array');
+            // Fallback: previously cached data (stale but better than nothing)
+            if (propertiesCache.data) {
+                console.warn('⚠️ Using stale cache as fallback');
+                return propertiesCache.data;
+            }
+
+            console.warn('⚠️ No fallback data available');
             return [];
         }
     }
 
-    /**
-     * Transform API property to frontend format
-     */
-    function transformApiProperty(apiProp) {
-        return {
-            id: apiProp.id,
-            title: apiProp.title,
-            description: apiProp.description,
-            price: apiProp.price,
-            bhk: apiProp.bhk,
-            sqft: apiProp.sqft,
-            address: apiProp.location?.address || apiProp.address,
-            city: apiProp.location?.city || apiProp.city,
-            area: apiProp.location?.area || apiProp.area,
-            pincode: apiProp.location?.pincode,
-            latitude: apiProp.location?.latitude || apiProp.latitude,
-            longitude: apiProp.location?.longitude || apiProp.longitude,
-            ownerId: apiProp.owner?.id,
-            ownerPhone: apiProp.owner?.phone,
-            agentName: apiProp.owner?.name,
-            verificationStatus: apiProp.verificationStatus,
-            propertyType: apiProp.propertyType,
-            listingType: apiProp.listingType,
-            furnishing: apiProp.furnishing,
-            bathrooms: apiProp.bathrooms,
-            images: apiProp.images || [],
-            amenities: apiProp.amenities || [],
-            yearBuilt: apiProp.yearBuilt,
-            featured: apiProp.isFeatured || apiProp.featured || false,
-            createdAt: apiProp.createdAt ? new Date(apiProp.createdAt) : new Date(),
-            viewCount: apiProp.viewCount || 0,
-            contactCount: apiProp.contactCount || 0
-        };
-    }
-
-    /**
-     * Fetch property by ID from API
-     * @param {string} propertyId - Property ID
-     * @returns {Promise<Object|null>} Property object or null
-     */
-    async function fetchPropertyById(propertyId) {
-        try {
-            console.log(`🔍 Fetching property ${propertyId} from API...`);
-            const response = await ApiConfig.get(ApiConfig.endpoints.getPropertyById(propertyId));
-
-            if (response.success && response.property) {
-                return transformApiProperty(response.property);
-            } else {
-                throw new Error('Property not found');
-            }
-        } catch (error) {
-            console.error(`❌ Failed to fetch property ${propertyId}:`, error);
-            return null;
-        }
-    }
-
-    /**
-     * Search properties via API
-     * @param {string} query - Search query
-     * @returns {Promise<Array>} Matching properties
-     */
-    async function fetchSearchResults(query) {
-        try {
-            // For now, fetch all and filter client-side
-            // Can be optimized to use backend search endpoint later
-            const allProperties = await fetchAllProperties();
-            const lowerQuery = query.toLowerCase();
-
-            return allProperties.filter(prop =>
-                prop.title.toLowerCase().includes(lowerQuery) ||
-                prop.address.toLowerCase().includes(lowerQuery) ||
-                prop.area.toLowerCase().includes(lowerQuery) ||
-                prop.city.toLowerCase().includes(lowerQuery)
-            );
-        } catch (error) {
-            console.error('❌ Search failed:', error);
-            return [];
-        }
-    }
-
-    // ==================== GETTER METHODS ====================
-
-    /**
-     * Get all properties
-     * @returns {Promise<Array>} All properties
-     */
     async function getAllProperties() {
         return await fetchAllProperties();
     }
 
-    /**
-     * Get property by ID
-     * @param {string} propertyId - Property ID
-     * @returns {Promise<Object|null>} Property object or null if not found
-     */
     async function getPropertyById(propertyId) {
-        // Try to get from cache first
+        // Try cache first
         if (isCacheValid() && propertiesCache.data) {
-            const cached = propertiesCache.data.find(p => p.id === propertyId);
-            if (cached) {
-                console.log('📦 Returning cached property:', propertyId);
-                return cached;
-            }
+            const cached = propertiesCache.data.find(p => String(p.id) === String(propertyId));
+            if (cached) return cached;
         }
-
-        // Fetch from API
-        return await fetchPropertyById(propertyId);
+        // Fetch directly from API
+        try {
+            const response = await ApiConfig.get(ApiConfig.endpoints.getPropertyById(propertyId));
+            if (response.success && response.property) return transformApiProperty(response.property);
+        } catch (e) {
+            console.error(`❌ Failed to fetch property ${propertyId}:`, e);
+        }
+        return null;
     }
 
-    /**
-     * Get verified properties only
-     * @returns {Promise<Array>} Verified properties
-     */
     async function getVerifiedProperties() {
-        const allProperties = await fetchAllProperties();
-        return allProperties.filter(prop => prop.verificationStatus === VERIFICATION_STATUS.VERIFIED);
+        const all = await fetchAllProperties();
+        return all.filter(p => p.verificationStatus === VERIFICATION_STATUS.VERIFIED);
     }
 
     /**
-     * Get properties by listing type (sell/rent)
-     * @param {string} listingType - Listing type
-     * @returns {Promise<Array>} Properties matching listing type
+     * Get properties by listing type. Includes ALL active listings (not just verified)
+     * so user-submitted properties appear immediately without requiring admin verification.
      */
     async function getPropertiesByType(listingType) {
-        const allProperties = await fetchAllProperties();
-        return allProperties.filter(prop =>
-            prop.listingType === listingType &&
-            prop.verificationStatus === VERIFICATION_STATUS.VERIFIED
-        );
+        const all = await fetchAllProperties();
+        return all.filter(p => p.listingType === listingType);
     }
 
+    async function getPropertiesByCity(city) {
+        const all = await fetchAllProperties();
+        return all.filter(p => (p.city || '').toLowerCase() === city.toLowerCase());
+    }
+
+    async function getPropertiesByArea(area) {
+        const all = await fetchAllProperties();
+        return all.filter(p => (p.area || '').toLowerCase().includes(area.toLowerCase()));
+    }
+
+    // ── Search ─────────────────────────────────────────────────────────────────
+
     /**
-     * Search properties by query
-     * @param {string} query - Search query
-     * @returns {Promise<Array>} Matching properties
+     * Simple full-text client-side search (used by the home page search bar).
      */
     async function searchProperties(query) {
-        return await fetchSearchResults(query);
-    }
-
-    /**
-     * Get properties by city
-     * @param {string} city - City name
-     * @returns {Promise<Array>} Properties in the city
-     */
-    async function getPropertiesByCity(city) {
-        const allProperties = await fetchAllProperties();
-        return allProperties.filter(prop =>
-            prop.city.toLowerCase() === city.toLowerCase()
+        const all = await fetchAllProperties();
+        const q = query.toLowerCase();
+        return all.filter(p =>
+            (p.title || '').toLowerCase().includes(q) ||
+            (p.address || '').toLowerCase().includes(q) ||
+            (p.area || '').toLowerCase().includes(q) ||
+            (p.city || '').toLowerCase().includes(q) ||
+            (p.state || '').toLowerCase().includes(q) ||
+            (p.description || '').toLowerCase().includes(q)
         );
     }
 
     /**
-     * Get properties by area
-     * @param {string} area - Area/locality name
-     * @returns {Promise<Array>} Properties in the area
+     * Advanced server-side search with filters (used by filter panel).
      */
-    async function getPropertiesByArea(area) {
-        const allProperties = await fetchAllProperties();
-        return allProperties.filter(prop =>
-            prop.area.toLowerCase().includes(area.toLowerCase())
-        );
+    async function searchPropertiesAdvanced(filters) {
+        try {
+            clearCache(); // Ensure fresh results after filter
+            const response = await ApiConfig.post(ApiConfig.endpoints.searchProperties, filters);
+            if (response.success && response.properties) {
+                return response.properties.map(transformApiProperty);
+            }
+        } catch (e) {
+            console.error('❌ Advanced search failed, falling back to client-side filter:', e);
+        }
+        // Client-side fallback
+        const all = await fetchAllProperties();
+        return applyFiltersClientSide(all, filters);
     }
 
-    // ==================== UTILITY METHODS ====================
+    function applyFiltersClientSide(properties, filters) {
+        let results = [...properties];
+        if (filters.query) {
+            const q = filters.query.toLowerCase();
+            results = results.filter(p =>
+                (p.title || '').toLowerCase().includes(q) ||
+                (p.city || '').toLowerCase().includes(q) ||
+                (p.area || '').toLowerCase().includes(q)
+            );
+        }
+        if (filters.city && filters.city !== 'all') results = results.filter(p => p.city === filters.city);
+        if (filters.listingType) results = results.filter(p => p.listingType === filters.listingType);
+        if (filters.propertyType && filters.propertyType !== 'all') results = results.filter(p => p.propertyType === filters.propertyType);
+        if (filters.minPrice) results = results.filter(p => p.price >= Number(filters.minPrice));
+        if (filters.maxPrice) results = results.filter(p => p.price <= Number(filters.maxPrice));
+        if (filters.bedrooms) results = results.filter(p => (p.bedrooms || 0) >= parseInt(filters.bedrooms));
+        if (filters.bathrooms) results = results.filter(p => (p.bathrooms || 0) >= parseInt(filters.bathrooms));
+        if (filters.amenities && filters.amenities.length > 0) {
+            results = results.filter(p => filters.amenities.every(a => (p.amenities || []).includes(a)));
+        }
+        return results;
+    }
+
+    // ── CREATE ─────────────────────────────────────────────────────────────────
 
     /**
-     * Calculate distance between two coordinates (Haversine formula)
+     * Submit a new property to the backend API.
+     * Invalidates cache on success so the home page re-fetches immediately.
+     * @param {Object} propertyData - Full property payload from the form
+     * @returns {Promise<Object>} The created property from the server
      */
+    async function createProperty(propertyData) {
+        console.log('📤 Submitting property to API...', propertyData);
+        const response = await ApiConfig.post(ApiConfig.endpoints.createProperty, {
+            ...propertyData,
+            _clientTimestamp: Date.now()
+        });
+
+        if (response.success && response.property) {
+            const created = transformApiProperty(response.property);
+
+            // Immediately inject into cache so the home page shows it without a re-fetch
+            clearCache();
+
+            console.log('✅ Property created:', created.id);
+            return created;
+        }
+        throw new Error(response.error || response.message || 'Failed to create property');
+    }
+
+    // ── Utilities ──────────────────────────────────────────────────────────────
+
     function calculateDistance(lat1, lng1, lat2, lng2) {
-        const R = 6371; // Earth's radius in km
+        const R = 6371;
         const dLat = toRad(lat2 - lat1);
         const dLng = toRad(lng2 - lng1);
-
-        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-            Math.sin(dLng / 2) * Math.sin(dLng / 2);
-
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c;
+        const a = Math.sin(dLat / 2) ** 2 +
+            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     }
 
-    function toRad(degrees) {
-        return degrees * (Math.PI / 180);
-    }
+    function toRad(degrees) { return degrees * (Math.PI / 180); }
 
-    /**
-     * Format price for display
-     */
     function formatPrice(price, listingType = 'sell') {
-        if (listingType === 'rent') {
-            return `₹${price.toLocaleString('en-IN')}/month`;
-        }
-
-        if (price >= 10000000) {
-            return `₹${(price / 10000000).toFixed(2)} Cr`;
-        } else if (price >= 100000) {
-            return `₹${(price / 100000).toFixed(2)} Lakh`;
-        } else {
-            return `₹${price.toLocaleString('en-IN')}`;
-        }
+        if (!price) return '₹0';
+        const suffix = listingType === 'rent' ? '/month' : '';
+        if (price >= 10000000) return `₹${(price / 10000000).toFixed(2)} Cr${suffix}`;
+        if (price >= 100000)   return `₹${(price / 100000).toFixed(2)} Lakh${suffix}`;
+        return `₹${price.toLocaleString('en-IN')}${suffix}`;
     }
 
-    /**
-     * Get verification status badge info
-     */
     function getVerificationBadge(status) {
         const badges = {
-            [VERIFICATION_STATUS.VERIFIED]: { text: '✓ Verified', color: '#22c55e' },
-            [VERIFICATION_STATUS.PENDING]: { text: '⏳ Pending', color: '#fbbf24' },
-            [VERIFICATION_STATUS.IN_PROGRESS]: { text: '🔄 In Progress', color: '#3b82f6' },
-            [VERIFICATION_STATUS.REJECTED]: { text: '✗ Rejected', color: '#ef4444' }
+            [VERIFICATION_STATUS.VERIFIED]:    { text: '✓ Verified',    color: '#22c55e' },
+            [VERIFICATION_STATUS.PENDING]:     { text: '⏳ Pending',    color: '#fbbf24' },
+            [VERIFICATION_STATUS.IN_PROGRESS]: { text: '🔄 In Progress',color: '#3b82f6' },
+            [VERIFICATION_STATUS.UNDER_REVIEW]:{ text: '👁 Under Review',color: '#f59e0b' },
+            [VERIFICATION_STATUS.REJECTED]:    { text: '✗ Rejected',    color: '#ef4444' }
         };
-        return badges[status] || badges[VERIFICATION_STATUS.PENDING];
+        return badges[status] || badges[VERIFICATION_STATUS.UNDER_REVIEW];
     }
 
-    /**
-     * Clear cache (useful for refresh)
-     */
-    function clearCache() {
-        propertiesCache = {
-            data: null,
-            timestamp: null
-        };
-        console.log('🗑️ Properties cache cleared');
-    }
+    // ── Public API ─────────────────────────────────────────────────────────────
 
-    // Public API
     return {
-        // Constants
         VERIFICATION_STATUS,
         PROPERTY_TYPES,
         LISTING_TYPES,
 
-        // Async Getters (all return Promises)
+        // Getters
         getAllProperties,
         getPropertyById,
         getVerifiedProperties,
@@ -371,16 +334,19 @@ const PropertiesData = (function () {
 
         // Search
         searchProperties,
+        searchPropertiesAdvanced,
+
+        // Create
+        createProperty,
 
         // Utilities
         calculateDistance,
         formatPrice,
         getVerificationBadge,
-        clearCache
+        clearCache,
+        applyFiltersClientSide,
     };
 })();
 
-// Make it available globally
 window.PropertiesData = PropertiesData;
-
 console.log('✅ PropertiesData API Service initialized');

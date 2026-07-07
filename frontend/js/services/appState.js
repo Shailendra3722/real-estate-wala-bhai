@@ -143,6 +143,25 @@ const AppState = (function () {
     }
 
     /**
+     * Get current user email
+     */
+    function getUserEmail() {
+        const user = getUser();
+        return user ? user.email : null;
+    }
+
+    /**
+     * Update user verification status
+     */
+    function updateUserVerification(verificationData) {
+        return updateUser({
+            verificationStatus: verificationData.status,
+            trustScore: verificationData.trustScore,
+            isVerified: verificationData.status === 'approved'
+        });
+    }
+
+    /**
      * Clear user data (logout)
      */
     function clearUser() {
@@ -398,7 +417,9 @@ const AppState = (function () {
         // User management
         setUser,
         getUser,
+        getUserEmail,
         updateUser,
+        updateUserVerification,
         clearUser,
         isLoggedIn,
 

@@ -8,6 +8,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/verification-badge.css">
+    <!-- App State & Verification Service -->
+    <script src="../js/services/appState.js"></script>
+    <script src="../js/services/verificationService.js"></script>
     <style>
         * {
             margin: 0;
@@ -682,7 +685,14 @@
             setTimeout(function() {
                 submitBtn.innerHTML = 'Cross-checking Govt Databases... 🔒';
                 
-                setTimeout(function() {
+                setTimeout(async function() {
+                    const userId = AppState.getUserEmail() || 'user_demo';
+                    await VerificationService.submitVerification(userId, {
+                        idType: type,
+                        idNumber: docVal,
+                        photoFront: selectedFile ? selectedFile.name : 'id_photo.jpg'
+                    });
+
                     form.style.display = 'none';
                     successMessage.classList.add('active');
     
