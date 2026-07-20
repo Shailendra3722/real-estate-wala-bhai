@@ -1,5 +1,5 @@
 /**
- * Seed Script - Migrate Initial Properties to Neon Database
+ * Seed Script - Migrate Initial Properties to MongoDB
  * Run this once to populate the database with initial 8 properties
  */
 
@@ -69,52 +69,37 @@ async function seed() {
         for (const prop of INITIAL_PROPERTIES) {
             console.log(`Inserting: ${prop.title}...`);
 
-            await db.query(`
-                INSERT INTO properties (
-                    id, title, description, property_type, listing_type,
-                    bhk, bathrooms, sqft, furnishing, price,
-                    latitude, longitude, address, city, area, pincode,
-                    amenities, images, year_built, verification_status,
-                    is_featured, owner_name, owner_phone, owner_email,
-                    owner_verified
-                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25)
-                ON CONFLICT (id) DO NOTHING
-            `, [
-                prop.id,
-                prop.title,
-                prop.description,
-                prop.propertyType,
-                prop.listingType,
-                prop.bhk,
-                prop.bathrooms,
-                prop.sqft,
-                prop.furnishing,
-                prop.price,
-                prop.latitude,
-                prop.longitude,
-                prop.address,
-                prop.city,
-                prop.area,
-                prop.pincode,
-                JSON.stringify(prop.amenities),
-                JSON.stringify(prop.images),
-                prop.yearBuilt,
-                prop.verificationStatus,
-                prop.isFeatured,
-                prop.ownerName,
-                prop.ownerPhone,
-                prop.ownerEmail,
-                true
-            ]);
+            const properties = await db.getCollection('properties');
+            await properties.updateOne(
+                { id: prop.id },
+                {
+                    $setOnInsert: {
+                        ...prop,
+                        locationPoint: {
+                            type: 'Point',
+                            coordinates: [prop.longitude, prop.latitude],
+                        },
+                        status: 'active',
+                        ownerVerified: true,
+                        viewCount: 0,
+                        contactCount: 0,
+                        createdAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString(),
+                    },
+                },
+                { upsert: true }
+            );
         }
 
         console.log('\n✅ Seed completed successfully!');
         console.log(`📊 Inserted ${INITIAL_PROPERTIES.length} properties`);
 
         // Verify
-        const result = await db.query('SELECT COUNT(*) FROM properties');
-        console.log(`🔍 Total properties in database: ${result.rows[0].count}`);
+        const properties = await db.getCollection('properties');
+        const count = await properties.countDocuments();
+        console.log(`🔍 Total properties in database: ${count}`);
 
+        await db.close();
         process.exit(0);
     } catch (error) {
         console.error('\n❌ Seed failed:', error);

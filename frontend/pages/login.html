@@ -4,385 +4,417 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Real Estate Wala Bhai</title>
-    <meta name="description" content="Sign in to Real Estate Wala Bhai to explore verified properties across India.">
-    <meta property="og:title" content="Login - Real Estate Wala Bhai">
-    <meta property="og:description" content="Sign in to explore verified properties across India. Buy, Sell, Rent.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://real-estate-app.vercel.app/login.html">
-    <meta property="og:image" content="https://real-estate-app.vercel.app/og-image.png">
-    <meta name="twitter:card" content="summary_large_image">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏡</text></svg>">
+    
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700&display=swap" rel="stylesheet">
-    <!-- Global App State -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Global App State & Firebase -->
     <script src="../js/services/appState.js"></script>
-    <!-- API Config & Auth Service -->
     <script src="../js/api/apiConfig.js"></script>
     <script src="../js/services/firebaseService.js"></script>
-    <!-- Premium 2026 Design System -->
-    <link rel="stylesheet" href="../css/premium-design-system.css">
-    <style>
-        /* ===== LOGIN PAGE - PREMIUM 2026 ===== */
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    <!-- Luxury CSS -->
+    <link rel="stylesheet" href="../css/luxury-ultra-premium.css">
+    <link rel="stylesheet" href="../css/loading-animation.css">
+    <script src="../js/utils/loadingAnimation.js"></script>
 
-        body {
-            font-family: var(--font-sans);
+    <style id="lux-critical">
+        html, body {
+            margin: 0 !important; padding: 0 !important;
+            background: #161312 !important;
+            overflow-x: hidden !important;
             min-height: 100vh;
+        }
+    </style>
+
+    <style>
+        /* Split Screen Layout */
+        .auth-split {
+            display: flex;
+            min-height: 100vh;
+            width: 100vw;
+        }
+
+        /* Left Side: Cinematic Background */
+        .auth-hero {
+            flex: 1.2;
+            position: relative;
+            background: url('../assets/luxury-hero-v2.jpg') center/cover no-repeat;
+            display: flex;
+            align-items: flex-end;
+            padding: var(--sp-16);
+        }
+        
+        .auth-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to right, rgba(22,19,18,0.2) 0%, #161312 100%),
+                        linear-gradient(to top, rgba(22,19,18,0.8) 0%, transparent 50%);
+        }
+
+        .auth-hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 600px;
+        }
+
+        .auth-hero-title {
+            font-family: var(--font-editorial);
+            font-size: 4rem;
+            color: var(--lux-gold-light);
+            line-height: 1.1;
+            margin-bottom: var(--sp-4);
+            text-shadow: 0 4px 24px rgba(0,0,0,0.4);
+        }
+        
+        .auth-hero-subtitle {
+            font-family: var(--font-sans);
+            font-size: 1.1rem;
+            color: var(--color-text-secondary);
+            font-weight: 300;
+            line-height: 1.6;
+        }
+
+        /* Right Side: Glass Login Panel */
+        .auth-panel-wrapper {
+            flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: var(--sp-6) var(--sp-4);
-            background: var(--color-bg);
-            overflow-x: hidden;
+            background: #161312;
+            padding: var(--sp-10);
             position: relative;
         }
 
-        /* Subtle mesh gradient background */
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background: radial-gradient(ellipse 80% 50% at 20% -20%, rgba(37,99,235,0.08) 0%, transparent 60%),
-                        radial-gradient(ellipse 80% 50% at 80% 120%, rgba(124,58,237,0.07) 0%, transparent 60%);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .gradient-bg { display: none; }
-        .particles   { display: none; }
-
-        .login-container {
-            position: relative;
-            z-index: 10;
+        .auth-panel {
             width: 100%;
             max-width: 440px;
-        }
-
-        .login-card {
             background: var(--color-surface);
             border-radius: var(--r-2xl);
             border: 1px solid var(--color-border);
-            box-shadow: var(--shadow-2xl), 0 0 0 1px rgba(255,255,255,0.7) inset;
-            padding: var(--sp-10) var(--sp-8);
-            animation: scaleIn 0.4s var(--ease-spring) both;
+            padding: var(--sp-12) var(--sp-10);
+            box-shadow: var(--shadow-2xl);
+            position: relative;
         }
 
-        @keyframes scaleIn {
-            from { opacity: 0; transform: scale(0.94) translateY(12px); }
-            to   { opacity: 1; transform: scale(1)    translateY(0);     }
+        /* Ambient Glow Behind Panel */
+        .auth-panel::before {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120%; height: 120%;
+            background: radial-gradient(circle, var(--color-accent) 0%, transparent 60%);
+            opacity: 0.05;
+            z-index: -1;
+            pointer-events: none;
         }
 
-        .logo-section {
+        .auth-header {
             text-align: center;
             margin-bottom: var(--sp-8);
         }
 
-        .logo-icon {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 64px;
-            height: 64px;
-            background: linear-gradient(135deg, var(--brand-600), var(--violet-500));
-            border-radius: var(--r-xl);
-            font-size: 1.8rem;
-            margin-bottom: var(--sp-5);
-            box-shadow: var(--shadow-md), var(--shadow-glow-brand);
-            animation: float 4s ease-in-out infinite;
+        .auth-logo {
+            font-size: 2.5rem;
+            margin-bottom: var(--sp-4);
+            display: inline-block;
+            filter: drop-shadow(0 4px 12px rgba(200,155,90,0.3));
         }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50%       { transform: translateY(-6px); }
-        }
-
-        .welcome-title {
-            font-size: var(--text-3xl);
-            font-weight: var(--fw-bold);
+        .auth-title {
+            font-family: var(--font-editorial);
+            font-size: 2.5rem;
             color: var(--color-text-primary);
-            letter-spacing: -0.03em;
             margin-bottom: var(--sp-2);
         }
 
-        .welcome-subtitle {
-            font-size: var(--text-sm);
-            color: var(--color-text-muted);
-            line-height: 1.6;
-        }
-
-        .auth-form {
-            display: flex;
-            flex-direction: column;
-            gap: var(--sp-4);
-        }
-
+        /* Luxury Inputs */
         .form-group {
-            animation: slideUp 0.4s var(--ease-out) both;
+            margin-bottom: var(--sp-5);
         }
 
-        .form-group:nth-child(1) { animation-delay: 80ms;  }
-        .form-group:nth-child(2) { animation-delay: 140ms; }
-        .form-group:nth-child(3) { animation-delay: 200ms; }
-        .form-group:nth-child(4) { animation-delay: 260ms; }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(12px); }
-            to   { opacity: 1; transform: translateY(0);    }
-        }
-
-        .form-input {
+        .lux-input {
             width: 100%;
-            padding: var(--sp-3) var(--sp-4);
-            background: var(--color-bg-alt);
-            border: 1.5px solid var(--color-border-strong);
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
             border-radius: var(--r-lg);
-            font-size: var(--text-sm);
+            padding: var(--sp-4) var(--sp-5);
             color: var(--color-text-primary);
             font-family: var(--font-sans);
+            font-size: 1rem;
             transition: all var(--dur-base) var(--ease-out);
+        }
+        
+        .lux-input::placeholder {
+            color: var(--color-text-muted);
+        }
+
+        .lux-input:focus {
             outline: none;
+            border-color: var(--color-accent);
+            box-shadow: 0 0 0 4px rgba(200,155,90,0.1);
+            background: rgba(255,255,255,0.12);
         }
 
-        .form-input::placeholder { color: var(--color-text-muted); }
-
-        .form-input:focus {
-            background: var(--color-surface);
-            border-color: var(--brand-500);
-            box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
-            transform: translateY(-1px);
-        }
-
-        .form-input option { background: var(--color-surface); }
-
-        .btn-continue {
+        /* Luxury Buttons */
+        .lux-btn-primary {
             width: 100%;
-            padding: var(--sp-3) var(--sp-6);
-            background: linear-gradient(135deg, var(--brand-600) 0%, var(--brand-700) 60%, var(--violet-600) 100%);
+            background: linear-gradient(135deg, var(--color-accent-hover), var(--color-accent));
+            color: #161312;
             border: none;
-            border-radius: var(--r-lg);
-            font-size: var(--text-base);
-            font-weight: var(--fw-semi);
-            color: #fff;
+            border-radius: var(--r-full);
+            padding: var(--sp-4);
             font-family: var(--font-sans);
+            font-size: 1rem;
+            font-weight: 600;
             cursor: pointer;
             transition: all var(--dur-base) var(--ease-out);
-            margin-top: var(--sp-4);
-            box-shadow: var(--shadow-md), var(--shadow-glow-brand);
-            position: relative;
-            overflow: hidden;
-            animation: slideUp 0.4s var(--ease-out) 320ms both;
+            margin-top: var(--sp-6);
+            box-shadow: var(--shadow-glow-brand);
         }
 
-        .btn-continue::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%; width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .btn-continue:hover::before { left: 100%; }
-
-        .btn-continue:hover {
+        .lux-btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: var(--shadow-lg), 0 0 0 4px rgba(37,99,235,0.2), 0 8px 32px rgba(37,99,235,0.3);
+            box-shadow: 0 8px 24px rgba(200,155,90,0.4);
         }
 
-        .btn-continue:active { transform: scale(0.98); }
-        .btn-continue:disabled { opacity: 0.6; cursor: not-allowed; pointer-events: none; }
-
-        .divider {
+        /* Dividers & Social */
+        .auth-divider {
             display: flex;
             align-items: center;
-            margin: var(--sp-5) 0;
-            gap: var(--sp-4);
-        }
-
-        .divider-line { flex: 1; height: 1px; background: var(--color-border); }
-
-        .divider-text {
-            font-size: var(--text-xs);
+            margin: var(--sp-8) 0;
             color: var(--color-text-muted);
-            white-space: nowrap;
-            font-weight: var(--fw-medium);
+            font-size: 0.85rem;
         }
-
-        .social-login { display: flex; gap: var(--sp-3); }
+        .auth-divider::before, .auth-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--color-border);
+        }
+        .auth-divider span { padding: 0 var(--sp-4); }
 
         .social-btn {
-            flex: 1;
-            padding: var(--sp-3);
-            background: var(--color-bg-alt);
-            border: 1.5px solid var(--color-border-strong);
-            border-radius: var(--r-lg);
-            cursor: pointer;
-            transition: all var(--dur-base) var(--ease-out);
+            width: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: var(--sp-2);
-            font-size: var(--text-sm);
-            color: var(--color-text-secondary);
-            font-family: var(--font-sans);
-            font-weight: var(--fw-medium);
-        }
-
-        .social-btn:hover {
-            background: var(--color-surface);
-            border-color: var(--brand-300);
+            gap: var(--sp-3);
+            background: transparent;
+            border: 1px solid var(--color-border);
+            border-radius: var(--r-full);
+            padding: var(--sp-3);
             color: var(--color-text-primary);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-sm);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: var(--sp-4);
+        }
+        .social-btn:hover {
+            background: var(--glass-bg);
+            border-color: var(--color-accent);
         }
 
-        .social-icon { font-size: 1.2rem; }
-
-        .footer-text {
-            text-align: center;
-            margin-top: var(--sp-5);
-            font-size: var(--text-xs);
-            color: var(--color-text-muted);
-        }
-
-        .footer-link {
-            color: var(--color-accent);
-            text-decoration: none;
-            font-weight: var(--fw-medium);
-            transition: color var(--dur-base);
-        }
-
-        .footer-link:hover { color: var(--brand-700); }
-
-        .helper-text {
-            display: flex; align-items: center; gap: var(--sp-2);
-            margin-top: var(--sp-2); font-size: var(--text-xs);
-            color: var(--color-text-muted);
-        }
-
-        .helper-icon {
-            display: inline-flex; align-items: center; justify-content: center;
-            width: 14px; height: 14px;
-            background: rgba(59,130,246,0.15); border-radius: var(--r-full);
-            font-size: 0.55rem;
-        }
-
-        @media (max-width: 480px) {
-            .login-card { padding: var(--sp-8) var(--sp-5); }
-            .welcome-title { font-size: var(--text-2xl); }
-            .social-login { flex-direction: column; }
+        @media (max-width: 900px) {
+            .auth-split { flex-direction: column; }
+            .auth-hero { display: none; }
+            .auth-panel-wrapper { padding: var(--sp-4); }
+            .auth-panel { padding: var(--sp-8) var(--sp-6); }
         }
     </style>
 </head>
-<body>
-    <!-- Animated background -->
-    <div class="gradient-bg"></div>
-    
-    <!-- Floating particles -->
-    <div class="particles" id="particles"></div>
-    
-    <!-- Main login container -->
-    <div class="login-container">
-        <div class="login-card">
-            <!-- Logo and welcome section -->
-            <div class="logo-section">
+<body data-theme="dark">
+
+<header class="header">
+            <!-- Left: Logo -->
+            <a href="home.html" class="logo">
                 <div class="logo-icon">🏡</div>
-                <h1 class="welcome-title">Welcome 👋</h1>
-                <p class="welcome-subtitle">Sign in to explore verified properties near you</p>
+                <span class="logo-text">Real Estate Wala Bhai</span>
+            </a>
+            
+            <!-- Center: Navigation Links (Desktop) -->
+            <div class="nav-desktop-links">
+                <a href="home.html" class="nav-desktop-link active">Home</a>
+                <a href="#" class="nav-desktop-link" onclick="setHeroTab('buy'); return false;">Buy</a>
+                <a href="#" class="nav-desktop-link" onclick="setHeroTab('rent'); return false;">Rent</a>
+                <a href="#" class="nav-desktop-link" onclick="if(window.Navigation) window.Navigation.goToAddProperty(); return false;">Sell</a>
+                <a href="map-explore.html" class="nav-desktop-link">Map</a>
+                <a href="mailto:support@realestatewala.com?subject=Inquiry" class="nav-desktop-link">Contact</a>
             </div>
 
-            <!-- Auth form -->
-            <form class="auth-form" id="authForm">
-                <div class="form-group" id="nameGroup">
-                    <input 
-                        type="text" 
-                        class="form-input" 
-                        id="nameInput"
-                        placeholder="Your full name"
-                    >
-                </div>
+            <!-- Right: Actions -->
+            <div class="nav-actions">
+                <!-- Search Trigger -->
+                <button class="nav-action-btn search-trigger-btn" aria-label="Search" title="Search" onclick="toggleNavSearch()">🔍</button>
 
-                <div class="form-group">
-                    <input 
-                        type="email" 
-                        class="form-input" 
-                        id="emailInput"
-                        placeholder="Email address"
-                        required
-                        autocomplete="email"
-                    >
-                </div>
-
-                <div class="form-group">
-                    <input 
-                        type="password" 
-                        class="form-input" 
-                        id="passwordInput"
-                        placeholder="Password (min 6 characters)"
-                        required
-                        autocomplete="current-password"
-                        minlength="6"
-                    >
-                </div>
-
-                <div class="form-group" id="roleGroup">
-                    <select class="form-input" id="roleSelect">
-                        <option value="">I am looking to... (for new accounts)</option>
-                        <option value="buyer">Buy a Property</option>
-                        <option value="owner">Sell/Rent a Property</option>
-                    </select>
-                </div>
-
-                <button type="submit" class="btn-continue" id="authBtn">
-                    Sign In / Register
+                <!-- Theme Toggle -->
+                <button class="nav-action-btn theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Theme" title="Toggle Theme" onclick="toggleTheme()">🌙</button>
+                
+                <!-- Notification Bell -->
+                <button class="nav-action-btn notification-btn" aria-label="Notifications" title="Notifications" onclick="if(window.Toast) Toast.info('You have no new notifications'); else showMiniToast('No new notifications')">
+                    🔔
+                    <span class="notification-badge"></span>
                 </button>
-            </form>
+                
+                <!-- User Profile -->
+                <div class="user-profile">👤</div>
 
-            <!-- Divider -->
-            <div class="divider">
-                <div class="divider-line"></div>
-                <span class="divider-text">or continue with</span>
-                <div class="divider-line"></div>
+                <!-- Mobile Menu Toggle Button -->
+                <button class="nav-action-btn mobile-menu-toggle" aria-label="Toggle Menu" onclick="toggleMobileMenu()">
+                    ☰
+                </button>
             </div>
 
-            <!-- Social login options -->
-            <div class="social-login">
+            <!-- Mobile Dropdown Menu -->
+            <div class="nav-mobile-dropdown" id="navMobileDropdown">
+                <a href="home.html" class="nav-mobile-link active" onclick="toggleMobileMenu()">Home</a>
+                <a href="#" class="nav-mobile-link" onclick="setHeroTab('buy'); toggleMobileMenu(); return false;">Buy</a>
+                <a href="#" class="nav-mobile-link" onclick="setHeroTab('rent'); toggleMobileMenu(); return false;">Rent</a>
+                <a href="#" class="nav-mobile-link" onclick="if(window.Navigation) window.Navigation.goToAddProperty(); toggleMobileMenu(); return false;">Sell</a>
+                <a href="map-explore.html" class="nav-mobile-link" onclick="toggleMobileMenu()">Map</a>
+                <a href="mailto:support@realestatewala.com?subject=Inquiry" class="nav-mobile-link" onclick="toggleMobileMenu()">Contact</a>
+            </div>
+
+            <!-- Inline Nav Search Bar -->
+            <div id="navSearchOverlay" style="
+                display:none; position:absolute; top:72px; left:0; right:0;
+                background:var(--glass-bg); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px);
+                border-bottom:1px solid var(--color-border); padding:var(--sp-3) var(--sp-6);
+                z-index:998; animation:slideDown var(--dur-base) var(--ease-out) both;
+            ">
+                <div style="max-width:600px; margin:0 auto; position:relative;">
+                    <input id="searchInput" type="text" placeholder="Search by city, area, property type..."
+                        style="
+                            width:100%; padding:var(--sp-3) var(--sp-5) var(--sp-3) var(--sp-10);
+                            background:var(--color-bg-alt); border:1px solid var(--color-border-strong);
+                            border-radius:var(--r-full); font-family:var(--font-sans);
+                            font-size:var(--text-sm); color:var(--color-text-primary);
+                            outline:none; transition:all var(--dur-base);
+                        "
+                        onfocus="this.style.borderColor='var(--brand-500)'; this.style.boxShadow='0 0 0 3px rgba(79,70,229,0.15)'"
+                        onblur="this.style.borderColor=''; this.style.boxShadow=''"
+                    >
+                    <span style="position:absolute;left:var(--sp-3);top:50%;transform:translateY(-50%);font-size:1rem;opacity:0.5;">🔍</span>
+                    <button onclick="document.getElementById('searchInput').value=''; loadAllProperties(); toggleNavSearch()" style="
+                        position:absolute;right:var(--sp-3);top:50%;transform:translateY(-50%);
+                        background:none;border:none;cursor:pointer;font-size:1.1rem;opacity:0.5;
+                        color:var(--color-text-primary); transition:opacity var(--dur-fast);
+                    " title="Clear search">✕</button>
+                </div>
+            </div>
+        </header>
+<div class="nav-mobile-dropdown" id="navMobileDropdown">
+                <a href="home.html" class="nav-mobile-link active" onclick="toggleMobileMenu()">Home</a>
+                <a href="#" class="nav-mobile-link" onclick="setHeroTab('buy'); toggleMobileMenu(); return false;">Buy</a>
+                <a href="#" class="nav-mobile-link" onclick="setHeroTab('rent'); toggleMobileMenu(); return false;">Rent</a>
+                <a href="#" class="nav-mobile-link" onclick="if(window.Navigation) window.Navigation.goToAddProperty(); toggleMobileMenu(); return false;">Sell</a>
+                <a href="map-explore.html" class="nav-mobile-link" onclick="toggleMobileMenu()">Map</a>
+                <a href="mailto:support@realestatewala.com?subject=Inquiry" class="nav-mobile-link" onclick="toggleMobileMenu()">Contact</a>
+            </div>
+<div id="navSearchOverlay" style="
+                display:none; position:absolute; top:72px; left:0; right:0;
+                background:var(--glass-bg); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px);
+                border-bottom:1px solid var(--color-border); padding:var(--sp-3) var(--sp-6);
+                z-index:998; animation:slideDown var(--dur-base) var(--ease-out) both;
+            ">
+                <div style="max-width:600px; margin:0 auto; position:relative;">
+                    <input id="searchInput" type="text" placeholder="Search by city, area, property type..."
+                        style="
+                            width:100%; padding:var(--sp-3) var(--sp-5) var(--sp-3) var(--sp-10);
+                            background:var(--color-bg-alt); border:1px solid var(--color-border-strong);
+                            border-radius:var(--r-full); font-family:var(--font-sans);
+                            font-size:var(--text-sm); color:var(--color-text-primary);
+                            outline:none; transition:all var(--dur-base);
+                        "
+                        onfocus="this.style.borderColor='var(--brand-500)'; this.style.boxShadow='0 0 0 3px rgba(79,70,229,0.15)'"
+                        onblur="this.style.borderColor=''; this.style.boxShadow=''"
+                    >
+                    <span style="position:absolute;left:var(--sp-3);top:50%;transform:translateY(-50%);font-size:1rem;opacity:0.5;">🔍</span>
+                    <button onclick="document.getElementById('searchInput').value=''; loadAllProperties(); toggleNavSearch()" style="
+                        position:absolute;right:var(--sp-3);top:50%;transform:translateY(-50%);
+                        background:none;border:none;cursor:pointer;font-size:1.1rem;opacity:0.5;
+                        color:var(--color-text-primary); transition:opacity var(--dur-fast);
+                    " title="Clear search">✕</button>
+                </div>
+<nav class="bottom-nav">
+        <div class="nav-items">
+            <div class="nav-item active">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">Home</span>
+            </div>
+            <div class="nav-item">
+                <span class="nav-icon">🔍</span>
+                <span class="nav-label">Search</span>
+            </div>
+            <div class="nav-item">
+                <span class="nav-icon">❤️</span>
+                <span class="nav-label">Saved</span>
+            </div>
+            <div class="nav-item">
+                <span class="nav-icon">👤</span>
+                <span class="nav-label">Profile</span>
+            </div>
+        </div>
+    </nav>
+
+
+    <div class="auth-split">
+        <!-- Left: Hero -->
+        <div class="auth-hero">
+            <div class="auth-hero-content">
+                <h1 class="auth-hero-title">Unlock Exclusive<br><i>Masterpiece</i> Homes</h1>
+                <p class="auth-hero-subtitle">Access verified, direct-owner luxury properties with zero brokerage and 24/7 concierge support.</p>
+            </div>
+        </div>
+
+        <!-- Right: Auth Panel -->
+        <div class="auth-panel-wrapper">
+            <div class="auth-panel">
+                <div class="auth-header">
+                    <span class="auth-logo">🏡</span>
+                    <h2 class="auth-title">Welcome Back</h2>
+                </div>
+
+                <form id="authForm">
+                    <div class="form-group" id="nameGroup" style="display:none;">
+                        <input type="text" class="lux-input" id="nameInput" placeholder="Your full name">
+                    </div>
+
+                    <div class="form-group">
+                        <input type="email" class="lux-input" id="emailInput" placeholder="Email address" required autocomplete="email">
+                    </div>
+
+                    <div class="form-group">
+                        <input type="password" class="lux-input" id="passwordInput" placeholder="Password (min 6 chars)" required autocomplete="current-password" minlength="6">
+                    </div>
+
+                    <div class="form-group" id="roleGroup" style="display:none;">
+                        <select class="lux-input" id="roleSelect">
+                            <option value="">I am looking to... (for new accounts)</option>
+                            <option value="buyer">Buy a Property</option>
+                            <option value="owner">Sell/Rent a Property</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="lux-btn-primary" id="authBtn">Sign In / Register</button>
+                </form>
+
+                <div class="auth-divider">
+                    <span>or continue with</span>
+                </div>
+
                 <button class="social-btn" onclick="handleGoogleLogin()">
-                    <span class="social-icon">🔍</span>
-                    <span>Google</span>
-                </button>
-                <button class="social-btn" onclick="handleEmailLogin()">
-                    <span class="social-icon">📧</span>
-                    <span>Email</span>
+                    <span>🔍</span> Continue with Google
                 </button>
             </div>
-
-            <!-- Footer -->
-            <p class="footer-text">
-                By continuing, you agree to our <a href="terms.html" class="footer-link">Terms</a> &amp; <a href="privacy.html" class="footer-link">Privacy Policy</a>
-            </p>
-            <p style="text-align:center; margin-top:1.25rem;">
-                <a href="home.html" style="color:#94a3b8; font-size:0.9rem; text-decoration:none; transition:color 0.2s;" onmouseover="this.style.color='#e2e8f0'" onmouseout="this.style.color='#94a3b8'">Browse as Guest &rarr;</a>
-            </p>
         </div>
     </div>
 
-    <script>
-        // ── Floating particles ──
-        const particlesContainer = document.getElementById('particles');
-        for (let i = 0; i < 25; i++) {
-            const p = document.createElement('div');
-            p.className = 'particle';
-            p.style.left = Math.random() * 100 + '%';
-            p.style.top = Math.random() * 100 + '%';
-            p.style.animationDelay = Math.random() * 20 + 's';
-            p.style.animationDuration = (Math.random() * 10 + 15) + 's';
-            const size = Math.random() * 4 + 2;
-            p.style.width = size + 'px';
-            p.style.height = size + 'px';
-            particlesContainer.appendChild(p);
-        }
-
+<script>
         // ── Helper: show/hide error ──
         function showError(msg) {
             let err = document.getElementById('formError');
@@ -463,7 +495,9 @@
                 } catch (loginErr) {
                     // ── Not found → REGISTER ──
                     if (!name) {
-                        showError('New user? Please enter your name too.');
+                        document.getElementById('nameGroup').style.display = 'block';
+                        document.getElementById('roleGroup').style.display = 'block';
+                        showError('New user? Please enter your name to register.');
                         btn.textContent = 'Sign In / Register';
                         btn.disabled = false;
                         document.getElementById('nameInput').focus();
@@ -502,6 +536,7 @@
         function handleEmailLogin() {
             document.getElementById('emailInput').focus();
         }
-    </script>
+    
+</script>
 </body>
 </html>

@@ -1,7 +1,7 @@
 /**
  * Database Seeding Script
  * 
- * Populates PostgreSQL database tables with sample properties and user accounts
+ * Populates MongoDB collections with sample properties and user accounts
  * for testing and demonstration.
  */
 
@@ -54,52 +54,51 @@ async function seedDatabase() {
     console.log('🌱 Starting database seeding...\n');
 
     if (db.isInMemoryMode()) {
-        console.warn('⚠️  Database is in in-memory mode. Seeding SQL skipped.');
+        console.warn('Database is in in-memory mode. MongoDB seeding skipped.');
         return;
     }
 
     try {
+        const users = await db.getCollection('users');
+        const properties = await db.getCollection('properties');
+        const PropertyModel = require('../models/propertyModel');
+
         // Seed Users
         console.log('👥 Seeding users...');
         for (const user of SAMPLE_USERS) {
-            const exists = await db.getOne('SELECT 1 FROM users WHERE email = $1', [user.email]);
+            const exists = await users.findOne({ email: user.email });
             if (exists) {
                 console.log(`  ⏭️  User ${user.email} already exists, skipping`);
                 continue;
             }
 
             const passwordHash = await bcrypt.hash(user.password, 10);
-            await db.query(
-                `INSERT INTO users (id, name, email, phone, password_hash, role)
-                 VALUES ($1, $2, $3, $4, $5, $6)`,
-                [user.id, user.name, user.email, user.phone, passwordHash, user.role]
-            );
+            const createdAt = new Date().toISOString();
+            await users.insertOne({
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                phone: user.phone,
+                password_hash: passwordHash,
+                role: user.role,
+                is_verified: false,
+                is_active: true,
+                created_at: createdAt,
+                createdAt,
+            });
             console.log(`  ✅ Created user: ${user.name} (${user.email})`);
         }
 
         // Seed Properties
         console.log('\n🏠 Seeding properties...');
         for (const prop of SAMPLE_PROPERTIES) {
-            const exists = await db.getOne('SELECT 1 FROM properties WHERE id = $1', [prop.id]);
+            const exists = await properties.findOne({ id: prop.id });
             if (exists) {
                 console.log(`  ⏭️  Property ${prop.id} already exists, skipping`);
                 continue;
             }
 
-            await db.query(
-                `INSERT INTO properties (
-                    id, owner_id, title, description, property_type, listing_type,
-                    bhk, bathrooms, sqft, furnishing, price,
-                    latitude, longitude, address, city, area, pincode,
-                    amenities, images
-                 ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)`,
-                [
-                    prop.id, prop.ownerId, prop.title, prop.description, prop.propertyType, prop.listingType,
-                    prop.bhk, prop.bathrooms, prop.sqft, prop.furnishing, prop.price,
-                    prop.latitude, prop.longitude, prop.address, prop.city, prop.area, prop.pincode,
-                    prop.amenities, prop.images
-                ]
-            );
+            await PropertyModel.create(prop);
             console.log(`  ✅ Created property: ${prop.title}`);
         }
 
@@ -108,8 +107,8 @@ async function seedDatabase() {
         console.error('❌ Database seeding failed:', error.message);
         throw error;
     } finally {
-        if (db.pool) {
-            await db.pool.end();
+        if (db.close) {
+            await db.close();
             console.log('👋 Database connection closed');
         }
     }

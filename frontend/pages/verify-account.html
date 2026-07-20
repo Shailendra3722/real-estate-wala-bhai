@@ -1,284 +1,268 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    
+    <!-- Global App State & Firebase -->
+    <script src="../js/services/appState.js"></script>
+    <script src="../js/api/apiConfig.js"></script>
+    <script src="../js/services/firebaseService.js"></script>
+
+    <!-- Luxury Ultra Premium -->
+    <link rel="stylesheet" href="../css/luxury-ultra-premium.css">
+    <link rel="stylesheet" href="../css/loading-animation.css">
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Get Verified - Real Estate Wala Bhai</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../css/loading-animation.css">
+    
     <script src="../js/utils/loadingAnimation.js"></script>
     <script src="../js/services/appState.js"></script>
     <script src="../js/services/verificationService.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    
 
-        body {
-            font-family: 'Outfit', sans-serif;
-            background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+    <style id="lux-critical">
+        html, body {
+            margin: 0 !important; padding: 0 !important;
+            background: #161312 !important;
             min-height: 100vh;
-            color: #ffffff;
-            padding: 2rem 1rem;
-        }
-
-        .container {
-            max-width: 700px;
-            margin: 0 auto;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-
-        .header-title {
-            font-size: 2.5rem;
-            font-weight: 800;
-            margin-bottom: 0.75rem;
-            background: linear-gradient(135deg, #667eea 0%, #f093fb 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .header-subtitle {
-            font-size: 1.1rem;
-            color: #94a3b8;
-        }
-
-        /* Benefits Section */
-        .benefits-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .benefits-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-            color: #e2e8f0;
-        }
-
-        .benefit-item {
-            display: flex;
-            align-items: start;
-            gap: 1rem;
-            margin-bottom: 1rem;
-            padding: 1rem;
-            background: rgba(102, 126, 234, 0.08);
-            border-radius: 12px;
-        }
-
-        .benefit-icon {
-            font-size: 1.5rem;
-            flex-shrink: 0;
-        }
-
-        .benefit-text {
-            color: #cbd5e1;
-            line-height: 1.6;
-        }
-
-        /* Form Card */
-        .form-card {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 25px;
-            padding: 2.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .form-section {
-            margin-bottom: 2.5rem;
-        }
-
-        .form-section-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-            color: #e2e8f0;
-        }
-
-        /* ID Type Selection */
-        .id-type-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-        }
-
-        .id-type-card {
-            position: relative;
-        }
-
-        .id-type-input {
-            position: absolute;
-            opacity: 0;
-        }
-
-        .id-type-label {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 1.5rem 1rem;
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid rgba(255, 255, 255, 0.15);
-            border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .id-type-input:checked + .id-type-label {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
-            border-color: #667eea;
-            box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
-        }
-
-        .id-type-icon {
-            font-size: 2rem;
-            margin-bottom: 0.75rem;
-        }
-
-        .id-type-name {
-            font-weight: 700;
-            color: #e2e8f0;
-            font-size: 0.95rem;
-        }
-
-        /* Photo Upload */
-        .upload-zone {
-            border: 3px dashed rgba(255, 255, 255, 0.3);
-            border-radius: 15px;
-            padding: 2rem;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.03);
-            margin-bottom: 1rem;
-        }
-
-        .upload-zone:hover {
-            border-color: #667eea;
-            background: rgba(102, 126, 234, 0.05);
-        }
-
-        .upload-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-
-        .photo-preview {
-            max-width: 100%;
-            max-height: 200px;
-            border-radius: 12px;
-            margin-top: 1rem;
-        }
-
-        /* Form Input */
-        .form-input {
-            width: 100%;
-            padding: 1rem;
-            background: rgba(255, 255, 255, 0.08);
-            border: 2px solid rgba(255, 255, 255, 0.15);
-            border-radius: 12px;
-            color: #ffffff;
-            font-size: 1rem;
-            font-family: 'Outfit', sans-serif;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .form-input::placeholder {
-            color: #64748b;
-        }
-
-        /* Privacy Notice */
-        .privacy-notice {
-            background: rgba(59, 130, 246, 0.1);
-            border: 1px solid rgba(59, 130, 246, 0.3);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .privacy-icon {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .privacy-text {
-            color: #cbd5e1;
-            line-height: 1.6;
-        }
-
-        /* Buttons */
-        .btn {
-            padding: 1.25rem 2rem;
-            border: none;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: 'Outfit', sans-serif;
-        }
-
-        .btn-submit {
-            width: 100%;
-            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-            color: white;
-            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
-        }
-
-        .btn-submit:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(34, 197, 94, 0.4);
-        }
-
-        .btn-submit:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .btn-back {
-            display: block;
-            width: 100%;
-            margin-top: 1rem;
-            background: rgba(255, 255, 255, 0.08);
-            color: #e2e8f0;
-            border: 2px solid rgba(255, 255, 255, 0.15);
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        @media (max-width: 640px) {
-            .id-type-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .header-title {
-                font-size: 2rem;
-            }
-
-            .form-card {
-                padding: 1.5rem;
-            }
+            color: var(--color-text-primary);
         }
     </style>
+    <style id="page-styles">
+        /* Luxury Verification Styles */
+        .container { max-width: 800px; margin: 0 auto; padding: var(--sp-20) var(--sp-6) var(--sp-12); }
+        .header { text-align: center; margin-bottom: var(--sp-12); }
+        .header-title {
+            font-family: var(--font-editorial); font-size: 3.5rem;
+            color: var(--lux-gold-light); margin-bottom: var(--sp-4);
+            line-height: 1.1;
+        }
+        .header-subtitle { font-size: 1.15rem; color: var(--color-text-secondary); }
+
+        .benefits-card {
+            background: var(--glass-bg); border: 1px solid var(--color-border);
+            border-radius: var(--r-2xl); padding: var(--sp-8); margin-bottom: var(--sp-10);
+            backdrop-filter: blur(16px);
+        }
+        .benefits-title { font-family: var(--font-editorial); font-size: 1.75rem; color: var(--lux-gold); margin-bottom: var(--sp-6); }
+        .benefit-item {
+            display: flex; align-items: flex-start; gap: var(--sp-4);
+            margin-bottom: var(--sp-4); padding: var(--sp-4);
+            background: rgba(255,255,255,0.03); border-radius: var(--r-xl);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .benefit-icon { font-size: 1.5rem; filter: grayscale(1) sepia(1) hue-rotate(345deg) saturate(3); }
+        .benefit-text { color: var(--color-text-secondary); line-height: 1.6; }
+        .benefit-text strong { color: var(--color-text-primary); }
+
+        .form-card {
+            background: var(--glass-bg); border: 1px solid var(--color-border);
+            border-radius: var(--r-2xl); padding: var(--sp-10); margin-bottom: var(--sp-10);
+            backdrop-filter: blur(16px);
+        }
+        .form-section { margin-bottom: var(--sp-10); }
+        .form-section-title { font-family: var(--font-editorial); font-size: 1.5rem; color: var(--color-text-primary); margin-bottom: var(--sp-6); }
+
+        .id-type-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--sp-4); }
+        .id-type-card { position: relative; }
+        .id-type-input { position: absolute; opacity: 0; }
+        .id-type-label {
+            display: flex; flex-direction: column; align-items: center;
+            padding: var(--sp-6); background: rgba(0,0,0,0.2);
+            border: 1px solid var(--color-border); border-radius: var(--r-xl);
+            cursor: pointer; transition: all 0.3s ease;
+        }
+        .id-type-input:checked + .id-type-label {
+            background: rgba(201,169,106,0.1); border-color: var(--lux-gold);
+            box-shadow: 0 8px 24px rgba(201,169,106,0.15);
+        }
+        .id-type-icon { font-size: 2rem; margin-bottom: var(--sp-2); filter: grayscale(1) sepia(1) hue-rotate(345deg) saturate(3); }
+        .id-type-name { font-weight: 600; color: var(--color-text-primary); font-size: 1rem; }
+
+        .upload-zone {
+            border: 2px dashed var(--color-border); border-radius: var(--r-xl);
+            padding: var(--sp-10); text-align: center; cursor: pointer;
+            transition: all 0.3s ease; background: rgba(0,0,0,0.2); margin-bottom: var(--sp-4);
+        }
+        .upload-zone:hover { border-color: var(--lux-gold); background: rgba(201,169,106,0.05); }
+        .upload-icon { font-size: 3rem; margin-bottom: var(--sp-4); filter: grayscale(1) sepia(1) hue-rotate(345deg) saturate(3); }
+        .photo-preview { max-width: 100%; max-height: 240px; border-radius: var(--r-lg); margin-top: var(--sp-4); }
+
+        .form-input {
+            width: 100%; padding: var(--sp-4); background: rgba(0,0,0,0.2);
+            border: 1px solid var(--color-border); border-radius: var(--r-xl);
+            color: var(--color-text-primary); font-size: 1rem; font-family: var(--font-sans);
+        }
+        .form-input:focus { outline: none; border-color: var(--color-accent); background: rgba(0,0,0,0.4); }
+
+        .privacy-notice {
+            background: rgba(201,169,106,0.08); border: 1px solid rgba(201,169,106,0.2);
+            border-radius: var(--r-xl); padding: var(--sp-6); margin-bottom: var(--sp-8);
+        }
+        .privacy-icon { font-size: 1.5rem; margin-bottom: var(--sp-2); filter: grayscale(1) sepia(1) hue-rotate(345deg) saturate(3); }
+        .privacy-text { color: var(--lux-taupe); line-height: 1.6; }
+
+        .btn-submit {
+            width: 100%; padding: var(--sp-5); border: none; border-radius: var(--r-full);
+            background: linear-gradient(135deg, var(--color-accent-hover), var(--color-accent));
+            color: #161312; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: all 0.3s;
+        }
+        .btn-submit:hover:not(:disabled) { transform: translateY(-2px); box-shadow: var(--shadow-glow-brand); }
+        .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-back {
+            display: block; width: 100%; margin-top: var(--sp-4); padding: var(--sp-4);
+            background: transparent; color: var(--color-text-secondary);
+            border: 1px solid var(--color-border); border-radius: var(--r-full);
+            font-weight: 600; cursor: pointer; transition: all 0.3s; font-size: 1.1rem;
+        }
+        .btn-back:hover { background: rgba(255,255,255,0.05); color: var(--color-text-primary); }
+        
+        .hidden { display: none; }
+    </style>
+
 </head>
 <body>
+
+<header class="header">
+            <!-- Left: Logo -->
+            <a href="home.html" class="logo">
+                <div class="logo-icon">🏡</div>
+                <span class="logo-text">Real Estate Wala Bhai</span>
+            </a>
+            
+            <!-- Center: Navigation Links (Desktop) -->
+            <div class="nav-desktop-links">
+                <a href="home.html" class="nav-desktop-link active">Home</a>
+                <a href="#" class="nav-desktop-link" onclick="setHeroTab('buy'); return false;">Buy</a>
+                <a href="#" class="nav-desktop-link" onclick="setHeroTab('rent'); return false;">Rent</a>
+                <a href="#" class="nav-desktop-link" onclick="if(window.Navigation) window.Navigation.goToAddProperty(); return false;">Sell</a>
+                <a href="map-explore.html" class="nav-desktop-link">Map</a>
+                <a href="mailto:support@realestatewala.com?subject=Inquiry" class="nav-desktop-link">Contact</a>
+            </div>
+
+            <!-- Right: Actions -->
+            <div class="nav-actions">
+                <!-- Search Trigger -->
+                <button class="nav-action-btn search-trigger-btn" aria-label="Search" title="Search" onclick="toggleNavSearch()">🔍</button>
+
+                <!-- Theme Toggle -->
+                <button class="nav-action-btn theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Theme" title="Toggle Theme" onclick="toggleTheme()">🌙</button>
+                
+                <!-- Notification Bell -->
+                <button class="nav-action-btn notification-btn" aria-label="Notifications" title="Notifications" onclick="if(window.Toast) Toast.info('You have no new notifications'); else showMiniToast('No new notifications')">
+                    🔔
+                    <span class="notification-badge"></span>
+                </button>
+                
+                <!-- User Profile -->
+                <div class="user-profile">👤</div>
+
+                <!-- Mobile Menu Toggle Button -->
+                <button class="nav-action-btn mobile-menu-toggle" aria-label="Toggle Menu" onclick="toggleMobileMenu()">
+                    ☰
+                </button>
+            </div>
+
+            <!-- Mobile Dropdown Menu -->
+            <div class="nav-mobile-dropdown" id="navMobileDropdown">
+                <a href="home.html" class="nav-mobile-link active" onclick="toggleMobileMenu()">Home</a>
+                <a href="#" class="nav-mobile-link" onclick="setHeroTab('buy'); toggleMobileMenu(); return false;">Buy</a>
+                <a href="#" class="nav-mobile-link" onclick="setHeroTab('rent'); toggleMobileMenu(); return false;">Rent</a>
+                <a href="#" class="nav-mobile-link" onclick="if(window.Navigation) window.Navigation.goToAddProperty(); toggleMobileMenu(); return false;">Sell</a>
+                <a href="map-explore.html" class="nav-mobile-link" onclick="toggleMobileMenu()">Map</a>
+                <a href="mailto:support@realestatewala.com?subject=Inquiry" class="nav-mobile-link" onclick="toggleMobileMenu()">Contact</a>
+            </div>
+
+            <!-- Inline Nav Search Bar -->
+            <div id="navSearchOverlay" style="
+                display:none; position:absolute; top:72px; left:0; right:0;
+                background:var(--glass-bg); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px);
+                border-bottom:1px solid var(--color-border); padding:var(--sp-3) var(--sp-6);
+                z-index:998; animation:slideDown var(--dur-base) var(--ease-out) both;
+            ">
+                <div style="max-width:600px; margin:0 auto; position:relative;">
+                    <input id="searchInput" type="text" placeholder="Search by city, area, property type..."
+                        style="
+                            width:100%; padding:var(--sp-3) var(--sp-5) var(--sp-3) var(--sp-10);
+                            background:var(--color-bg-alt); border:1px solid var(--color-border-strong);
+                            border-radius:var(--r-full); font-family:var(--font-sans);
+                            font-size:var(--text-sm); color:var(--color-text-primary);
+                            outline:none; transition:all var(--dur-base);
+                        "
+                        onfocus="this.style.borderColor='var(--brand-500)'; this.style.boxShadow='0 0 0 3px rgba(79,70,229,0.15)'"
+                        onblur="this.style.borderColor=''; this.style.boxShadow=''"
+                    >
+                    <span style="position:absolute;left:var(--sp-3);top:50%;transform:translateY(-50%);font-size:1rem;opacity:0.5;">🔍</span>
+                    <button onclick="document.getElementById('searchInput').value=''; loadAllProperties(); toggleNavSearch()" style="
+                        position:absolute;right:var(--sp-3);top:50%;transform:translateY(-50%);
+                        background:none;border:none;cursor:pointer;font-size:1.1rem;opacity:0.5;
+                        color:var(--color-text-primary); transition:opacity var(--dur-fast);
+                    " title="Clear search">✕</button>
+                </div>
+            </div>
+        </header>
+<div class="nav-mobile-dropdown" id="navMobileDropdown">
+                <a href="home.html" class="nav-mobile-link active" onclick="toggleMobileMenu()">Home</a>
+                <a href="#" class="nav-mobile-link" onclick="setHeroTab('buy'); toggleMobileMenu(); return false;">Buy</a>
+                <a href="#" class="nav-mobile-link" onclick="setHeroTab('rent'); toggleMobileMenu(); return false;">Rent</a>
+                <a href="#" class="nav-mobile-link" onclick="if(window.Navigation) window.Navigation.goToAddProperty(); toggleMobileMenu(); return false;">Sell</a>
+                <a href="map-explore.html" class="nav-mobile-link" onclick="toggleMobileMenu()">Map</a>
+                <a href="mailto:support@realestatewala.com?subject=Inquiry" class="nav-mobile-link" onclick="toggleMobileMenu()">Contact</a>
+            </div>
+<div id="navSearchOverlay" style="
+                display:none; position:absolute; top:72px; left:0; right:0;
+                background:var(--glass-bg); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px);
+                border-bottom:1px solid var(--color-border); padding:var(--sp-3) var(--sp-6);
+                z-index:998; animation:slideDown var(--dur-base) var(--ease-out) both;
+            ">
+                <div style="max-width:600px; margin:0 auto; position:relative;">
+                    <input id="searchInput" type="text" placeholder="Search by city, area, property type..."
+                        style="
+                            width:100%; padding:var(--sp-3) var(--sp-5) var(--sp-3) var(--sp-10);
+                            background:var(--color-bg-alt); border:1px solid var(--color-border-strong);
+                            border-radius:var(--r-full); font-family:var(--font-sans);
+                            font-size:var(--text-sm); color:var(--color-text-primary);
+                            outline:none; transition:all var(--dur-base);
+                        "
+                        onfocus="this.style.borderColor='var(--brand-500)'; this.style.boxShadow='0 0 0 3px rgba(79,70,229,0.15)'"
+                        onblur="this.style.borderColor=''; this.style.boxShadow=''"
+                    >
+                    <span style="position:absolute;left:var(--sp-3);top:50%;transform:translateY(-50%);font-size:1rem;opacity:0.5;">🔍</span>
+                    <button onclick="document.getElementById('searchInput').value=''; loadAllProperties(); toggleNavSearch()" style="
+                        position:absolute;right:var(--sp-3);top:50%;transform:translateY(-50%);
+                        background:none;border:none;cursor:pointer;font-size:1.1rem;opacity:0.5;
+                        color:var(--color-text-primary); transition:opacity var(--dur-fast);
+                    " title="Clear search">✕</button>
+                </div>
+<nav class="bottom-nav">
+        <div class="nav-items">
+            <div class="nav-item active">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">Home</span>
+            </div>
+            <div class="nav-item">
+                <span class="nav-icon">🔍</span>
+                <span class="nav-label">Search</span>
+            </div>
+            <div class="nav-item">
+                <span class="nav-icon">❤️</span>
+                <span class="nav-label">Saved</span>
+            </div>
+            <div class="nav-item">
+                <span class="nav-icon">👤</span>
+                <span class="nav-label">Profile</span>
+            </div>
+        </div>
+    </nav>
+
     <div class="container">
         <!-- Header -->
         <div class="header">

@@ -1,11 +1,11 @@
 /**
  * Property Model
  *
- * Manages properties data layer. Automatically selects PostgreSQL database queries
+ * Manages properties data layer. Automatically selects MongoDB queries
  * or switches to in-memory JSON fallback operations if database connection is unavailable.
  *
  * In-memory mode now persists user-submitted properties to a local JSON file so
- * listings survive server restarts without requiring a real PostgreSQL database.
+ * listings survive server restarts without requiring a real MongoDB database.
  */
 
 const db = require('../database/pool');
@@ -40,6 +40,10 @@ function saveUserPropertiesToDisk(list) {
     }
 }
 
+function escapeRegExp(value) {
+    return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 // Load static / mock listings from the frontend data file (read-only fallback).
 let STATIC_PROPERTIES = [];
 try {
@@ -70,7 +74,9 @@ function getMergedInMemory() {
 /** Normalize a raw property record into a consistent in-memory shape. */
 function normalizeProperty(data, generatedId) {
     const id = data.id || generatedId || `prop_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    return {
+    const latitude = parseFloat(data.latitude) || parseFloat(data.lat) || parseFloat(data.location?.latitude) || 0;
+    const longitude = parseFloat(data.longitude) || parseFloat(data.lng) || parseFloat(data.location?.longitude) || 0;
+    const property = {
         id,
         title: data.title || `${data.bhk || ''} ${data.propertyType || 'Property'} in ${data.area || ''}`.trim(),
         description: data.description || '',
@@ -91,8 +97,8 @@ function normalizeProperty(data, generatedId) {
         state: data.state || '',
         country: data.country || 'India',
         pincode: data.pincode || '',
-        latitude: parseFloat(data.latitude) || parseFloat(data.lat) || 0,
-        longitude: parseFloat(data.longitude) || parseFloat(data.lng) || 0,
+        latitude,
+        longitude,
 
         // Media
         images: Array.isArray(data.images) ? data.images : (data.photos ? data.photos : []),
@@ -121,6 +127,79 @@ function normalizeProperty(data, generatedId) {
         createdAt: data.createdAt || data.created_at || new Date().toISOString(),
         updatedAt: data.updatedAt || data.updated_at || new Date().toISOString(),
     };
+
+    if (latitude && longitude) {
+        property.locationPoint = {
+            type: 'Point',
+            coordinates: [longitude, latitude],
+        };
+    }
+
+    return property;
+}
+
+function newestFirstSort(a, b) {
+    return new Date(b.createdAt || b.created_at || 0) - new Date(a.createdAt || a.created_at || 0);
+}
+
+function buildSearchQuery(filters) {
+    const clauses = [{ status: 'active' }];
+
+    if (filters.query) {
+        const pattern = new RegExp(escapeRegExp(filters.query), 'i');
+        clauses.push({
+            $or: [
+                { title: pattern },
+                { city: pattern },
+                { area: pattern },
+                { address: pattern },
+                { state: pattern },
+            ],
+        });
+    }
+
+    if (filters.city) {
+        clauses.push({ city: new RegExp(escapeRegExp(filters.city), 'i') });
+    }
+    if (filters.listingType) {
+        clauses.push({ $or: [{ listingType: filters.listingType }, { listing_type: filters.listingType }] });
+    }
+    if (filters.minPrice) {
+        clauses.push({ price: { $gte: Number(filters.minPrice) } });
+    }
+    if (filters.maxPrice) {
+        clauses.push({ price: { $lte: Number(filters.maxPrice) } });
+    }
+    if (filters.minPrice && filters.maxPrice) {
+        clauses.pop();
+        clauses.pop();
+        clauses.push({ price: { $gte: Number(filters.minPrice), $lte: Number(filters.maxPrice) } });
+    }
+    if (filters.bhk) {
+        clauses.push({ bhk: filters.bhk });
+    }
+    if (filters.bedrooms) {
+        clauses.push({ bedrooms: { $gte: parseInt(filters.bedrooms) } });
+    }
+    if (filters.bathrooms) {
+        clauses.push({ bathrooms: { $gte: parseInt(filters.bathrooms) } });
+    }
+    if (filters.propertyType) {
+        clauses.push({ $or: [{ propertyType: filters.propertyType }, { property_type: filters.propertyType }] });
+    }
+    if (filters.amenities && filters.amenities.length > 0) {
+        clauses.push({ amenities: { $all: filters.amenities } });
+    }
+    if (filters.verifiedOnly) {
+        clauses.push({
+            $or: [
+                { verificationStatus: 'verified' },
+                { verification_status: 'verified' },
+            ],
+        });
+    }
+
+    return clauses.length === 1 ? clauses[0] : { $and: clauses };
 }
 
 // ── Property Model ─────────────────────────────────────────────────────────────
@@ -133,19 +212,20 @@ const PropertyModel = {
     async getAll() {
         if (!db.isInMemoryMode()) {
             try {
-                const sql = `
-                    SELECT * FROM properties
-                    WHERE status = 'active'
-                    ORDER BY created_at DESC
-                    LIMIT 200
-                `;
-                const rows = await db.getAll(sql);
+                const collection = await db.getCollection('properties');
+                const rows = await collection
+                    .find({ status: 'active' })
+                    .sort({ createdAt: -1, created_at: -1 })
+                    .limit(200)
+                    .toArray();
                 if (rows && rows.length > 0) return rows;
             } catch (err) {
-                console.warn('🔄 PostgreSQL getAll() failed. Using in-memory mode.');
+                console.warn('MongoDB getAll() failed. Using in-memory mode.');
             }
         }
-        return getMergedInMemory().filter(p => (p.status || 'active') === 'active');
+        return getMergedInMemory()
+            .filter(p => (p.status || 'active') === 'active')
+            .sort(newestFirstSort);
     },
 
     /**
@@ -154,21 +234,11 @@ const PropertyModel = {
     async getById(id) {
         if (!db.isInMemoryMode()) {
             try {
-                const sql = `
-                    SELECT
-                        p.*,
-                        u.name as owner_name,
-                        u.phone as owner_phone,
-                        u.email as owner_email,
-                        u.is_verified as owner_verified
-                    FROM properties p
-                    LEFT JOIN users u ON p.owner_id = u.id
-                    WHERE p.id = $1
-                `;
-                const prop = await db.getOne(sql, [id]);
+                const collection = await db.getCollection('properties');
+                const prop = await collection.findOne({ id: String(id) });
                 if (prop) return prop;
             } catch (err) {
-                console.warn(`🔄 PostgreSQL getById(${id}) failed. Using in-memory mode.`);
+                console.warn(`MongoDB getById(${id}) failed. Using in-memory mode.`);
             }
         }
         return getMergedInMemory().find(p => String(p.id) === String(id)) || null;
@@ -180,24 +250,23 @@ const PropertyModel = {
     async findNearby(lat, lng, radiusKm = 5) {
         if (!db.isInMemoryMode()) {
             try {
-                const radiusMeters = radiusKm * 1000;
-                const sql = `
-                    SELECT
-                        *,
-                        earth_distance(
-                            ll_to_earth($1, $2),
-                            ll_to_earth(latitude, longitude)
-                        ) / 1000 AS distance_km
-                    FROM properties
-                    WHERE
-                        earth_box(ll_to_earth($1, $2), $3) @> ll_to_earth(latitude, longitude)
-                        AND status = 'active'
-                    ORDER BY distance_km
-                    LIMIT 50
-                `;
-                return await db.getAll(sql, [lat, lng, radiusMeters]);
+                const collection = await db.getCollection('properties');
+                const candidates = await collection
+                    .find({
+                        status: 'active',
+                        latitude: { $type: 'number' },
+                        longitude: { $type: 'number' },
+                    })
+                    .limit(500)
+                    .toArray();
+
+                return candidates
+                    .map(p => ({ ...p, distance_km: calculateDistance(lat, lng, p.latitude, p.longitude) }))
+                    .filter(p => p.distance_km <= radiusKm)
+                    .sort((a, b) => a.distance_km - b.distance_km)
+                    .slice(0, 50);
             } catch (err) {
-                console.warn('🔄 PostgreSQL findNearby() failed. Using in-memory mode.');
+                console.warn('MongoDB findNearby() failed. Using in-memory mode.');
             }
         }
 
@@ -217,63 +286,14 @@ const PropertyModel = {
     async search(filters) {
         if (!db.isInMemoryMode()) {
             try {
-                let sql = `SELECT * FROM properties WHERE status = 'active'`;
-                const params = [];
-                let paramIndex = 1;
-
-                if (filters.query) {
-                    sql += ` AND (title ILIKE $${paramIndex} OR city ILIKE $${paramIndex} OR area ILIKE $${paramIndex} OR address ILIKE $${paramIndex})`;
-                    params.push(`%${filters.query}%`);
-                    paramIndex++;
-                }
-                if (filters.city) {
-                    sql += ` AND city ILIKE $${paramIndex}`;
-                    params.push(`%${filters.city}%`);
-                    paramIndex++;
-                }
-                if (filters.listingType) {
-                    sql += ` AND listing_type = $${paramIndex}`;
-                    params.push(filters.listingType);
-                    paramIndex++;
-                }
-                if (filters.minPrice) {
-                    sql += ` AND price >= $${paramIndex}`;
-                    params.push(filters.minPrice);
-                    paramIndex++;
-                }
-                if (filters.maxPrice) {
-                    sql += ` AND price <= $${paramIndex}`;
-                    params.push(filters.maxPrice);
-                    paramIndex++;
-                }
-                if (filters.bhk) {
-                    sql += ` AND bhk = $${paramIndex}`;
-                    params.push(filters.bhk);
-                    paramIndex++;
-                }
-                if (filters.bedrooms) {
-                    sql += ` AND bedrooms >= $${paramIndex}`;
-                    params.push(parseInt(filters.bedrooms));
-                    paramIndex++;
-                }
-                if (filters.bathrooms) {
-                    sql += ` AND bathrooms >= $${paramIndex}`;
-                    params.push(parseInt(filters.bathrooms));
-                    paramIndex++;
-                }
-                if (filters.propertyType) {
-                    sql += ` AND property_type = $${paramIndex}`;
-                    params.push(filters.propertyType);
-                    paramIndex++;
-                }
-                if (filters.verifiedOnly) {
-                    sql += ` AND verification_status = 'verified'`;
-                }
-
-                sql += ` ORDER BY created_at DESC LIMIT 100`;
-                return await db.getAll(sql, params);
+                const collection = await db.getCollection('properties');
+                return await collection
+                    .find(buildSearchQuery(filters))
+                    .sort({ createdAt: -1, created_at: -1 })
+                    .limit(100)
+                    .toArray();
             } catch (err) {
-                console.warn('🔄 PostgreSQL search() failed. Using in-memory mode.');
+                console.warn('MongoDB search() failed. Using in-memory mode.');
             }
         }
 
@@ -334,61 +354,12 @@ const PropertyModel = {
     async create(propertyData) {
         if (!db.isInMemoryMode()) {
             try {
-                const d = propertyData;
-                const sql = `
-                    INSERT INTO properties (
-                        id, owner_id, title, description, property_type, listing_type,
-                        bhk, bathrooms, sqft, furnishing, price,
-                        latitude, longitude, address, city, area, state, country, pincode,
-                        amenities, images, featured_image, is_featured,
-                        verification_status, status, year_built,
-                        owner_name, owner_phone, owner_email,
-                        created_at, updated_at
-                    ) VALUES (
-                        $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,
-                        $12,$13,$14,$15,$16,$17,$18,$19,
-                        $20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31
-                    )
-                    RETURNING *
-                `;
-                const normalized = normalizeProperty(d, d.id);
-                const values = [
-                    normalized.id,
-                    normalized.ownerId,
-                    normalized.title,
-                    normalized.description,
-                    normalized.propertyType,
-                    normalized.listingType,
-                    normalized.bhk,
-                    normalized.bathrooms,
-                    normalized.sqft,
-                    normalized.furnishing,
-                    normalized.price,
-                    normalized.latitude,
-                    normalized.longitude,
-                    normalized.address,
-                    normalized.city,
-                    normalized.area,
-                    normalized.state,
-                    normalized.country,
-                    normalized.pincode,
-                    JSON.stringify(normalized.amenities),
-                    JSON.stringify(normalized.images),
-                    normalized.featuredImage,
-                    normalized.isFeatured,
-                    normalized.verificationStatus,
-                    normalized.status,
-                    normalized.yearBuilt,
-                    normalized.ownerName,
-                    normalized.ownerPhone,
-                    normalized.ownerEmail,
-                    normalized.createdAt,
-                    normalized.updatedAt,
-                ];
-                const result = await db.getOne(sql, values);
-                if (result) return result;
+                const collection = await db.getCollection('properties');
+                const normalized = normalizeProperty(propertyData, propertyData.id);
+                await collection.insertOne(normalized);
+                return normalized;
             } catch (err) {
-                console.warn('🔄 PostgreSQL create() failed. Using in-memory mode. Error:', err.message);
+                console.warn('MongoDB create() failed. Using in-memory mode. Error:', err.message);
             }
         }
 
@@ -406,11 +377,17 @@ const PropertyModel = {
     async incrementView(id) {
         if (!db.isInMemoryMode()) {
             try {
-                const sql = `UPDATE properties SET view_count = view_count + 1 WHERE id = $1`;
-                await db.query(sql, [id]);
-                return;
+                const collection = await db.getCollection('properties');
+                const result = await collection.updateOne(
+                    { id: String(id) },
+                    {
+                        $inc: { viewCount: 1 },
+                        $set: { updatedAt: new Date().toISOString() },
+                    }
+                );
+                if (result.matchedCount > 0) return;
             } catch (err) {
-                console.warn('🔄 PostgreSQL incrementView() failed. Using in-memory mode.');
+                console.warn('MongoDB incrementView() failed. Using in-memory mode.');
             }
         }
         const merged = getMergedInMemory();

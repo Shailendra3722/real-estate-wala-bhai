@@ -1,6 +1,9 @@
 /* ==================== GLOBAL STYLES ==================== */
 /* Smooth page transitions, consistent spacing, premium UI */
 
+
+@import "./design-tokens.css";
+
 /* Page Transition Animations */
 @keyframes fadeIn {
     from {

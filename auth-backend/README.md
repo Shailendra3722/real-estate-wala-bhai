@@ -64,7 +64,7 @@ FIREBASE_CLIENT_EMAIL=firebase-adminsdk@your-project.iam.gserviceaccount.com
 
 PORT=5000
 NODE_ENV=development
-FRONTEND_URL=http://localhost:3000
+FRONTEND_URL=http://localhost:3004
 
 JWT_SECRET=your-super-secret-jwt-key
 ```

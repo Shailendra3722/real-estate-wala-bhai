@@ -184,7 +184,7 @@ async function loadPropertyMarkers() {
 
 **API Request:**
 ```http
-GET http://localhost:3000/api/properties/nearby?lat=26.8467&lng=80.9462&radius=5
+GET http://localhost:3004/api/properties/nearby?lat=26.8467&lng=80.9462&radius=5
 Accept: application/json
 ```
 
@@ -354,7 +354,7 @@ function applyFilters() {
 
 **API Request:**
 ```http
-GET http://localhost:3000/api/properties/nearby?lat=26.8467&lng=80.9462&radius=5&bhk=2+BHK
+GET http://localhost:3004/api/properties/nearby?lat=26.8467&lng=80.9462&radius=5&bhk=2+BHK
 ```
 
 **Database Query:**
@@ -499,7 +499,7 @@ async function loadPropertyDetails() {
 
 **API Request:**
 ```http
-GET http://localhost:3000/api/properties/prop_006
+GET http://localhost:3004/api/properties/prop_006
 Accept: application/json
 ```
 
@@ -712,7 +712,7 @@ function chatWhatsApp() {
 
 **API Request:**
 ```http
-POST http://localhost:3000/api/inquiries
+POST http://localhost:3004/api/inquiries
 Content-Type: application/json
 
 {

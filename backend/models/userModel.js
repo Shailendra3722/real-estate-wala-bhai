@@ -2,10 +2,14 @@
  * User & Favorites Model
  * 
  * Handles user authentication records, details, and personal favorites.
- * Automatically chooses database or switches to in-memory state.
+ * Automatically chooses MongoDB or switches to in-memory state.
  */
 
 const db = require('../database/pool');
+
+function escapeRegExp(value) {
+    return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 
 // Mock storage for user sessions and favorites in in-memory mode
 const IN_MEMORY_USERS = [];
@@ -19,14 +23,23 @@ const UserModel = {
         if (!db.isInMemoryMode()) {
             try {
                 const { id, name, email, phone, passwordHash, role } = userData;
-                const sql = `
-                    INSERT INTO users (id, name, email, phone, password_hash, role)
-                    VALUES ($1, $2, $3, $4, $5, $6)
-                    RETURNING id, name, email, phone, role, is_verified, created_at
-                `;
-                return await db.getOne(sql, [id, name, email, phone, passwordHash, role]);
+                const collection = await db.getCollection('users');
+                const newUser = {
+                    id,
+                    name,
+                    email,
+                    phone,
+                    password_hash: passwordHash,
+                    role,
+                    is_verified: false,
+                    is_active: true,
+                    created_at: new Date().toISOString(),
+                    createdAt: new Date().toISOString(),
+                };
+                await collection.insertOne(newUser);
+                return newUser;
             } catch (err) {
-                console.warn('🔄 PostgreSQL user insert failed in create(). Retrying in in-memory mode.');
+                console.warn('MongoDB user insert failed in create(). Retrying in in-memory mode.');
             }
         }
 
@@ -51,11 +64,14 @@ const UserModel = {
     async findByEmail(email) {
         if (!db.isInMemoryMode()) {
             try {
-                const sql = 'SELECT * FROM users WHERE email = $1 AND is_active = TRUE';
-                const user = await db.getOne(sql, [email]);
+                const collection = await db.getCollection('users');
+                const user = await collection.findOne({
+                    email: new RegExp(`^${escapeRegExp(email)}$`, 'i'),
+                    is_active: { $ne: false },
+                });
                 if (user) return user;
             } catch (err) {
-                console.warn(`🔄 PostgreSQL query failed in findByEmail(${email}). Retrying in in-memory mode.`);
+                console.warn(`MongoDB query failed in findByEmail(${email}). Retrying in in-memory mode.`);
             }
         }
 
@@ -68,11 +84,14 @@ const UserModel = {
     async findById(id) {
         if (!db.isInMemoryMode()) {
             try {
-                const sql = 'SELECT id, name, email, phone, role, is_verified FROM users WHERE id = $1';
-                const user = await db.getOne(sql, [id]);
+                const collection = await db.getCollection('users');
+                const user = await collection.findOne(
+                    { id },
+                    { projection: { _id: 0, id: 1, name: 1, email: 1, phone: 1, role: 1, is_verified: 1 } }
+                );
                 if (user) return user;
             } catch (err) {
-                console.warn(`🔄 PostgreSQL query failed in findById(${id}). Retrying in in-memory mode.`);
+                console.warn(`MongoDB query failed in findById(${id}). Retrying in in-memory mode.`);
             }
         }
 
@@ -85,15 +104,16 @@ const UserModel = {
     async addFavorite(userId, propertyId) {
         if (!db.isInMemoryMode()) {
             try {
-                const sql = `
-                    INSERT INTO favorites (user_id, property_id)
-                    VALUES ($1, $2)
-                    ON CONFLICT (user_id, property_id) DO NOTHING
-                    RETURNING *
-                `;
-                return await db.getOne(sql, [userId, propertyId]);
+                const collection = await db.getCollection('favorites');
+                const createdAt = new Date().toISOString();
+                await collection.updateOne(
+                    { userId, propertyId },
+                    { $setOnInsert: { userId, propertyId, createdAt, created_at: createdAt } },
+                    { upsert: true }
+                );
+                return { userId, propertyId, createdAt };
             } catch (err) {
-                console.warn('🔄 PostgreSQL insert failed in addFavorite(). Retrying in in-memory mode.');
+                console.warn('MongoDB insert failed in addFavorite(). Retrying in in-memory mode.');
             }
         }
 
@@ -110,11 +130,11 @@ const UserModel = {
     async removeFavorite(userId, propertyId) {
         if (!db.isInMemoryMode()) {
             try {
-                const sql = 'DELETE FROM favorites WHERE user_id = $1 AND property_id = $2';
-                await db.query(sql, [userId, propertyId]);
+                const collection = await db.getCollection('favorites');
+                await collection.deleteOne({ userId, propertyId });
                 return;
             } catch (err) {
-                console.warn('🔄 PostgreSQL delete failed in removeFavorite(). Retrying in in-memory mode.');
+                console.warn('MongoDB delete failed in removeFavorite(). Retrying in in-memory mode.');
             }
         }
 
@@ -130,16 +150,10 @@ const UserModel = {
     async isFavorited(userId, propertyId) {
         if (!db.isInMemoryMode()) {
             try {
-                const sql = `
-                    SELECT EXISTS(
-                        SELECT 1 FROM favorites
-                        WHERE user_id = $1 AND property_id = $2
-                    ) as is_favorited
-                `;
-                const result = await db.getOne(sql, [userId, propertyId]);
-                return result ? result.is_favorited : false;
+                const collection = await db.getCollection('favorites');
+                return await collection.countDocuments({ userId, propertyId }, { limit: 1 }) > 0;
             } catch (err) {
-                console.warn('🔄 PostgreSQL query failed in isFavorited(). Retrying in in-memory mode.');
+                console.warn('MongoDB query failed in isFavorited(). Retrying in in-memory mode.');
             }
         }
 
@@ -152,18 +166,23 @@ const UserModel = {
     async getFavorites(userId) {
         if (!db.isInMemoryMode()) {
             try {
-                const sql = `
-                    SELECT 
-                        p.*,
-                        f.created_at as favorited_at
-                    FROM favorites f
-                    JOIN properties p ON f.property_id = p.id
-                    WHERE f.user_id = $1
-                    ORDER BY f.created_at DESC
-                `;
-                return await db.getAll(sql, [userId]);
+                const collection = await db.getCollection('favorites');
+                const favorites = await collection
+                    .find({ userId })
+                    .sort({ createdAt: -1, created_at: -1 })
+                    .toArray();
+
+                const PropertyModel = require('./propertyModel');
+                const list = [];
+                for (const favorite of favorites) {
+                    const prop = await PropertyModel.getById(favorite.propertyId);
+                    if (prop) {
+                        list.push({ ...prop, favorited_at: favorite.createdAt || favorite.created_at });
+                    }
+                }
+                return list;
             } catch (err) {
-                console.warn('🔄 PostgreSQL query failed in getFavorites(). Retrying in in-memory mode.');
+                console.warn('MongoDB query failed in getFavorites(). Retrying in in-memory mode.');
             }
         }
 

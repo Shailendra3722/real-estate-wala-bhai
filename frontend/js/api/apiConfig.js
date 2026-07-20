@@ -17,12 +17,12 @@ const API_BASE_URL = (() => {
             return window.location.origin;
         }
 
-        // Local development - API server on port 3000
-        return 'http://localhost:3000';
+        // Local development - API server on port 3004
+        return 'http://localhost:3004';
     }
 
     // Node.js environment
-    return process.env.API_BASE_URL || 'http://localhost:3000';
+    return process.env.API_BASE_URL || 'http://localhost:3004';
 })();
 
 const ApiConfig = {

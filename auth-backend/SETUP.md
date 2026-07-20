@@ -64,7 +64,7 @@ FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nMIIEv...\n-----END PRIVATE KE
 # Server settings:
 PORT=5000
 NODE_ENV=development
-FRONTEND_URL=http://localhost:3000
+FRONTEND_URL=http://localhost:3004
 
 # Generate a random string:
 JWT_SECRET=your-super-secret-random-string-here

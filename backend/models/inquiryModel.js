@@ -17,18 +17,37 @@ const InquiryModel = {
 
         if (!db.isInMemoryMode()) {
             try {
-                const sql = `
-                    INSERT INTO inquiries (property_id, buyer_id, agent_id, message, contact_method)
-                    VALUES ($1, $2, $3, $4, $5)
-                    RETURNING *
-                `;
+                const createdAt = new Date().toISOString();
+                const inquiry = {
+                    id: `inquiry_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+                    propertyId,
+                    property_id: propertyId,
+                    buyerId,
+                    buyer_id: buyerId,
+                    agentId,
+                    agent_id: agentId,
+                    message: message || 'Interested in viewing this property.',
+                    contactMethod: contactMethod || 'call',
+                    contact_method: contactMethod || 'call',
+                    status: 'new',
+                    createdAt,
+                    created_at: createdAt,
+                };
 
-                // Increment property contact count
-                await db.query('UPDATE properties SET contact_count = contact_count + 1 WHERE id = $1', [propertyId]);
+                const properties = await db.getCollection('properties');
+                await properties.updateOne(
+                    { id: String(propertyId) },
+                    {
+                        $inc: { contactCount: 1 },
+                        $set: { updatedAt: new Date().toISOString() },
+                    }
+                );
 
-                return await db.getOne(sql, [propertyId, buyerId, agentId, message, contactMethod]);
+                const inquiries = await db.getCollection('inquiries');
+                await inquiries.insertOne(inquiry);
+                return inquiry;
             } catch (err) {
-                console.warn('🔄 PostgreSQL insert failed in create() inquiry. Retrying in in-memory mode.');
+                console.warn('MongoDB insert failed in create() inquiry. Retrying in in-memory mode.');
             }
         }
 
@@ -51,23 +70,32 @@ const InquiryModel = {
     async getByAgent(agentId) {
         if (!db.isInMemoryMode()) {
             try {
-                const sql = `
-                    SELECT 
-                        i.*,
-                        p.title as property_title,
-                        p.price,
-                        u.name as buyer_name,
-                        u.phone as buyer_phone,
-                        u.email as buyer_email
-                    FROM inquiries i
-                    JOIN properties p ON i.property_id = p.id
-                    JOIN users u ON i.buyer_id = u.id
-                    WHERE i.agent_id = $1
-                    ORDER BY i.created_at DESC
-                `;
-                return await db.getAll(sql, [agentId]);
+                const inquiries = await db.getCollection('inquiries');
+                const rows = await inquiries
+                    .find({ $or: [{ agentId }, { agent_id: agentId }] })
+                    .sort({ createdAt: -1, created_at: -1 })
+                    .toArray();
+
+                const PropertyModel = require('./propertyModel');
+                const UserModel = require('./userModel');
+                const hydrated = [];
+
+                for (const inquiry of rows) {
+                    const property = await PropertyModel.getById(inquiry.propertyId || inquiry.property_id);
+                    const buyer = await UserModel.findById(inquiry.buyerId || inquiry.buyer_id);
+                    hydrated.push({
+                        ...inquiry,
+                        property_title: property?.title,
+                        price: property?.price,
+                        buyer_name: buyer?.name,
+                        buyer_phone: buyer?.phone,
+                        buyer_email: buyer?.email,
+                    });
+                }
+
+                return hydrated;
             } catch (err) {
-                console.warn('🔄 PostgreSQL query failed in getByAgent() inquiries. Retrying in in-memory mode.');
+                console.warn('MongoDB query failed in getByAgent() inquiries. Retrying in in-memory mode.');
             }
         }
 

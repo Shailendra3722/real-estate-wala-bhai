@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+    
+    <!-- Luxury Ultra Premium -->
+    <link rel="stylesheet" href="../css/luxury-ultra-premium.css">
+    <link rel="stylesheet" href="../css/loading-animation.css">
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Explore Map - Real Estate Wala Bhai</title>
@@ -11,400 +21,7 @@
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
     
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Outfit', sans-serif;
-            background: #1E293B;
-            height: 100vh;
-            color: #ffffff;
-            overflow: hidden;
-        }
-
-        /* Top hint banner */
-        .top-hint {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            padding: 1rem;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
-            backdrop-filter: blur(10px);
-            text-align: center;
-            font-size: 0.95rem;
-            font-weight: 600;
-            z-index: 100;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Map container */
-        .map-container {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
-            position: relative;
-        }
-
-        /* Map - using Leaflet */
-        #map {
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
-        
-        .map-placeholder {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: 
-                radial-gradient(circle at 30% 40%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 70% 60%, rgba(118, 75, 162, 0.1) 0%, transparent 50%),
-                linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-        }
-
-        /* Location permission overlay */
-        .permission-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(10px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 200;
-        }
-
-        .permission-card {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 25px;
-            padding: 3rem 2.5rem;
-            max-width: 400px;
-            text-align: center;
-            backdrop-filter: blur(10px);
-        }
-
-        .permission-icon {
-            font-size: 4rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .permission-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-        }
-
-        .permission-text {
-            font-size: 1rem;
-            color: #cbd5e1;
-            margin-bottom: 2rem;
-            line-height: 1.6;
-        }
-
-        .btn-allow {
-            width: 100%;
-            padding: 1.1rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            border-radius: 15px;
-            font-size: 1rem;
-            font-weight: 700;
-            color: #ffffff;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: 'Outfit', sans-serif;
-            margin-bottom: 0.75rem;
-        }
-
-        .btn-allow:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-skip {
-            width: 100%;
-            padding: 1rem;
-            background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 15px;
-            font-size: 0.95rem;
-            color: #94a3b8;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: 'Outfit', sans-serif;
-        }
-
-        .btn-skip:hover {
-            border-color: rgba(255, 255, 255, 0.3);
-            color: #cbd5e1;
-        }
-
-        /* Property pins on map */
-        .map-pin {
-            position: absolute;
-            width: 45px;
-            height: 45px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 50% 50% 50% 0;
-            transform: rotate(-45deg);
-            border: 3px solid #ffffff;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .map-pin:hover {
-            transform: rotate(-45deg) scale(1.2);
-            z-index: 10;
-        }
-
-        .pin-inner {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transform: rotate(45deg);
-            font-size: 1.2rem;
-        }
-
-        /* Property info card */
-        .property-info-card {
-            position: absolute;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 20px;
-            padding: 1.5rem;
-            max-width: 350px;
-            width: calc(100% - 2rem);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
-            display: none;
-            z-index: 50;
-        }
-
-        .property-info-card.active {
-            display: block;
-            animation: slideUp 0.4s ease-out;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateX(-50%) translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(-50%) translateY(0);
-            }
-        }
-
-        .info-price {
-            font-size: 1.8rem;
-            font-weight: 800;
-            margin-bottom: 0.5rem;
-            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .info-details {
-            font-size: 1.05rem;
-            color: #cbd5e1;
-            margin-bottom: 1.25rem;
-        }
-
-        .btn-view-details {
-            width: 100%;
-            padding: 1rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            border-radius: 15px;
-            font-size: 0.95rem;
-            font-weight: 700;
-            color: #ffffff;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: 'Outfit', sans-serif;
-        }
-
-        .btn-view-details:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-        }
-
-        /* Search Filter Panel */
-        .filter-panel {
-            position: absolute;
-            top: 70px;
-            left: 20px;
-            background: rgba(255, 255, 255, 0.98);
-            border-radius: 20px;
-            padding: 1.5rem;
-            width: 300px;
-            z-index: 500;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-            max-height: calc(100vh - 150px);
-            overflow-y: auto;
-            color: #0f172a;
-        }
-
-        .filter-panel.hidden {
-            display: none;
-        }
-
-        .filter-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.25rem;
-        }
-
-        .filter-title {
-            font-size: 1.1rem;
-            font-weight: 800;
-            color: #0f172a;
-        }
-
-        .filter-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #64748b;
-        }
-
-        .filter-group {
-            margin-bottom: 1.25rem;
-        }
-
-        .filter-label {
-            display: block;
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: #475569;
-            margin-bottom: 0.5rem;
-        }
-
-        .filter-select {
-            width: 100%;
-            padding: 0.75rem;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            font-size: 0.95rem;
-            font-family: 'Outfit', sans-serif;
-            color: #0f172a;
-        }
-
-        .filter-select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .price-inputs {
-            display: flex;
-            gap: 0.75rem;
-        }
-
-        .price-input {
-            flex: 1;
-            padding: 0.75rem;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            font-family: 'Outfit', sans-serif;
-        }
-
-        .btn-apply-filters {
-            width: 100%;
-            padding: 0.9rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-weight: 700;
-            cursor: pointer;
-            font-family: 'Outfit', sans-serif;
-            margin-top: 0.5rem;
-        }
-
-        .btn-clear-filters {
-            width: 100%;
-            padding: 0.75rem;
-            background: white;
-            color: #64748b;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            font-family: 'Outfit', sans-serif;
-            margin-top: 0.5rem;
-        }
-
-        /* Map Controls */
-        .map-controls {
-            position: absolute;
-            top: 70px;
-            right: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            z-index: 500;
-        }
-
-        .map-btn {
-            width: 50px;
-            height: 50px;
-            background: rgba(255, 255, 255, 0.98);
-            border: none;
-            border-radius: 12px;
-            font-size: 1.3rem;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-        }
-
-        .map-btn.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .pin-drop-hint {
-            position: absolute;
-            top: 130px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(102, 126, 234, 0.95);
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: 25px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            z-index: 500;
-        }
-
-        .pin-drop-hint.hidden {
-            display: none;
-        }
-
-        /* Hidden class */
-        .hidden {
-            display: none !important;
-        }
-    </style>
+    
     <!-- Premium Smooth Scroll -->
     <script src="https://unpkg.com/@studio-freight/lenis@1.0.35/dist/lenis.min.js"></script>
     <script src="../js/utils/smoothScroll.js"></script>
@@ -412,8 +29,246 @@
     <script src="../js/services/themeManager.js"></script>
     <!-- Profile Menu -->
     <script src="profile-menu.js"></script>
+
+    <style id="lux-critical">
+        html, body {
+            margin: 0 !important; padding: 0 !important;
+            background: #161312 !important;
+            overflow: hidden !important; /* Maps usually need hidden overflow on body */
+            height: 100vh;
+            color: var(--color-text-primary);
+        }
+    </style>
+    <style id="page-styles">
+        /* Luxury Map Explore Styles */
+        .map-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            filter: sepia(0.6) hue-rotate(345deg) brightness(0.9) contrast(1.1); /* Warm cinematic map */
+        }
+        #map { width: 100%; height: 100%; }
+
+        .top-hint {
+            position: absolute; top: var(--sp-6); left: 50%; transform: translateX(-50%);
+            background: var(--glass-bg); border: 1px solid var(--color-border);
+            color: var(--color-text-primary); padding: var(--sp-3) var(--sp-6);
+            border-radius: var(--r-full); font-size: 0.9rem; font-weight: 500;
+            z-index: 500; backdrop-filter: blur(16px);
+        }
+
+        .filter-panel {
+            position: absolute; top: var(--sp-24); left: var(--sp-6);
+            background: var(--glass-bg); border: 1px solid var(--color-border);
+            border-radius: var(--r-2xl); padding: var(--sp-6); width: 320px;
+            z-index: 500; backdrop-filter: blur(16px); color: var(--color-text-primary);
+            box-shadow: 0 24px 60px rgba(0,0,0,0.4);
+            max-height: calc(100vh - 120px); overflow-y: auto;
+        }
+        .filter-panel.hidden { display: none; }
+        .filter-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--sp-6); }
+        .filter-title { font-family: var(--font-editorial); font-size: 1.5rem; color: var(--lux-gold-light); }
+        .filter-close { background: none; border: none; font-size: 1.5rem; color: var(--color-text-muted); cursor: pointer; }
+        
+        .filter-group { margin-bottom: var(--sp-4); }
+        .filter-label { font-size: 0.8rem; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: var(--sp-2); display: block; }
+        .filter-select, .price-input {
+            width: 100%; padding: var(--sp-3); background: rgba(0,0,0,0.2);
+            border: 1px solid var(--color-border); border-radius: var(--r-lg);
+            color: var(--color-text-primary); font-family: var(--font-sans);
+        }
+        .filter-select:focus, .price-input:focus { outline: none; border-color: var(--color-accent); }
+        
+        .price-inputs { display: flex; gap: var(--sp-2); }
+        .btn-apply-filters {
+            width: 100%; padding: var(--sp-3); margin-top: var(--sp-4);
+            background: linear-gradient(135deg, var(--color-accent-hover), var(--color-accent));
+            color: #161312; border: none; border-radius: var(--r-full); font-weight: 600; cursor: pointer;
+        }
+        .btn-clear-filters {
+            width: 100%; padding: var(--sp-3); margin-top: var(--sp-2);
+            background: transparent; color: var(--color-text-secondary);
+            border: 1px solid var(--color-border); border-radius: var(--r-full); font-weight: 600; cursor: pointer;
+        }
+
+        .map-controls { position: absolute; top: var(--sp-24); right: var(--sp-6); display: flex; flex-direction: column; gap: var(--sp-2); z-index: 500; }
+        .map-btn {
+            width: 48px; height: 48px; background: var(--glass-bg); border: 1px solid var(--color-border);
+            border-radius: var(--r-full); color: var(--color-text-primary); font-size: 1.25rem;
+            cursor: pointer; backdrop-filter: blur(12px); display: flex; align-items: center; justify-content: center;
+        }
+        .map-btn:hover { background: var(--color-surface); color: var(--lux-gold); }
+        .map-btn.active { background: var(--color-accent); color: #161312; border-color: var(--color-accent); }
+
+        /* Custom Markers */
+        .custom-pin { filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4)); }
+        .pin-inner {
+            background: var(--lux-espresso); border: 2px solid var(--lux-gold);
+            width: 40px; height: 40px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg);
+            display: flex; align-items: center; justify-content: center; color: var(--lux-gold-light);
+            font-size: 1rem; position: relative;
+        }
+        .pin-inner::after {
+            content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 12px; height: 12px; background: var(--lux-gold); border-radius: 50%;
+        }
+        .pin-inner.highlight { background: var(--lux-gold); border-color: var(--lux-white); }
+        .pin-inner.highlight::after { background: var(--lux-espresso); }
+
+        /* Property info card overlay */
+        .property-info-card {
+            position: absolute; bottom: var(--sp-8); left: 50%; transform: translateX(-50%);
+            background: var(--glass-bg); border: 1px solid var(--color-border);
+            border-radius: var(--r-2xl); padding: var(--sp-6); width: 360px;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.4); display: none; z-index: 500;
+            backdrop-filter: blur(16px);
+        }
+        .property-info-card.active { display: block; animation: slideUp 0.4s cubic-bezier(0.22,1,0.36,1); }
+        @keyframes slideUp { from { opacity: 0; transform: translate(-50%, 30px); } to { opacity: 1; transform: translate(-50%, 0); } }
+        
+        .info-price { font-family: var(--font-editorial); font-size: 2.25rem; color: var(--lux-gold-light); margin-bottom: var(--sp-2); }
+        .info-details { font-size: 0.95rem; color: var(--color-text-secondary); margin-bottom: var(--sp-4); }
+        .btn-view-details {
+            width: 100%; padding: var(--sp-3); background: linear-gradient(135deg, var(--color-accent-hover), var(--color-accent));
+            color: #161312; border: none; border-radius: var(--r-full); font-weight: 600; cursor: pointer;
+        }
+    </style>
+
 </head>
 <body>
+
+<header class="header">
+            <!-- Left: Logo -->
+            <a href="home.html" class="logo">
+                <div class="logo-icon">🏡</div>
+                <span class="logo-text">Real Estate Wala Bhai</span>
+            </a>
+            
+            <!-- Center: Navigation Links (Desktop) -->
+            <div class="nav-desktop-links">
+                <a href="home.html" class="nav-desktop-link active">Home</a>
+                <a href="#" class="nav-desktop-link" onclick="setHeroTab('buy'); return false;">Buy</a>
+                <a href="#" class="nav-desktop-link" onclick="setHeroTab('rent'); return false;">Rent</a>
+                <a href="#" class="nav-desktop-link" onclick="if(window.Navigation) window.Navigation.goToAddProperty(); return false;">Sell</a>
+                <a href="map-explore.html" class="nav-desktop-link">Map</a>
+                <a href="mailto:support@realestatewala.com?subject=Inquiry" class="nav-desktop-link">Contact</a>
+            </div>
+
+            <!-- Right: Actions -->
+            <div class="nav-actions">
+                <!-- Search Trigger -->
+                <button class="nav-action-btn search-trigger-btn" aria-label="Search" title="Search" onclick="toggleNavSearch()">🔍</button>
+
+                <!-- Theme Toggle -->
+                <button class="nav-action-btn theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Theme" title="Toggle Theme" onclick="toggleTheme()">🌙</button>
+                
+                <!-- Notification Bell -->
+                <button class="nav-action-btn notification-btn" aria-label="Notifications" title="Notifications" onclick="if(window.Toast) Toast.info('You have no new notifications'); else showMiniToast('No new notifications')">
+                    🔔
+                    <span class="notification-badge"></span>
+                </button>
+                
+                <!-- User Profile -->
+                <div class="user-profile">👤</div>
+
+                <!-- Mobile Menu Toggle Button -->
+                <button class="nav-action-btn mobile-menu-toggle" aria-label="Toggle Menu" onclick="toggleMobileMenu()">
+                    ☰
+                </button>
+            </div>
+
+            <!-- Mobile Dropdown Menu -->
+            <div class="nav-mobile-dropdown" id="navMobileDropdown">
+                <a href="home.html" class="nav-mobile-link active" onclick="toggleMobileMenu()">Home</a>
+                <a href="#" class="nav-mobile-link" onclick="setHeroTab('buy'); toggleMobileMenu(); return false;">Buy</a>
+                <a href="#" class="nav-mobile-link" onclick="setHeroTab('rent'); toggleMobileMenu(); return false;">Rent</a>
+                <a href="#" class="nav-mobile-link" onclick="if(window.Navigation) window.Navigation.goToAddProperty(); toggleMobileMenu(); return false;">Sell</a>
+                <a href="map-explore.html" class="nav-mobile-link" onclick="toggleMobileMenu()">Map</a>
+                <a href="mailto:support@realestatewala.com?subject=Inquiry" class="nav-mobile-link" onclick="toggleMobileMenu()">Contact</a>
+            </div>
+
+            <!-- Inline Nav Search Bar -->
+            <div id="navSearchOverlay" style="
+                display:none; position:absolute; top:72px; left:0; right:0;
+                background:var(--glass-bg); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px);
+                border-bottom:1px solid var(--color-border); padding:var(--sp-3) var(--sp-6);
+                z-index:998; animation:slideDown var(--dur-base) var(--ease-out) both;
+            ">
+                <div style="max-width:600px; margin:0 auto; position:relative;">
+                    <input id="searchInput" type="text" placeholder="Search by city, area, property type..."
+                        style="
+                            width:100%; padding:var(--sp-3) var(--sp-5) var(--sp-3) var(--sp-10);
+                            background:var(--color-bg-alt); border:1px solid var(--color-border-strong);
+                            border-radius:var(--r-full); font-family:var(--font-sans);
+                            font-size:var(--text-sm); color:var(--color-text-primary);
+                            outline:none; transition:all var(--dur-base);
+                        "
+                        onfocus="this.style.borderColor='var(--brand-500)'; this.style.boxShadow='0 0 0 3px rgba(79,70,229,0.15)'"
+                        onblur="this.style.borderColor=''; this.style.boxShadow=''"
+                    >
+                    <span style="position:absolute;left:var(--sp-3);top:50%;transform:translateY(-50%);font-size:1rem;opacity:0.5;">🔍</span>
+                    <button onclick="document.getElementById('searchInput').value=''; loadAllProperties(); toggleNavSearch()" style="
+                        position:absolute;right:var(--sp-3);top:50%;transform:translateY(-50%);
+                        background:none;border:none;cursor:pointer;font-size:1.1rem;opacity:0.5;
+                        color:var(--color-text-primary); transition:opacity var(--dur-fast);
+                    " title="Clear search">✕</button>
+                </div>
+            </div>
+        </header>
+<div class="nav-mobile-dropdown" id="navMobileDropdown">
+                <a href="home.html" class="nav-mobile-link active" onclick="toggleMobileMenu()">Home</a>
+                <a href="#" class="nav-mobile-link" onclick="setHeroTab('buy'); toggleMobileMenu(); return false;">Buy</a>
+                <a href="#" class="nav-mobile-link" onclick="setHeroTab('rent'); toggleMobileMenu(); return false;">Rent</a>
+                <a href="#" class="nav-mobile-link" onclick="if(window.Navigation) window.Navigation.goToAddProperty(); toggleMobileMenu(); return false;">Sell</a>
+                <a href="map-explore.html" class="nav-mobile-link" onclick="toggleMobileMenu()">Map</a>
+                <a href="mailto:support@realestatewala.com?subject=Inquiry" class="nav-mobile-link" onclick="toggleMobileMenu()">Contact</a>
+            </div>
+<div id="navSearchOverlay" style="
+                display:none; position:absolute; top:72px; left:0; right:0;
+                background:var(--glass-bg); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px);
+                border-bottom:1px solid var(--color-border); padding:var(--sp-3) var(--sp-6);
+                z-index:998; animation:slideDown var(--dur-base) var(--ease-out) both;
+            ">
+                <div style="max-width:600px; margin:0 auto; position:relative;">
+                    <input id="searchInput" type="text" placeholder="Search by city, area, property type..."
+                        style="
+                            width:100%; padding:var(--sp-3) var(--sp-5) var(--sp-3) var(--sp-10);
+                            background:var(--color-bg-alt); border:1px solid var(--color-border-strong);
+                            border-radius:var(--r-full); font-family:var(--font-sans);
+                            font-size:var(--text-sm); color:var(--color-text-primary);
+                            outline:none; transition:all var(--dur-base);
+                        "
+                        onfocus="this.style.borderColor='var(--brand-500)'; this.style.boxShadow='0 0 0 3px rgba(79,70,229,0.15)'"
+                        onblur="this.style.borderColor=''; this.style.boxShadow=''"
+                    >
+                    <span style="position:absolute;left:var(--sp-3);top:50%;transform:translateY(-50%);font-size:1rem;opacity:0.5;">🔍</span>
+                    <button onclick="document.getElementById('searchInput').value=''; loadAllProperties(); toggleNavSearch()" style="
+                        position:absolute;right:var(--sp-3);top:50%;transform:translateY(-50%);
+                        background:none;border:none;cursor:pointer;font-size:1.1rem;opacity:0.5;
+                        color:var(--color-text-primary); transition:opacity var(--dur-fast);
+                    " title="Clear search">✕</button>
+                </div>
+<nav class="bottom-nav">
+        <div class="nav-items">
+            <div class="nav-item active">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">Home</span>
+            </div>
+            <div class="nav-item">
+                <span class="nav-icon">🔍</span>
+                <span class="nav-label">Search</span>
+            </div>
+            <div class="nav-item">
+                <span class="nav-icon">❤️</span>
+                <span class="nav-label">Saved</span>
+            </div>
+            <div class="nav-item">
+                <span class="nav-icon">👤</span>
+                <span class="nav-label">Profile</span>
+            </div>
+        </div>
+    </nav>
+
     <!-- Top hint banner -->
     <div class="top-hint">
         Explore properties around you
@@ -862,7 +717,7 @@
             map = L.map('map').setView([centerLat, centerLng], 13);
             
             // Add OpenStreetMap tiles
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
                 attribution: '© OpenStreetMap contributors',
                 maxZoom: 19
             }).addTo(map);

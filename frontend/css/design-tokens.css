@@ -1,0 +1,134 @@
+/* ==========================================================
+   REAL ESTATE WALA BHAI
+   DESIGN TOKENS v1.0
+   ========================================================== */
+
+:root{
+
+/* =========================
+   BRAND COLORS
+========================= */
+
+--color-primary:#4E6B5A;
+--color-primary-hover:#425C4D;
+
+--color-secondary:#8B7355;
+
+--color-accent:#C8A977;
+
+/* =========================
+   BACKGROUND
+========================= */
+
+--color-background:#F8F6F2;
+--color-surface:#F2EFE8;
+--color-card:#FFFFFF;
+
+/* =========================
+   TEXT
+========================= */
+
+--color-text:#2D2D2D;
+--color-text-light:#707070;
+--color-text-white:#FFFFFF;
+
+/* =========================
+   BORDER
+========================= */
+
+--color-border:#E7E2D9;
+
+/* =========================
+   STATUS
+========================= */
+
+--color-success:#3C7A57;
+--color-warning:#D6A64F;
+--color-error:#B84A4A;
+--color-info:#4E6B5A;
+
+/* =========================
+   SHADOWS
+========================= */
+
+--shadow-xs:0 2px 4px rgba(0,0,0,.03);
+
+--shadow-sm:0 6px 16px rgba(0,0,0,.05);
+
+--shadow-md:0 12px 28px rgba(0,0,0,.08);
+
+--shadow-lg:0 20px 50px rgba(0,0,0,.10);
+
+/* =========================
+   BORDER RADIUS
+========================= */
+
+--radius-sm:8px;
+
+--radius-md:14px;
+
+--radius-lg:22px;
+
+--radius-xl:30px;
+
+--radius-round:999px;
+
+/* =========================
+   SPACING
+========================= */
+
+--space-xs:4px;
+--space-sm:8px;
+--space-md:16px;
+--space-lg:24px;
+--space-xl:40px;
+--space-2xl:64px;
+--space-3xl:96px;
+
+/* =========================
+   TRANSITIONS
+========================= */
+
+--transition-fast:.2s ease;
+
+--transition-normal:.35s ease;
+
+--transition-slow:.5s ease;
+
+/* =========================
+   CONTAINER
+========================= */
+
+--container-width:1280px;
+
+/* =========================
+   NAVBAR
+========================= */
+
+--navbar-height:82px;
+
+/* =========================
+   BUTTONS
+========================= */
+
+--button-height:54px;
+
+--button-radius:16px;
+
+/* =========================
+   INPUTS
+========================= */
+
+--input-height:54px;
+
+/* =========================
+   GLASS EFFECT
+========================= */
+
+--glass-bg:rgba(255,255,255,.65);
+
+--glass-border:rgba(255,255,255,.45);
+
+--glass-blur:18px;
+
+}

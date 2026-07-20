@@ -1,99 +1,95 @@
 /**
- * Database Connection Pool Setup
- * 
- * Provides unified interface to PostgreSQL.
- * If credentials are not set or database is unreachable, 
- * falls back to in-memory/static data mode to keep application running.
+ * MongoDB Connection Setup
+ *
+ * Provides a small shared MongoDB client for the app models.
+ * If MongoDB credentials are not set or Atlas is unreachable, the app keeps
+ * running with the existing in-memory/static fallback data.
  */
 
 require('dotenv').config();
-const { Pool } = require('pg');
+const { MongoClient } = require('mongodb');
 
-let pool = null;
+const mongoUri = process.env.MONGODB_URI;
+const dbName = process.env.MONGODB_DB_NAME || 'real_estate_wala_bhai';
+
+let client = null;
+let database = null;
 let isInMemoryMode = false;
 let dbStartupError = null;
+let connectionPromise = null;
 
-const dbConfig = {
-    user: process.env.DB_USER || 'postgres',
-    host: process.env.DB_HOST || 'localhost',
-    database: process.env.DB_NAME || 'real_estate_db',
-    password: process.env.DB_PASSWORD,
-    port: process.env.DB_PORT || 5432,
-    max: 10,
-    idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 2000,
-};
+async function ensureIndexes(db) {
+    await Promise.all([
+        db.collection('properties').createIndex({ id: 1 }, { unique: true }),
+        db.collection('properties').createIndex({ status: 1, createdAt: -1 }),
+        db.collection('properties').createIndex({ city: 1, area: 1 }),
+        db.collection('properties').createIndex({ locationPoint: '2dsphere' }, { sparse: true }),
+        db.collection('users').createIndex({ id: 1 }, { unique: true }),
+        db.collection('users').createIndex({ email: 1 }, { unique: true, sparse: true }),
+        db.collection('favorites').createIndex({ userId: 1, propertyId: 1 }, { unique: true }),
+        db.collection('inquiries').createIndex({ agentId: 1, createdAt: -1 }),
+    ]);
+}
 
-// Check if credentials are set
-if (!process.env.DB_HOST || !process.env.DB_PASSWORD) {
-    console.warn('\n⚠️  Database environment variables missing. Falling back to IN-MEMORY MODE.');
+if (!mongoUri) {
+    console.warn('\nMongoDB environment variable MONGODB_URI is missing. Falling back to IN-MEMORY MODE.');
     isInMemoryMode = true;
 } else {
-    try {
-        pool = new Pool(dbConfig);
+    client = new MongoClient(mongoUri, {
+        maxPoolSize: 10,
+        serverSelectionTimeoutMS: 5000,
+    });
 
-        pool.on('connect', () => {
-            console.log('✅ Database connection established successfully.');
-        });
-
-        pool.on('error', (err) => {
-            console.error('❌ Database connection pool error:', err);
-        });
-    } catch (e) {
-        dbStartupError = e.message;
-        isInMemoryMode = true;
-        console.error('❌ Database pool initialization failed:', e);
-    }
-}
-
-/**
- * Executes an SQL query against the active PostgreSQL pool.
- * @param {string} text - SQL Query String
- * @param {Array} params - Query Parameters
- */
-async function query(text, params) {
-    if (isInMemoryMode) {
-        throw new Error('Database is in in-memory fallback mode. Direct queries not available.');
-    }
-    const start = Date.now();
-    try {
-        const res = await pool.query(text, params);
-        const duration = Date.now() - start;
-        console.log(`Executed query in ${duration}ms (Rows: ${res.rowCount})`);
-        return res;
-    } catch (error) {
-        // Check for common database connection failure codes
-        if (error.code === 'ECONNREFUSED' || error.code === 'ENOTFOUND' || error.message.includes('connect')) {
-            console.warn('\n⚠️  Database connection failed. Dynamically switching to IN-MEMORY MODE.');
+    connectionPromise = client.connect()
+        .then(async () => {
+            database = client.db(dbName);
+            await ensureIndexes(database);
+            console.log(`MongoDB connected successfully (${dbName}).`);
+            return database;
+        })
+        .catch((error) => {
+            dbStartupError = error.message;
             isInMemoryMode = true;
-        }
-        console.error('Database query execution error:', error);
-        throw error;
+            console.error('MongoDB connection failed. Using in-memory fallback mode:', error.message);
+            return null;
+        });
+}
+
+async function connect() {
+    if (isInMemoryMode) {
+        throw new Error('Database is in in-memory fallback mode. Direct MongoDB access is not available.');
     }
+
+    if (!database) {
+        await connectionPromise;
+    }
+
+    if (!database || isInMemoryMode) {
+        throw new Error(dbStartupError || 'MongoDB connection is not available.');
+    }
+
+    return database;
 }
 
-/**
- * Fetches a single record from SQL query results.
- */
-async function getOne(text, params) {
-    const result = await query(text, params);
-    return result.rows[0] || null;
+async function getCollection(name) {
+    const db = await connect();
+    return db.collection(name);
 }
 
-/**
- * Fetches multiple records from SQL query results.
- */
-async function getAll(text, params) {
-    const result = await query(text, params);
-    return result.rows;
+async function close() {
+    if (client) {
+        await client.close();
+        client = null;
+        database = null;
+    }
 }
 
 module.exports = {
-    pool,
-    query,
-    getOne,
-    getAll,
+    client,
+    connect,
+    getCollection,
+    close,
     isInMemoryMode: () => isInMemoryMode,
     getStartupError: () => dbStartupError,
-    setInMemoryMode: (val) => { isInMemoryMode = val; }
+    setInMemoryMode: (val) => { isInMemoryMode = val; },
 };

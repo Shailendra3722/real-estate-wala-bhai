@@ -103,8 +103,8 @@ node api-server.js
 
 **Expected output:**
 ```
-✅ API Server running on http://localhost:3000
-📍 Map API: http://localhost:3000/api/properties/nearby?lat=26.8467&lng=80.9462&radius=5
+✅ API Server running on http://localhost:3004
+📍 Map API: http://localhost:3004/api/properties/nearby?lat=26.8467&lng=80.9462&radius=5
 ```
 
 ---
@@ -113,7 +113,7 @@ node api-server.js
 
 Open browser and visit:
 ```
-http://localhost:3000/api/properties/nearby?lat=26.8467&lng=80.9462&radius=5
+http://localhost:3004/api/properties/nearby?lat=26.8467&lng=80.9462&radius=5
 ```
 
 **Expected response:**
@@ -462,17 +462,17 @@ function getFallbackProperties(lat, lng, radiusKm) {
 
 ### Test 1: API Nearby Query
 ```bash
-curl "http://localhost:3000/api/properties/nearby?lat=26.8467&lng=80.9462&radius=5"
+curl "http://localhost:3004/api/properties/nearby?lat=26.8467&lng=80.9462&radius=5"
 ```
 
 ### Test 2: With Filters
 ```bash
-curl "http://localhost:3000/api/properties/nearby?lat=26.8467&lng=80.9462&radius=10&listingType=sell&minPrice=3000000&maxPrice=10000000"
+curl "http://localhost:3004/api/properties/nearby?lat=26.8467&lng=80.9462&radius=10&listingType=sell&minPrice=3004000&maxPrice=10000000"
 ```
 
 ### Test 3: Get Single Property
 ```bash
-curl "http://localhost:3000/api/properties/prop_001"
+curl "http://localhost:3004/api/properties/prop_001"
 ```
 
 ### Test 4: In Browser Console

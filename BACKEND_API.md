@@ -4,7 +4,7 @@
 
 This document describes the REST API endpoints for the Real Estate Wala Bhai application.
 
-**Base URL (Development):** `http://localhost:3000`  
+**Base URL (Development):** `http://localhost:3004`  
 **Base URL (Production):** Your deployed server URL
 
 ---
@@ -25,7 +25,7 @@ Get a paginated list of all active properties.
 
 **Example Request:**
 ```bash
-curl http://localhost:3000/api/properties?page=1&limit=10
+curl http://localhost:3004/api/properties?page=1&limit=10
 ```
 
 **Success Response (200):**
@@ -55,7 +55,7 @@ Fetch detailed information about a single property.
 
 **Example Request:**
 ```bash
-curl http://localhost:3000/api/properties/prop_001
+curl http://localhost:3004/api/properties/prop_001
 ```
 
 **Success Response (200):**
@@ -132,7 +132,7 @@ Find properties within a specified radius of coordinates.
 
 **Example Request:**
 ```bash
-curl "http://localhost:3000/api/properties/nearby?lat=26.8467&lng=80.9462&radius=5"
+curl "http://localhost:3004/api/properties/nearby?lat=26.8467&lng=80.9462&radius=5"
 ```
 
 **Success Response (200):**
@@ -178,7 +178,7 @@ Search properties with multiple filters.
 {
   "city": "Lucknow",
   "listingType": "sell",
-  "minPrice": 3000000,
+  "minPrice": 3004000,
   "maxPrice": 10000000,
   "bhk": "3 BHK",
   "propertyType": "flat",
@@ -190,7 +190,7 @@ All fields are optional.
 
 **Example Request:**
 ```bash
-curl -X POST http://localhost:3000/api/properties/search \
+curl -X POST http://localhost:3004/api/properties/search \
   -H "Content-Type: application/json" \
   -d '{
     "city": "Lucknow",
@@ -247,7 +247,7 @@ Submit an inquiry/contact request for a property.
 
 **Example Request:**
 ```bash
-curl -X POST http://localhost:3000/api/contact \
+curl -X POST http://localhost:3004/api/contact \
   -H "Content-Type: application/json" \
   -d '{
     "propertyId": "prop_001",
@@ -418,11 +418,11 @@ All endpoints return consistent error responses:
    npm run dev
    ```
 
-   Server will run on `http://localhost:3000`
+   Server will run on `http://localhost:3004`
 
 5. **Test API:**
    ```bash
-   curl http://localhost:3000/api/properties
+   curl http://localhost:3004/api/properties
    ```
 
 ---
@@ -435,7 +435,7 @@ Set these in your production environment:
 
 ```bash
 NODE_ENV=production
-PORT=3000
+PORT=3004
 DB_USER=your_db_user
 DB_HOST=your_db_host
 DB_NAME=real_estate_db

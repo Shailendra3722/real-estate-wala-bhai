@@ -44,7 +44,7 @@ const InquiryController = {
             const inquiry = await Inquiry.create({
                 propertyId,
                 buyerId: `guest_${Date.now()}`, // Temporary fallback until token-based profiles are enabled
-                agentId: property.owner_id || (property.owner ? property.owner.id : 'agent_default'),
+                agentId: property.owner_id || property.ownerId || (property.owner ? property.owner.id : 'agent_default'),
                 message: message || `Contact request from ${name}.`,
                 contactMethod: contactMethod || 'call'
             });

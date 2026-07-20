@@ -25,7 +25,7 @@ This application is built as a unified repository separating Concerns between a 
        │  [Routes Layer]     --> Matches endpoint (/api/nearby) │
        │  [Controller Layer] --> Parses parameters, formats response │
        │  [Service Layer]    --> Calculates spatial geo-distances │
-       │  [Model Layer]      --> Fetches from Postgres / JSON arrays │
+       │  [Model Layer]      --> Fetches from MongoDB / JSON arrays  │
        +────────────────────────────────────────────────────────+
 ```
 
@@ -34,7 +34,7 @@ This application is built as a unified repository separating Concerns between a 
 2. **Frontend API Call**: `mapService.js` coordinates with `apiConfig.js` to dispatch a `GET` request to `/api/properties/nearby?lat=26.8467&lng=80.9462&radius=5`.
 3. **Backend Routing**: `backend/routes/propertyRoutes.js` routes the request to `PropertyController.getNearby`.
 4. **Backend Controller**: `PropertyController` validates coordinates and queries the database model.
-5. **Backend Data Model**: `PropertyModel` executes an SQL query utilizing `earthdistance` in PostgreSQL, or delegates to `distanceService.js` (Haversine formula) in **In-Memory Mode**.
+5. **Backend Data Model**: `PropertyModel` fetches MongoDB records and delegates nearby distance sorting to `distanceService.js` (Haversine formula), or uses the same local logic in **In-Memory Mode**.
 6. **Response Delivery**: The formatted list of properties, complete with calculated distances and localized pricing, is returned as JSON to the client to render custom map markers.
 
 ---
@@ -55,10 +55,10 @@ real-estate-wala-bhai/
 │
 ├── backend/                      # Layered Express Server
 │   ├── config/                   # Global parameters & Firebase configurations
-│   ├── database/                 # Pool configurations & seed migrations
-│   │   └── schema/               # Database SQL tables schemas
+│   ├── database/                 # MongoDB connection & seed migrations
+│   │   └── schema/               # Legacy SQL schema reference
 │   ├── middleware/               # Token verifications & standard headers
-│   ├── models/                   # DB interaction abstraction (PostgreSQL / Memory fallback)
+│   ├── models/                   # DB interaction abstraction (MongoDB / Memory fallback)
 │   ├── controllers/              # Express handlers parsing requests & returned payloads
 │   ├── routes/                   # Routing configuration mapping URLs to controllers
 │   ├── services/                 # Geo-distance & pricing format services
@@ -77,18 +77,15 @@ real-estate-wala-bhai/
 Copy `.env.example` to `.env` in the root directory:
 
 ```env
-# Database Credentials (optional - falls back to In-Memory mode if empty)
-DB_USER=postgres
-DB_HOST=localhost
-DB_NAME=real_estate_db
-DB_PASSWORD=your_secure_password
-DB_PORT=5432
+# MongoDB Credentials (optional - falls back to In-Memory mode if empty)
+MONGODB_URI=mongodb+srv://username:password@cluster0.example.mongodb.net/?appName=Cluster0
+MONGODB_DB_NAME=real_estate_wala_bhai
 
 # Authentication
 JWT_SECRET=generate_a_secure_token_secret
 
 # Server Configurations
-PORT=3000
+PORT=3004
 NODE_ENV=development
 ```
 
@@ -104,21 +101,20 @@ npm install
 
 # Start the development server
 npm run dev
-# → Server will start on http://localhost:3000 and fall back to In-Memory JSON mode
+# → Server will start on http://localhost:3004 and fall back to In-Memory JSON mode
 ```
 
-### 2. Database Mode (PostgreSQL)
+### 2. Database Mode (MongoDB Atlas)
 For production-quality databases:
-1. Ensure **PostgreSQL** is running.
-2. Setup the database and schema using the files in `backend/database/schema/`.
-3. Add your database credentials to `.env`.
-4. Run the database seed script:
+1. Create or open your **MongoDB Atlas** cluster.
+2. Add `MONGODB_URI` and `MONGODB_DB_NAME` to `.env`.
+3. Run the database seed script:
 ```bash
 npm run seed
-# → Populates PostgreSQL tables with sample users and properties
+# → Populates MongoDB collections with sample users and properties
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3004](http://localhost:3004) in your browser.
 
 ---
 

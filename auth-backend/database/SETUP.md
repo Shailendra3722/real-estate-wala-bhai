@@ -1,54 +1,39 @@
-# Setup Instructions for Neon PostgreSQL
+# MongoDB Setup For Legacy Simple API
 
-## Steps to Complete Setup
+## 1. Configure Environment
 
-### 1. Create Neon Account & Get Connection String
-1. Go to https://neon.tech
-2. Sign up (free)
-3. Create project: "real-estate-wala-bhai"
-4. Copy connection string from dashboard
-
-### 2. Fix npm Permissions (One-time Fix)
-```bash
-sudo chown -R $(id -u):$(id -g) ~/.npm
-```
-
-### 3. Install Dependencies
-```bash
-cd auth-backend
-npm install pg dotenv
-```
-
-### 4. Configure Environment
 ```bash
 cp .env.example .env
-# Edit .env and paste your Neon connection string
 ```
 
-### 5. Run Database Schema
-Using psql (if installed):
+Set:
+
+```env
+MONGODB_URI=mongodb+srv://username:password@cluster0.example.mongodb.net/?appName=Cluster0
+MONGODB_DB_NAME=real_estate_wala_bhai
+```
+
+## 2. Install Dependencies
+
 ```bash
-psql "YOUR_NEON_CONNECTION_STRING" -f database/schema.sql
+cd auth-backend
+npm install
 ```
 
-OR using Neon Web Console:
-- Go to your Neon project dashboard
-- Click "SQL Editor"
-- Copy schema.sql contents and run
+## 3. Seed Initial Data
 
-### 6. Seed Initial Data
 ```bash
 node database/seed.js
 ```
 
-### 7. Start Server
+## 4. Start Server
+
 ```bash
 node simple-api-server.js
 ```
 
-## Verify Setup
-- Browser: http://localhost:3000/api/properties
-- Should see 8 initial properties from database
+Verify:
 
-##Ready!
-Your data now persists forever - restart server anytime without losing data!
+```bash
+curl http://localhost:3004/api/properties
+```

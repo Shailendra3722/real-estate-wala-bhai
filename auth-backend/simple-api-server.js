@@ -1,9 +1,9 @@
 /**
  * ==========================================
- * REAL ESTATE API SERVER WITH NEON POSTGRESQL
+ * REAL ESTATE API SERVER WITH MONGODB
  * ==========================================
  * 
- * Production-ready backend with Neon serverless PostgreSQL
+ * Production-ready backend with MongoDB Atlas
  * Permanent data storage with auto-scaling database
  */
 
@@ -13,7 +13,7 @@ const cors = require('cors');
 const db = require('./database/db');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3004;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
 // Middleware
@@ -22,7 +22,7 @@ app.use(express.json());
 // CORS Configuration - Allow both local and production origins
 const allowedOrigins = [
     'http://localhost:8080',
-    'http://localhost:3000',
+    'http://localhost:3004',
     'http://127.0.0.1:8080',
     'https://real-estate-wala-bhai.vercel.app', // Add your Vercel domain here
     'https://*.vercel.app' // Allow all Vercel preview deployments
@@ -400,45 +400,52 @@ function formatProperty(prop, distance = null) {
     return formatted;
 }
 
-// Helper: Format property from database row (snake_case to camelCase)
+// Helper: Format property from database row/document (snake_case to camelCase)
 function formatPropertyFromDB(row, distance = null) {
+    const propertyType = row.propertyType || row.property_type;
+    const listingType = row.listingType || row.listing_type;
+    const verificationStatus = row.verificationStatus || row.verification_status;
+    const latitude = row.latitude || row.location?.latitude;
+    const longitude = row.longitude || row.location?.longitude;
+    const price = parseInt(row.price) || 0;
+
     const prop = {
         id: row.id,
         title: row.title,
         description: row.description,
-        propertyType: row.property_type,
-        listingType: row.listing_type,
+        propertyType,
+        listingType,
         bhk: row.bhk,
         bathrooms: row.bathrooms,
         sqft: row.sqft,
         furnishing: row.furnishing,
-        price: parseInt(row.price),
-        priceFormatted: formatPrice(parseInt(row.price), row.listing_type),
+        price,
+        priceFormatted: formatPrice(price, listingType),
         location: {
-            latitude: parseFloat(row.latitude),
-            longitude: parseFloat(row.longitude),
+            latitude: parseFloat(latitude) || 0,
+            longitude: parseFloat(longitude) || 0,
             address: row.address,
             city: row.city,
             area: row.area,
             pincode: row.pincode
         },
         amenities: row.amenities || [],
-        yearBuilt: row.year_built,
+        yearBuilt: row.yearBuilt || row.year_built,
         images: row.images || [],
-        verificationStatus: row.verification_status,
-        isVerified: row.verification_status === 'verified',
+        verificationStatus,
+        isVerified: verificationStatus === 'verified',
         owner: {
-            id: row.owner_id,
-            name: row.owner_name,
-            phone: row.owner_phone,
-            email: row.owner_email,
-            isVerified: row.owner_verified
+            id: row.ownerId || row.owner_id || row.owner?.id,
+            name: row.ownerName || row.owner_name || row.owner?.name,
+            phone: row.ownerPhone || row.owner_phone || row.owner?.phone,
+            email: row.ownerEmail || row.owner_email || row.owner?.email,
+            isVerified: row.ownerVerified || row.owner_verified || row.owner?.isVerified
         },
-        viewCount: row.view_count,
-        contactCount: row.contact_count,
+        viewCount: row.viewCount || row.view_count || 0,
+        contactCount: row.contactCount || row.contact_count || 0,
         status: row.status,
-        isFeatured: row.is_featured,
-        createdAt: row.created_at
+        isFeatured: row.isFeatured || row.is_featured,
+        createdAt: row.createdAt || row.created_at
     };
 
     if (distance !== null) {
@@ -455,25 +462,28 @@ function formatPropertyFromDB(row, distance = null) {
 app.get('/api/properties', async (req, res) => {
     try {
         const { page = 1, limit = 20 } = req.query;
-        const offset = (page - 1) * limit;
+        const pageNumber = parseInt(page);
+        const limitNumber = parseInt(limit);
+        const offset = (pageNumber - 1) * limitNumber;
 
-        const result = await db.query(
-            'SELECT * FROM properties WHERE status = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3',
-            ['active', parseInt(limit), offset]
-        );
-
-        const countResult = await db.query(
-            'SELECT COUNT(*) FROM properties WHERE status = $1',
-            ['active']
-        );
+        const propertiesCollection = await db.getCollection('properties');
+        const [properties, total] = await Promise.all([
+            propertiesCollection
+                .find({ status: 'active' })
+                .sort({ createdAt: -1, created_at: -1 })
+                .skip(offset)
+                .limit(limitNumber)
+                .toArray(),
+            propertiesCollection.countDocuments({ status: 'active' }),
+        ]);
 
         res.json({
             success: true,
-            page: parseInt(page),
-            limit: parseInt(limit),
-            total: parseInt(countResult.rows[0].count),
-            count: result.rows.length,
-            properties: result.rows.map(p => formatPropertyFromDB(p))
+            page: pageNumber,
+            limit: limitNumber,
+            total,
+            count: properties.length,
+            properties: properties.map(p => formatPropertyFromDB(p))
         });
     } catch (error) {
         console.error('Database error:', error);
@@ -485,19 +495,17 @@ app.get('/api/properties', async (req, res) => {
 app.get('/api/properties/:id', async (req, res) => {
     try {
         const { id } = req.params;
+        const propertiesCollection = await db.getCollection('properties');
 
         // Increment view count and get property
-        await db.query(
-            'UPDATE properties SET view_count = view_count + 1 WHERE id = $1',
-            [id]
+        await propertiesCollection.updateOne(
+            { id },
+            { $inc: { viewCount: 1 }, $set: { updatedAt: new Date().toISOString() } }
         );
 
-        const result = await db.query(
-            'SELECT * FROM properties WHERE id = $1',
-            [id]
-        );
+        const property = await propertiesCollection.findOne({ id });
 
-        if (result.rows.length === 0) {
+        if (!property) {
             return res.status(404).json({
                 error: 'Property not found',
                 propertyId: id
@@ -506,7 +514,7 @@ app.get('/api/properties/:id', async (req, res) => {
 
         res.json({
             success: true,
-            property: formatPropertyFromDB(result.rows[0])
+            property: formatPropertyFromDB(property)
         });
     } catch (error) {
         console.error('Database error:', error);
@@ -609,41 +617,49 @@ app.post('/api/properties', async (req, res) => {
         const id = `prop_${Date.now()}`;
         const title = data.title || `${data.bedrooms} BHK ${data.propertyType} in ${data.area}`;
 
-        await db.query(`
-            INSERT INTO properties (
-                id, title, description, property_type, listing_type,
-                bhk, bathrooms, sqft, furnishing, price,
-                latitude, longitude, address, city, area, pincode,
-                amenities, images, year_built, verification_status,
-                is_featured, owner_name, owner_phone, owner_email, owner_verified
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25)
-        `, [
+        const latitude = parseFloat(data.latitude) || 26.8467;
+        const longitude = parseFloat(data.longitude) || 80.9462;
+        const now = new Date().toISOString();
+        const property = {
             id,
             title,
-            data.description || '',
-            data.propertyType,
-            data.listingType,
-            `${data.bedrooms} BHK`,
-            parseInt(data.bathrooms) || 1,
-            parseInt(data.sqft) || 0,
-            data.furnished || 'unfurnished',
-            parseInt(data.price),
-            parseFloat(data.latitude) || 26.8467,
-            parseFloat(data.longitude) || 80.9462,
-            data.address || `${data.area}, ${data.city}`,
-            data.city || 'Lucknow',
-            data.area,
-            data.pincode || '',
-            JSON.stringify(data.amenities || []),
-            JSON.stringify(data.photos || []),
-            parseInt(data.yearBuilt) || new Date().getFullYear(),
-            'verified',
-            false,
-            data.name,
-            data.phone,
-            data.email || '',
-            true
-        ]);
+            description: data.description || '',
+            propertyType: data.propertyType,
+            listingType: data.listingType,
+            bhk: `${data.bedrooms} BHK`,
+            bedrooms: parseInt(data.bedrooms) || 1,
+            bathrooms: parseInt(data.bathrooms) || 1,
+            sqft: parseInt(data.sqft) || 0,
+            furnishing: data.furnished || 'unfurnished',
+            price: parseInt(data.price),
+            latitude,
+            longitude,
+            locationPoint: {
+                type: 'Point',
+                coordinates: [longitude, latitude],
+            },
+            address: data.address || `${data.area}, ${data.city}`,
+            city: data.city || 'Lucknow',
+            area: data.area,
+            pincode: data.pincode || '',
+            amenities: data.amenities || [],
+            images: data.photos || [],
+            yearBuilt: parseInt(data.yearBuilt) || new Date().getFullYear(),
+            verificationStatus: 'verified',
+            isFeatured: false,
+            status: 'active',
+            ownerName: data.name,
+            ownerPhone: data.phone,
+            ownerEmail: data.email || '',
+            ownerVerified: true,
+            viewCount: 0,
+            contactCount: 0,
+            createdAt: now,
+            updatedAt: now,
+        };
+
+        const propertiesCollection = await db.getCollection('properties');
+        await propertiesCollection.insertOne(property);
 
         console.log(`✅ Property created in database: ${id} - ${title}`);
 

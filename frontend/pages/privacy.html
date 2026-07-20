@@ -7,17 +7,17 @@
     <meta name="description" content="Privacy Policy for Real Estate Wala Bhai - how we collect, use, and protect your data.">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏡</text></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Outfit', sans-serif;
-            background: #f8fafc;
-            color: #1e293b;
+            font-family: 'Inter', sans-serif;
+            background: #161312;
+            color: #FAF8F5;
             min-height: 100vh;
         }
         .header {
-            background: white;
+            background: #2B241E; border-color: rgba(255,255,255,0.12); color: #FAF8F5;
             border-bottom: 1px solid #e2e8f0;
             padding: 20px 24px;
             display: flex;
@@ -37,11 +37,11 @@
             font-weight: 500;
             transition: color 0.2s;
         }
-        .back-btn:hover { color: #1e293b; }
+        .back-btn:hover { color: #FAF8F5; }
         .header-title {
             font-size: 1.1rem;
             font-weight: 700;
-            color: #0f172a;
+            color: #FAF8F5;
         }
         .container {
             max-width: 760px;
@@ -51,7 +51,7 @@
         h1 {
             font-size: 2.25rem;
             font-weight: 800;
-            color: #0f172a;
+            color: #FAF8F5;
             margin-bottom: 8px;
             letter-spacing: -0.5px;
         }
@@ -63,7 +63,7 @@
         h2 {
             font-size: 1.2rem;
             font-weight: 700;
-            color: #0f172a;
+            color: #FAF8F5;
             margin: 36px 0 12px;
         }
         p {
@@ -100,17 +100,17 @@
             text-align: left;
             font-weight: 600;
             color: #374151;
-            border: 1px solid #e2e8f0;
+            border: 1px solid rgba(255,255,255,0.12);
         }
         .data-table td {
             padding: 12px 16px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid rgba(255,255,255,0.12);
             color: #475569;
         }
-        .data-table tr:nth-child(even) td { background: #f8fafc; }
+        .data-table tr:nth-child(even) td { background: #161312; }
         .contact-box {
-            background: white;
-            border: 1px solid #e2e8f0;
+            background: #2B241E; border-color: rgba(255,255,255,0.12); color: #FAF8F5;
+            border: 1px solid rgba(255,255,255,0.12);
             border-radius: 16px;
             padding: 24px;
             margin-top: 40px;
@@ -130,8 +130,143 @@
             vertical-align: middle;
         }
     </style>
+
+    <link rel="stylesheet" href="../css/luxury-ultra-premium.css">
 </head>
 <body>
+
+<header class="header">
+            <!-- Left: Logo -->
+            <a href="home.html" class="logo">
+                <div class="logo-icon">🏡</div>
+                <span class="logo-text">Real Estate Wala Bhai</span>
+            </a>
+            
+            <!-- Center: Navigation Links (Desktop) -->
+            <div class="nav-desktop-links">
+                <a href="home.html" class="nav-desktop-link active">Home</a>
+                <a href="#" class="nav-desktop-link" onclick="setHeroTab('buy'); return false;">Buy</a>
+                <a href="#" class="nav-desktop-link" onclick="setHeroTab('rent'); return false;">Rent</a>
+                <a href="#" class="nav-desktop-link" onclick="if(window.Navigation) window.Navigation.goToAddProperty(); return false;">Sell</a>
+                <a href="map-explore.html" class="nav-desktop-link">Map</a>
+                <a href="mailto:support@realestatewala.com?subject=Inquiry" class="nav-desktop-link">Contact</a>
+            </div>
+
+            <!-- Right: Actions -->
+            <div class="nav-actions">
+                <!-- Search Trigger -->
+                <button class="nav-action-btn search-trigger-btn" aria-label="Search" title="Search" onclick="toggleNavSearch()">🔍</button>
+
+                <!-- Theme Toggle -->
+                <button class="nav-action-btn theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Theme" title="Toggle Theme" onclick="toggleTheme()">🌙</button>
+                
+                <!-- Notification Bell -->
+                <button class="nav-action-btn notification-btn" aria-label="Notifications" title="Notifications" onclick="if(window.Toast) Toast.info('You have no new notifications'); else showMiniToast('No new notifications')">
+                    🔔
+                    <span class="notification-badge"></span>
+                </button>
+                
+                <!-- User Profile -->
+                <div class="user-profile">👤</div>
+
+                <!-- Mobile Menu Toggle Button -->
+                <button class="nav-action-btn mobile-menu-toggle" aria-label="Toggle Menu" onclick="toggleMobileMenu()">
+                    ☰
+                </button>
+            </div>
+
+            <!-- Mobile Dropdown Menu -->
+            <div class="nav-mobile-dropdown" id="navMobileDropdown">
+                <a href="home.html" class="nav-mobile-link active" onclick="toggleMobileMenu()">Home</a>
+                <a href="#" class="nav-mobile-link" onclick="setHeroTab('buy'); toggleMobileMenu(); return false;">Buy</a>
+                <a href="#" class="nav-mobile-link" onclick="setHeroTab('rent'); toggleMobileMenu(); return false;">Rent</a>
+                <a href="#" class="nav-mobile-link" onclick="if(window.Navigation) window.Navigation.goToAddProperty(); toggleMobileMenu(); return false;">Sell</a>
+                <a href="map-explore.html" class="nav-mobile-link" onclick="toggleMobileMenu()">Map</a>
+                <a href="mailto:support@realestatewala.com?subject=Inquiry" class="nav-mobile-link" onclick="toggleMobileMenu()">Contact</a>
+            </div>
+
+            <!-- Inline Nav Search Bar -->
+            <div id="navSearchOverlay" style="
+                display:none; position:absolute; top:72px; left:0; right:0;
+                background:var(--glass-bg); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px);
+                border-bottom:1px solid var(--color-border); padding:var(--sp-3) var(--sp-6);
+                z-index:998; animation:slideDown var(--dur-base) var(--ease-out) both;
+            ">
+                <div style="max-width:600px; margin:0 auto; position:relative;">
+                    <input id="searchInput" type="text" placeholder="Search by city, area, property type..."
+                        style="
+                            width:100%; padding:var(--sp-3) var(--sp-5) var(--sp-3) var(--sp-10);
+                            background:var(--color-bg-alt); border:1px solid var(--color-border-strong);
+                            border-radius:var(--r-full); font-family:var(--font-sans);
+                            font-size:var(--text-sm); color:var(--color-text-primary);
+                            outline:none; transition:all var(--dur-base);
+                        "
+                        onfocus="this.style.borderColor='var(--brand-500)'; this.style.boxShadow='0 0 0 3px rgba(79,70,229,0.15)'"
+                        onblur="this.style.borderColor=''; this.style.boxShadow=''"
+                    >
+                    <span style="position:absolute;left:var(--sp-3);top:50%;transform:translateY(-50%);font-size:1rem;opacity:0.5;">🔍</span>
+                    <button onclick="document.getElementById('searchInput').value=''; loadAllProperties(); toggleNavSearch()" style="
+                        position:absolute;right:var(--sp-3);top:50%;transform:translateY(-50%);
+                        background:none;border:none;cursor:pointer;font-size:1.1rem;opacity:0.5;
+                        color:var(--color-text-primary); transition:opacity var(--dur-fast);
+                    " title="Clear search">✕</button>
+                </div>
+            </div>
+        </header>
+<div class="nav-mobile-dropdown" id="navMobileDropdown">
+                <a href="home.html" class="nav-mobile-link active" onclick="toggleMobileMenu()">Home</a>
+                <a href="#" class="nav-mobile-link" onclick="setHeroTab('buy'); toggleMobileMenu(); return false;">Buy</a>
+                <a href="#" class="nav-mobile-link" onclick="setHeroTab('rent'); toggleMobileMenu(); return false;">Rent</a>
+                <a href="#" class="nav-mobile-link" onclick="if(window.Navigation) window.Navigation.goToAddProperty(); toggleMobileMenu(); return false;">Sell</a>
+                <a href="map-explore.html" class="nav-mobile-link" onclick="toggleMobileMenu()">Map</a>
+                <a href="mailto:support@realestatewala.com?subject=Inquiry" class="nav-mobile-link" onclick="toggleMobileMenu()">Contact</a>
+            </div>
+<div id="navSearchOverlay" style="
+                display:none; position:absolute; top:72px; left:0; right:0;
+                background:var(--glass-bg); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px);
+                border-bottom:1px solid var(--color-border); padding:var(--sp-3) var(--sp-6);
+                z-index:998; animation:slideDown var(--dur-base) var(--ease-out) both;
+            ">
+                <div style="max-width:600px; margin:0 auto; position:relative;">
+                    <input id="searchInput" type="text" placeholder="Search by city, area, property type..."
+                        style="
+                            width:100%; padding:var(--sp-3) var(--sp-5) var(--sp-3) var(--sp-10);
+                            background:var(--color-bg-alt); border:1px solid var(--color-border-strong);
+                            border-radius:var(--r-full); font-family:var(--font-sans);
+                            font-size:var(--text-sm); color:var(--color-text-primary);
+                            outline:none; transition:all var(--dur-base);
+                        "
+                        onfocus="this.style.borderColor='var(--brand-500)'; this.style.boxShadow='0 0 0 3px rgba(79,70,229,0.15)'"
+                        onblur="this.style.borderColor=''; this.style.boxShadow=''"
+                    >
+                    <span style="position:absolute;left:var(--sp-3);top:50%;transform:translateY(-50%);font-size:1rem;opacity:0.5;">🔍</span>
+                    <button onclick="document.getElementById('searchInput').value=''; loadAllProperties(); toggleNavSearch()" style="
+                        position:absolute;right:var(--sp-3);top:50%;transform:translateY(-50%);
+                        background:none;border:none;cursor:pointer;font-size:1.1rem;opacity:0.5;
+                        color:var(--color-text-primary); transition:opacity var(--dur-fast);
+                    " title="Clear search">✕</button>
+                </div>
+<nav class="bottom-nav">
+        <div class="nav-items">
+            <div class="nav-item active">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">Home</span>
+            </div>
+            <div class="nav-item">
+                <span class="nav-icon">🔍</span>
+                <span class="nav-label">Search</span>
+            </div>
+            <div class="nav-item">
+                <span class="nav-icon">❤️</span>
+                <span class="nav-label">Saved</span>
+            </div>
+            <div class="nav-item">
+                <span class="nav-icon">👤</span>
+                <span class="nav-label">Profile</span>
+            </div>
+        </div>
+    </nav>
+
     <div class="header">
         <a href="home.html" class="back-btn">← Back to Home</a>
         <span class="header-title">🏡 Real Estate Wala Bhai</span>

@@ -208,7 +208,7 @@ const property = PropertiesData.getPropertyById('prop_001');
 const filtered = PropertiesData.filterProperties({
     city: 'Lucknow',
     listingType: 'sell',
-    minPrice: 3000000,
+    minPrice: 3004000,
     maxPrice: 10000000,
     bhk: '3 BHK'
 });

@@ -58,7 +58,7 @@ npm install
 node simple-api-server.js
 ```
 
-This runs a backend with in-memory data (same 8 properties) on `http://localhost:3000`
+This runs a backend with in-memory data (same 8 properties) on `http://localhost:3004`
 
 #### Update Map to Use API
 

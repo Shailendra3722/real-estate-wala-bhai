@@ -33,7 +33,7 @@ app.use(helmet());
 
 // CORS - Allow frontend to access API
 const corsOptions = {
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: process.env.FRONTEND_URL || 'http://localhost:3004',
     credentials: true,
     optionsSuccessStatus: 200
 };

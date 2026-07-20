@@ -1,40 +1,55 @@
 /**
- * Database Connection Pool for Neon PostgreSQL
- * Manages connections to the serverless Postgres database
+ * MongoDB connection helper for the legacy auth/simple API backend.
  */
 
-const { Pool } = require('pg');
+require('dotenv').config();
+const { MongoClient } = require('mongodb');
 
-// Create connection pool
-const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: {
-        rejectUnauthorized: false
-    },
-    max: 20, // Maximum number of clients in the pool
-    idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 2000,
+const mongoUri = process.env.MONGODB_URI;
+const dbName = process.env.MONGODB_DB_NAME || 'real_estate_wala_bhai';
+
+if (!mongoUri) {
+    throw new Error('MONGODB_URI is required for the auth backend database connection.');
+}
+
+const client = new MongoClient(mongoUri, {
+    maxPoolSize: 10,
+    serverSelectionTimeoutMS: 5000,
 });
 
-// Log connection status
-pool.on('connect', () => {
-    console.log('✅ Connected to Neon PostgreSQL database');
-});
+let databasePromise = null;
 
-pool.on('error', (err) => {
-    console.error('❌ Unexpected database error:', err);
-});
-
-// Test connection on startup
-pool.query('SELECT NOW()', (err, res) => {
-    if (err) {
-        console.error('❌ Database connection test failed:', err);
-    } else {
-        console.log('🔗 Database connected at:', res.rows[0].now);
+async function connect() {
+    if (!databasePromise) {
+        databasePromise = client.connect()
+            .then(async () => {
+                const database = client.db(dbName);
+                await Promise.all([
+                    database.collection('properties').createIndex({ id: 1 }, { unique: true }),
+                    database.collection('properties').createIndex({ status: 1, createdAt: -1 }),
+                    database.collection('properties').createIndex({ locationPoint: '2dsphere' }, { sparse: true }),
+                ]);
+                console.log(`Connected to MongoDB database: ${dbName}`);
+                return database;
+            });
     }
-});
+
+    return databasePromise;
+}
+
+async function getCollection(name) {
+    const database = await connect();
+    return database.collection(name);
+}
+
+async function close() {
+    await client.close();
+    databasePromise = null;
+}
 
 module.exports = {
-    query: (text, params) => pool.query(text, params),
-    pool
+    connect,
+    getCollection,
+    collection: getCollection,
+    close,
 };

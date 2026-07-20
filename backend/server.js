@@ -1,7 +1,7 @@
 /**
  * Unified Real Estate API Server
  * 
- * Production-ready Express application combining SQL capabilities and
+ * Production-ready Express application combining MongoDB capabilities and
  * local mock fallbacks. Standardizes endpoints and serves the static frontend.
  */
 
@@ -12,7 +12,7 @@ const path = require('path');
 const db = require('./database/pool');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3004;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
 // ── MIDDLEWARE ───────────────────────────────────────────────────────────────
@@ -23,7 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 // CORS setup supporting Vercel previews and local dev
 const allowedOrigins = [
     'http://localhost:8080',
-    'http://localhost:3000',
+    'http://localhost:3004',
     'http://127.0.0.1:8080',
     'http://localhost:8081', // React Native / Metro dev ports
     'https://real-estate-wala-bhai.vercel.app',
@@ -79,7 +79,7 @@ app.get('/health', (req, res) => {
     res.json({
         success: true,
         status: db.isInMemoryMode() ? 'degraded_mode_active' : 'healthy',
-        database: db.isInMemoryMode() ? 'in_memory_fallback_active' : 'postgres_connected',
+        database: db.isInMemoryMode() ? 'in_memory_fallback_active' : 'mongodb_connected',
         timestamp: new Date().toISOString()
     });
 });
@@ -115,14 +115,14 @@ if (require.main === module || !process.env.VERCEL) {
         console.log('🏗️   Real Estate Wala Bhai Backend Engine');
         console.log(`📡  Port: ${PORT}`);
         console.log(`🌍  Environment: ${NODE_ENV}`);
-        console.log(`📊  Data Access: ${db.isInMemoryMode() ? 'IN-MEMORY MODE 📦' : 'POSTGRESQL MODE 🗄️'}`);
+        console.log(`📊  Data Access: ${db.isInMemoryMode() ? 'IN-MEMORY MODE 📦' : 'MONGODB MODE 🗄️'}`);
         console.log('==================================================\n');
         console.log('🔗  Core Endpoints:');
         console.log(`    GET   http://localhost:${PORT}/api/properties`);
         console.log(`    POST  http://localhost:${PORT}/api/properties/search`);
         console.log(`    GET   http://localhost:${PORT}/api/properties/nearby?lat=26.8467&lng=80.9462`);
         console.log(`    GET   http://localhost:${PORT}/health`);
-        console.log('\n🌟  Launch App: Open http://localhost:3000 in your browser\n');
+        console.log('\n🌟  Launch App: Open http://localhost:3004 in your browser\n');
     });
 }
 

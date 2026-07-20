@@ -164,7 +164,7 @@ FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxxxx@real-estate-xxxxx.iam.gserviceacco
 # Server settings
 PORT=5000
 NODE_ENV=development
-FRONTEND_URL=http://localhost:3000
+FRONTEND_URL=http://localhost:3004
 
 # Generate a random secret (any long random string)
 JWT_SECRET=randomly-generated-secret-key-change-this-123456

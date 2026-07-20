@@ -58,7 +58,7 @@ Once you have your Render backend URL, update `simple-api-server.js`:
 // Line 24 - Update with your actual Vercel domain
 const allowedOrigins = [
     'http://localhost:8080',
-    'http://localhost:3000',
+    'http://localhost:3004',
     'http://127.0.0.1:8080',
     'https://YOUR-VERCEL-APP.vercel.app', // ← Update this
     'https://*.vercel.app'
@@ -95,7 +95,7 @@ Update `simple-api-server.js` with your actual Vercel URL:
 // Line 24
 const allowedOrigins = [
     'http://localhost:8080',
-    'http://localhost:3000',
+    'http://localhost:3004',
     'http://127.0.0.1:8080',
     'https://real-estate-wala-bhai.vercel.app', // ← Your actual URL
     'https://*.vercel.app'

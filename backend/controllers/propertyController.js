@@ -2,7 +2,7 @@
  * Property Controller
  *
  * Intercepts HTTP requests for listings and coordinates with the Property Model.
- * Normalizes field names between snake_case (PostgreSQL) and camelCase (frontend).
+ * Normalizes field names between older snake_case records and camelCase (frontend).
  */
 
 const Property = require('../models/propertyModel');
@@ -21,7 +21,7 @@ function formatPrice(price, listingType) {
 
 /**
  * Standardize a property record for the client.
- * Handles both snake_case (from PostgreSQL) and camelCase (from in-memory store).
+ * Handles both snake_case (older records) and camelCase (MongoDB/in-memory store).
  */
 function formatPropertyResponse(prop, distance = null) {
     const lType   = prop.listing_type      || prop.listingType      || 'sell';

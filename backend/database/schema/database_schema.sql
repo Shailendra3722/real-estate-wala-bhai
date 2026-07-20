@@ -341,7 +341,7 @@ LIMIT 10;
 SELECT * FROM v_active_properties
 WHERE city = 'Lucknow'
   AND listing_type = 'sell'
-  AND price BETWEEN 3000000 AND 10000000
+  AND price BETWEEN 3004000 AND 10000000
   AND bhk = '3 BHK'
   AND verification_status = 'verified'
 ORDER BY created_at DESC;

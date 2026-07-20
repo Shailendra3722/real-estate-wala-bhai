@@ -15,7 +15,7 @@
         }
 
         body {
-            font-family: 'Outfit', sans-serif;
+            font-family: 'Inter', sans-serif;
             overflow: hidden;
             background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #334155 100%);
             height: 100vh;
@@ -106,7 +106,7 @@
         .logo-circle {
             width: 140px;
             height: 140px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #E7C68B 0%, #C89B5E 100%); color: #161312 !important;;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -165,7 +165,7 @@
         }
 
         .app-title {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Cormorant Garamond', serif;
             font-size: 3rem;
             font-weight: 900;
             background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%);
@@ -317,8 +317,143 @@
             }
         }
     </style>
+
+    <link rel="stylesheet" href="../css/luxury-ultra-premium.css">
 </head>
 <body>
+
+<header class="header">
+            <!-- Left: Logo -->
+            <a href="home.html" class="logo">
+                <div class="logo-icon">🏡</div>
+                <span class="logo-text">Real Estate Wala Bhai</span>
+            </a>
+            
+            <!-- Center: Navigation Links (Desktop) -->
+            <div class="nav-desktop-links">
+                <a href="home.html" class="nav-desktop-link active">Home</a>
+                <a href="#" class="nav-desktop-link" onclick="setHeroTab('buy'); return false;">Buy</a>
+                <a href="#" class="nav-desktop-link" onclick="setHeroTab('rent'); return false;">Rent</a>
+                <a href="#" class="nav-desktop-link" onclick="if(window.Navigation) window.Navigation.goToAddProperty(); return false;">Sell</a>
+                <a href="map-explore.html" class="nav-desktop-link">Map</a>
+                <a href="mailto:support@realestatewala.com?subject=Inquiry" class="nav-desktop-link">Contact</a>
+            </div>
+
+            <!-- Right: Actions -->
+            <div class="nav-actions">
+                <!-- Search Trigger -->
+                <button class="nav-action-btn search-trigger-btn" aria-label="Search" title="Search" onclick="toggleNavSearch()">🔍</button>
+
+                <!-- Theme Toggle -->
+                <button class="nav-action-btn theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Theme" title="Toggle Theme" onclick="toggleTheme()">🌙</button>
+                
+                <!-- Notification Bell -->
+                <button class="nav-action-btn notification-btn" aria-label="Notifications" title="Notifications" onclick="if(window.Toast) Toast.info('You have no new notifications'); else showMiniToast('No new notifications')">
+                    🔔
+                    <span class="notification-badge"></span>
+                </button>
+                
+                <!-- User Profile -->
+                <div class="user-profile">👤</div>
+
+                <!-- Mobile Menu Toggle Button -->
+                <button class="nav-action-btn mobile-menu-toggle" aria-label="Toggle Menu" onclick="toggleMobileMenu()">
+                    ☰
+                </button>
+            </div>
+
+            <!-- Mobile Dropdown Menu -->
+            <div class="nav-mobile-dropdown" id="navMobileDropdown">
+                <a href="home.html" class="nav-mobile-link active" onclick="toggleMobileMenu()">Home</a>
+                <a href="#" class="nav-mobile-link" onclick="setHeroTab('buy'); toggleMobileMenu(); return false;">Buy</a>
+                <a href="#" class="nav-mobile-link" onclick="setHeroTab('rent'); toggleMobileMenu(); return false;">Rent</a>
+                <a href="#" class="nav-mobile-link" onclick="if(window.Navigation) window.Navigation.goToAddProperty(); toggleMobileMenu(); return false;">Sell</a>
+                <a href="map-explore.html" class="nav-mobile-link" onclick="toggleMobileMenu()">Map</a>
+                <a href="mailto:support@realestatewala.com?subject=Inquiry" class="nav-mobile-link" onclick="toggleMobileMenu()">Contact</a>
+            </div>
+
+            <!-- Inline Nav Search Bar -->
+            <div id="navSearchOverlay" style="
+                display:none; position:absolute; top:72px; left:0; right:0;
+                background:var(--glass-bg); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px);
+                border-bottom:1px solid var(--color-border); padding:var(--sp-3) var(--sp-6);
+                z-index:998; animation:slideDown var(--dur-base) var(--ease-out) both;
+            ">
+                <div style="max-width:600px; margin:0 auto; position:relative;">
+                    <input id="searchInput" type="text" placeholder="Search by city, area, property type..."
+                        style="
+                            width:100%; padding:var(--sp-3) var(--sp-5) var(--sp-3) var(--sp-10);
+                            background:var(--color-bg-alt); border:1px solid var(--color-border-strong);
+                            border-radius:var(--r-full); font-family:var(--font-sans);
+                            font-size:var(--text-sm); color:var(--color-text-primary);
+                            outline:none; transition:all var(--dur-base);
+                        "
+                        onfocus="this.style.borderColor='var(--brand-500)'; this.style.boxShadow='0 0 0 3px rgba(79,70,229,0.15)'"
+                        onblur="this.style.borderColor=''; this.style.boxShadow=''"
+                    >
+                    <span style="position:absolute;left:var(--sp-3);top:50%;transform:translateY(-50%);font-size:1rem;opacity:0.5;">🔍</span>
+                    <button onclick="document.getElementById('searchInput').value=''; loadAllProperties(); toggleNavSearch()" style="
+                        position:absolute;right:var(--sp-3);top:50%;transform:translateY(-50%);
+                        background:none;border:none;cursor:pointer;font-size:1.1rem;opacity:0.5;
+                        color:var(--color-text-primary); transition:opacity var(--dur-fast);
+                    " title="Clear search">✕</button>
+                </div>
+            </div>
+        </header>
+<div class="nav-mobile-dropdown" id="navMobileDropdown">
+                <a href="home.html" class="nav-mobile-link active" onclick="toggleMobileMenu()">Home</a>
+                <a href="#" class="nav-mobile-link" onclick="setHeroTab('buy'); toggleMobileMenu(); return false;">Buy</a>
+                <a href="#" class="nav-mobile-link" onclick="setHeroTab('rent'); toggleMobileMenu(); return false;">Rent</a>
+                <a href="#" class="nav-mobile-link" onclick="if(window.Navigation) window.Navigation.goToAddProperty(); toggleMobileMenu(); return false;">Sell</a>
+                <a href="map-explore.html" class="nav-mobile-link" onclick="toggleMobileMenu()">Map</a>
+                <a href="mailto:support@realestatewala.com?subject=Inquiry" class="nav-mobile-link" onclick="toggleMobileMenu()">Contact</a>
+            </div>
+<div id="navSearchOverlay" style="
+                display:none; position:absolute; top:72px; left:0; right:0;
+                background:var(--glass-bg); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px);
+                border-bottom:1px solid var(--color-border); padding:var(--sp-3) var(--sp-6);
+                z-index:998; animation:slideDown var(--dur-base) var(--ease-out) both;
+            ">
+                <div style="max-width:600px; margin:0 auto; position:relative;">
+                    <input id="searchInput" type="text" placeholder="Search by city, area, property type..."
+                        style="
+                            width:100%; padding:var(--sp-3) var(--sp-5) var(--sp-3) var(--sp-10);
+                            background:var(--color-bg-alt); border:1px solid var(--color-border-strong);
+                            border-radius:var(--r-full); font-family:var(--font-sans);
+                            font-size:var(--text-sm); color:var(--color-text-primary);
+                            outline:none; transition:all var(--dur-base);
+                        "
+                        onfocus="this.style.borderColor='var(--brand-500)'; this.style.boxShadow='0 0 0 3px rgba(79,70,229,0.15)'"
+                        onblur="this.style.borderColor=''; this.style.boxShadow=''"
+                    >
+                    <span style="position:absolute;left:var(--sp-3);top:50%;transform:translateY(-50%);font-size:1rem;opacity:0.5;">🔍</span>
+                    <button onclick="document.getElementById('searchInput').value=''; loadAllProperties(); toggleNavSearch()" style="
+                        position:absolute;right:var(--sp-3);top:50%;transform:translateY(-50%);
+                        background:none;border:none;cursor:pointer;font-size:1.1rem;opacity:0.5;
+                        color:var(--color-text-primary); transition:opacity var(--dur-fast);
+                    " title="Clear search">✕</button>
+                </div>
+<nav class="bottom-nav">
+        <div class="nav-items">
+            <div class="nav-item active">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">Home</span>
+            </div>
+            <div class="nav-item">
+                <span class="nav-icon">🔍</span>
+                <span class="nav-label">Search</span>
+            </div>
+            <div class="nav-item">
+                <span class="nav-icon">❤️</span>
+                <span class="nav-label">Saved</span>
+            </div>
+            <div class="nav-item">
+                <span class="nav-icon">👤</span>
+                <span class="nav-label">Profile</span>
+            </div>
+        </div>
+    </nav>
+
     <!-- Animated background -->
     <div class="gradient-bg"></div>
     
@@ -379,7 +514,7 @@
         // Auto-redirect after 3 seconds (optional)
         // setTimeout(() => {
         //     window.location.href = 'main-app.html';
-        // }, 3000);
+        // }, 3004);
     </script>
 </body>
 </html>

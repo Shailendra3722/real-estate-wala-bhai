@@ -7,7 +7,7 @@ const MapService = (function () {
     'use strict';
 
     // Configuration
-    const API_BASE_URL = 'http://localhost:3000/api';
+    const API_BASE_URL = 'http://localhost:3004/api' || ;
     const DEFAULT_RADIUS_KM = 5;
     const MAX_RADIUS_KM = 50;
 
@@ -231,7 +231,7 @@ const MapService = (function () {
                 {
                     enableHighAccuracy: true,
                     timeout: 10000,
-                    maximumAge: 300000 // 5 minutes
+                    maximumAge: 300400 // 5 minutes
                 }
             );
         });

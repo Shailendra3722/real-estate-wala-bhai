@@ -1,18 +1,50 @@
-/* ==================== PREMIUM LOADING ANIMATION ==================== */
-/* Minimal, classy loading screen for app launch and page transitions */
+/* ══════════════════════════════════════════════════════════
+   LUXURY LOADING SCREEN — Real Estate Wala Bhai
+   Full-screen cinematic intro matching the warm gold palette
+══════════════════════════════════════════════════════════ */
 
 .premium-loader {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: #ffffff;
+    inset: 0;
+    background: #161312;
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 99999;
-    transition: opacity 0.8s ease, visibility 0.8s ease;
+    z-index: 999999;
+    transition: opacity 0.8s cubic-bezier(0.22,1,0.36,1), visibility 0.8s cubic-bezier(0.22,1,0.36,1);
+    overflow: hidden;
+}
+
+/* Radial warm ambient glow behind logo */
+.premium-loader::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -55%);
+    width: 500px; height: 500px;
+    background: radial-gradient(ellipse at center,
+        rgba(201,169,106,0.14) 0%,
+        rgba(201,169,106,0.04) 45%,
+        transparent 70%
+    );
+    pointer-events: none;
+    animation: loaderGlow 3s ease-in-out infinite;
+}
+
+/* Subtle noise texture */
+.premium-loader::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+    pointer-events: none;
+}
+
+@keyframes loaderGlow {
+    0%, 100% { opacity: 0.6; transform: translate(-50%, -55%) scale(1); }
+    50%       { opacity: 1;   transform: translate(-50%, -55%) scale(1.12); }
 }
 
 .premium-loader.hidden {
@@ -23,98 +55,97 @@
 
 .loader-content {
     text-align: center;
+    position: relative;
+    z-index: 2;
+    animation: loaderContentIn 0.8s cubic-bezier(0.22,1,0.36,1) both;
+}
+
+@keyframes loaderContentIn {
+    from { opacity: 0; transform: translateY(20px) scale(0.96); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Logo icon */
+.loader-content::before {
+    content: '🏡';
+    display: block;
+    font-size: 3rem;
+    margin-bottom: 24px;
+    animation: loaderIconFloat 3s ease-in-out infinite;
+    filter: drop-shadow(0 8px 24px rgba(201,169,106,0.40));
+}
+
+@keyframes loaderIconFloat {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-8px); }
 }
 
 .app-name {
-    font-family: 'Outfit', sans-serif;
-    font-size: 2.5rem;
-    font-weight: 800;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: 'Cormorant Garamond', 'Georgia', serif;
+    font-size: 2.6rem;
+    font-weight: 600;
+    font-style: italic;
+    background: linear-gradient(135deg, #F0DCA0 0%, #C9A96A 55%, #A8813E 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    animation: subtlePulse 3s ease-in-out infinite;
-    letter-spacing: -0.5px;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin-bottom: 12px;
+    animation: loaderNamePulse 3s ease-in-out infinite;
+}
+
+@keyframes loaderNamePulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.75; }
 }
 
 .app-tagline {
-    font-family: 'Outfit', sans-serif;
-    font-size: 0.95rem;
-    font-weight: 400;
-    color: #64748b;
-    margin-top: 0.75rem;
-    animation: subtlePulse 3s ease-in-out infinite;
-    animation-delay: 0.3s;
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(201,169,106,0.60);
+    animation: loaderNamePulse 3s ease-in-out 0.3s infinite;
 }
 
-/* Subtle pulsing animation - very slow and classy */
-@keyframes subtlePulse {
-    0%, 100% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0.4;
-    }
-}
-
-/* Optional: Minimalist dot indicator */
+/* Minimalist gold dot loader */
 .loader-dots {
     display: flex;
     justify-content: center;
-    gap: 0.5rem;
-    margin-top: 2rem;
+    gap: 8px;
+    margin-top: 36px;
 }
 
 .loader-dot {
-    width: 8px;
-    height: 8px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    width: 5px; height: 5px;
+    background: linear-gradient(135deg, #D4AF62, #A8813E);
     border-radius: 50%;
-    animation: dotPulse 1.5s ease-in-out infinite;
+    animation: dotBounce 1.4s ease-in-out infinite;
+    box-shadow: 0 0 8px rgba(201,169,106,0.40);
 }
 
-.loader-dot:nth-child(1) {
-    animation-delay: 0s;
+.loader-dot:nth-child(1) { animation-delay: 0s; }
+.loader-dot:nth-child(2) { animation-delay: 0.2s; }
+.loader-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes dotBounce {
+    0%, 100% { transform: scaleY(1); opacity: 0.4; }
+    50%       { transform: scaleY(1.8); opacity: 1; }
 }
 
-.loader-dot:nth-child(2) {
-    animation-delay: 0.3s;
-}
-
-.loader-dot:nth-child(3) {
-    animation-delay: 0.6s;
-}
-
-@keyframes dotPulse {
-    0%, 100% {
-        opacity: 0.3;
-        transform: scale(1);
-    }
-    50% {
-        opacity: 1;
-        transform: scale(1.2);
-    }
-}
-
-/* Page transition loader variant (faster) */
+/* Page transition loader variant */
 .premium-loader.transition-mode .app-name,
 .premium-loader.transition-mode .app-tagline {
-    animation-duration: 2s; /* Slightly faster for transitions */
+    animation-duration: 1.5s;
 }
 
-/* Mobile responsive */
+/* Mobile */
 @media (max-width: 768px) {
-    .app-name {
-        font-size: 2rem;
-    }
-    
-    .app-tagline {
-        font-size: 0.85rem;
-    }
+    .app-name    { font-size: 2rem; }
+    .app-tagline { font-size: 0.68rem; }
 }
-
 @media (max-width: 480px) {
-    .app-name {
-        font-size: 1.75rem;
-    }
+    .app-name { font-size: 1.75rem; }
 }

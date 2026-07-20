@@ -7,6 +7,11 @@
  */
 
 /* ===================== TOKEN SYSTEM ===================== */
+
+@import url("./design-tokens.css");
+
+/* Existing code below... */
+
 :root {
   /* --- Colors: Brand --- */
   --brand-50:  #e0e7ff;

@@ -307,7 +307,7 @@ ORDER BY i.created_at DESC;
 SELECT * FROM properties
 WHERE city = 'Lucknow'
   AND listing_type = 'sell'
-  AND price BETWEEN 3000000 AND 10000000
+  AND price BETWEEN 3004000 AND 10000000
   AND bhk = '3 BHK'
   AND status = 'active'
   AND verification_status = 'verified'
