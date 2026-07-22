@@ -8,6 +8,10 @@
 
 require('dotenv').config();
 const { MongoClient } = require('mongodb');
+const dns = require('dns');
+
+// Force Google DNS to bypass local ISP / firewall SRV resolution failures (ECONNREFUSED)
+dns.setServers(['8.8.8.8', '8.8.4.4']);
 
 const mongoUri = process.env.MONGODB_URI;
 const dbName = process.env.MONGODB_DB_NAME || 'real_estate_wala_bhai';
@@ -37,7 +41,7 @@ if (!mongoUri) {
 } else {
     client = new MongoClient(mongoUri, {
         maxPoolSize: 10,
-        serverSelectionTimeoutMS: 5000,
+        serverSelectionTimeoutMS: 15000,
     });
 
     connectionPromise = client.connect()

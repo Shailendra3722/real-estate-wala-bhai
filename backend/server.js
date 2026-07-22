@@ -25,6 +25,8 @@ const allowedOrigins = [
     'http://localhost:8080',
     'http://localhost:3004',
     'http://127.0.0.1:8080',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
     'http://localhost:8081', // React Native / Metro dev ports
     'https://real-estate-wala-bhai.vercel.app',
 ];

@@ -158,40 +158,8 @@
                 </div>
             </div>
         </header>
-<div class="nav-mobile-dropdown" id="navMobileDropdown">
-                <a href="home.html" class="nav-mobile-link active" onclick="toggleMobileMenu()">Home</a>
-                <a href="#" class="nav-mobile-link" onclick="setHeroTab('buy'); toggleMobileMenu(); return false;">Buy</a>
-                <a href="#" class="nav-mobile-link" onclick="setHeroTab('rent'); toggleMobileMenu(); return false;">Rent</a>
-                <a href="#" class="nav-mobile-link" onclick="if(window.Navigation) window.Navigation.goToAddProperty(); toggleMobileMenu(); return false;">Sell</a>
-                <a href="map-explore.html" class="nav-mobile-link" onclick="toggleMobileMenu()">Map</a>
-                <a href="mailto:support@realestatewala.com?subject=Inquiry" class="nav-mobile-link" onclick="toggleMobileMenu()">Contact</a>
-            </div>
-<div id="navSearchOverlay" style="
-                display:none; position:absolute; top:72px; left:0; right:0;
-                background:var(--glass-bg); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px);
-                border-bottom:1px solid var(--color-border); padding:var(--sp-3) var(--sp-6);
-                z-index:998; animation:slideDown var(--dur-base) var(--ease-out) both;
-            ">
-                <div style="max-width:600px; margin:0 auto; position:relative;">
-                    <input id="searchInput" type="text" placeholder="Search by city, area, property type..."
-                        style="
-                            width:100%; padding:var(--sp-3) var(--sp-5) var(--sp-3) var(--sp-10);
-                            background:var(--color-bg-alt); border:1px solid var(--color-border-strong);
-                            border-radius:var(--r-full); font-family:var(--font-sans);
-                            font-size:var(--text-sm); color:var(--color-text-primary);
-                            outline:none; transition:all var(--dur-base);
-                        "
-                        onfocus="this.style.borderColor='var(--brand-500)'; this.style.boxShadow='0 0 0 3px rgba(79,70,229,0.15)'"
-                        onblur="this.style.borderColor=''; this.style.boxShadow=''"
-                    >
-                    <span style="position:absolute;left:var(--sp-3);top:50%;transform:translateY(-50%);font-size:1rem;opacity:0.5;">🔍</span>
-                    <button onclick="document.getElementById('searchInput').value=''; loadAllProperties(); toggleNavSearch()" style="
-                        position:absolute;right:var(--sp-3);top:50%;transform:translateY(-50%);
-                        background:none;border:none;cursor:pointer;font-size:1.1rem;opacity:0.5;
-                        color:var(--color-text-primary); transition:opacity var(--dur-fast);
-                    " title="Clear search">✕</button>
-                </div>
-<nav class="bottom-nav">
+
+    <nav class="bottom-nav">
         <div class="nav-items">
             <div class="nav-item active">
                 <span class="nav-icon">🏠</span>
@@ -270,7 +238,7 @@
                     <div class="property-card" onclick="if(window.Navigation) window.Navigation.goToPropertyDetail('${p.id}')">
                         <div class="property-image-wrapper">
                             <img src="${p.images && p.images.length > 0 ? p.images[0] : '../assets/luxury-hero.jpg'}" alt="${p.title}" class="property-image">
-                            <div class="property-badge">${p.type.toUpperCase()}</div>
+                            <div class="property-badge">${(p.type || 'Property').toUpperCase()}</div>
                         </div>
                         <div class="property-content">
                             <div class="property-price">${priceStr}</div>
